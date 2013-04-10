@@ -1,0 +1,8 @@
+* Départ et arrivée : bout de graphe entre points choisis par l'utilisateur et points utilisés pour le routing
+* Fichier de conf (xml ?) pour les zones à prendre en compte
+* preprocessing à faire propre
+* ways_openspace : ajouter le nom de la place aux segments générés
+* attributs foot=yes avec index pour les routes où les piétons peuvent circuler
+* routing uniquement sur ways avec foot=yes
+* OK: length en mètres
+* longueur totale trajet

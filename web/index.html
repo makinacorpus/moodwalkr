@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>Routing</title>
+	 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
+	<!--[if lte IE 8]>
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.ie.css" />
+	<![endif]-->
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
+</head>
+
+<body>
+	<!-- Add Leaflet library -->
+	<div id="map" style="height:600px;" ></div>
+	<div><button onclick="computeRoute();">Compute Route</button> </div>
+	<script type='text/javascript'>
+		map = new L.Map('map');
+		// create the tile layer with correct attribution
+		var osmUrl='http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png';
+		var osmAttrib='Carte <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png"> Données <a href="http://www.openstreetmap.org/copyright">© Contributeurs OpenStreetMap</a>';
+		var subDomains = ['otile1','otile2','otile3','otile4'];
+		var osm = new L.TileLayer(osmUrl, {minZoom: 3, maxZoom: 18, attribution: osmAttrib, subdomains: subDomains});	
+
+		// Don't show the 'Powered by Leaflet' text	
+		map.attributionControl.setPrefix('');
+
+		// Start the map in Toulouse
+		map.addLayer(osm);
+		map.setView(new L.LatLng(43.6, 1.4),12);
+		
+		// markerStart
+		var markerStart = null;
+		var latStart;
+		var lonStart;
+		map.on('click', function(e) {
+			if (markerStart == null) {
+				markerStart = L.marker(e.latlng);
+				markerStart.addTo(map);
+			} else {
+				markerStart.setLatLng(e.latlng);
+			};
+		latStart = markerStart.getLatLng().lat;
+		lonStart = markerStart.getLatLng().lng;
+		computeRoute()
+		});
+
+		
+		// markerStop
+		var markerStop = null;
+		var latStop;
+		var lonStop;
+		map.on('contextmenu', function(e) {
+			if (markerStop == null) {
+				markerStop = L.marker(e.latlng);
+				markerStop.addTo(map);
+			} else {
+				markerStop.setLatLng(e.latlng);
+			};
+		latStop = markerStop.getLatLng().lat;
+		lonStop = markerStop.getLatLng().lng;
+		computeRoute()
+		});
+		
+		// get the route
+		routeLayer = undefined;
+		function computeRoute() {
+			$.ajax({
+				dataType: "json",
+				url: 'http://localhost:8000/route.json',
+				data: {lat1: latStart, lon1: lonStart, lat2: latStop, lon2: lonStop},
+				success: function(route) {
+					if (routeLayer != undefined) {
+					map.removeLayer(routeLayer);
+					}
+					//console.log('route: ' + route);
+					routeLayer = L.geoJson(route);
+					routeLayer.addTo(map);
+			  }
+			});
+		};
+
+	</script>
+</body>
+</html>
