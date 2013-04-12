@@ -14,7 +14,7 @@
 <body>
 	<!-- Add Leaflet library -->
 	<div id="map" style="height:600px;" ></div>
-	<div><button onclick="computeRoute();">Compute Route</button> </div>
+	<div id="routeLength"></div>
 	<script type='text/javascript'>
 		map = new L.Map('map');
 		// create the tile layer with correct attribution
@@ -74,13 +74,12 @@
 					if (routeLayer != undefined) {
 					map.removeLayer(routeLayer);
 					}
-					//console.log('route: ' + route);
+					$("#routeLength").html("Longueur : " + Math.round(route.properties.length) + " m");
 					routeLayer = L.geoJson(route);
 					routeLayer.addTo(map);
 			  }
 			});
 		};
-
 	</script>
 </body>
 </html>

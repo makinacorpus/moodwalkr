@@ -3,10 +3,10 @@
 * Fichier de conf (xml ?) pour les obstacles à prendre en compte
 * preprocessing à faire propre
 OK: ways_openspace : ajouter le nom de la place aux segments générés
-* attributs foot=yes avec index pour les routes où les piétons peuvent circuler
-* routing uniquement sur ways avec foot=yes
+OK: attributs foot=yes avec index pour les routes où les piétons peuvent circuler
+OK: routing uniquement sur ways avec où foot!=no
 OK: length en mètres
-* longueur totale trajet
+OK: longueur totale trajet
 * choix méthode affectation coût (raster ou vecteur ?)
 * coûts profil espace naturel
 * coûts profil shopping
