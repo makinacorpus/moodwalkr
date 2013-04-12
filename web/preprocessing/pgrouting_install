@@ -1,0 +1,37 @@
+# Installation de PostGis 2
+sudo apt-get install postgis
+
+# Installation de osm2pgrouting : ne pas utiliser le ppa georepublic, qui genere des multilinestring au lieu de linestring
+git clone git@github.com:pgRouting/osm2pgrouting.git
+cd osm2pgrouting
+make
+
+# Installation des bibliothèques
+sudo apt-get install libboost-graph-dev libboost-graph1.48.0 
+sudo apt-get install gaul-devel 
+sudo apt-get install libcgal-dev 
+
+# Installation de pgrouting
+git clone git@github.com:pgRouting/pgrouting.git
+cd pgrouting
+git checkout sew-devel-2_0
+# Utiliser cmake  2.8.10
+../cmake-2.8.10.2-Linux-i386/bin/cmake  -DWITH_TSP=ON -DWITH_DD=ON .
+# cmake  -DWITH_TSP=ON -DWITH_DD=ON .
+make
+sudo make install
+
+# Creation de la base de données routing
+sudo su postgres
+createdb routing
+createlang plpgsql routing
+psql -d routing -c "CREATE EXTENSION postgis;"
+psql -d routing -c "CREATE EXTENSION pgrouting;"
+psql -d routing -f /usr/share/postgresql/9.1/contrib/postgis-2.0/legacy.sql 
+
+# Import des données OSM : cela peut être long
+# Utiliser le fichier .osm approprié
+cd osm2pgrouting
+./osm2pgrouting -file "donnees.osm" -conf "/usr/share/osm2pgrouting/mapconfig.xml" -host localhost -dbname routing -user postgres -clean
+
+
