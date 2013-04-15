@@ -34,7 +34,6 @@ $$
 LANGUAGE plpgsql ;
 
 
-
 CREATE OR REPLACE FUNCTION AllSegmentsFromPoints(polygon geometry,osm_id integer)
 RETURNS SETOF geometry AS
 $$
@@ -130,19 +129,22 @@ DECLARE
 	linegeom record;
 	i integer;
 	pvid integer;
+	point_length double precision;
 	length_tot double precision;
 BEGIN
 	i:=1;
+	length_tot:=0;
 	length_tot:=0;
 	geojson:='{"type":"FeatureCollection","features":[';
 	FOR point IN (SELECT * FROM shortest_path('
                 SELECT gid as id,
                          source::integer,
                          target::integer,
-                         length::double precision as cost
+                         length*3::double precision as cost
                         FROM ways WHERE foot IS NOT FALSE', startp, stopp, false, false) WHERE edge_id>0) LOOP
 		pvid:=point.edge_id;
-		length_tot:=lenght_tot + point.cost;
+		SELECT length INTO point_length FROM ways WHERE ways.gid=pvid;
+		length_tot:=length_tot + point_length;
 		geojson:=geojson || '{"type":"Feature","geometry":';
 		FOR linegeom IN (SELECT ST_AsGeoJSON(ways.the_geom) FROM ways WHERE ways.gid=pvid) LOOP
 			geojson:=geojson || linegeom.st_asgeojson;
@@ -239,3 +241,7 @@ SELECT UpdateFootAttribute()
 
 
 
+SELECT 1 as id,ST_BUFFER((SELECT st_transform(the_geom,3857) FROM ways WHERE gid=75988),30, 'endcap=square')
+
+SELECT w.gid,w.the_geom FROM ways w
+	WHERE ST_DWithin(w.the_geom,(SELECT the_geom FROM ways WHERE gid=75988),0.0001)
