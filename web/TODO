@@ -7,8 +7,8 @@ OK: attributs foot=yes avec index pour les routes où les piétons peuvent circu
 OK: routing uniquement sur ways avec où foot!=no
 OK: length en mètres
 OK: longueur totale trajet
-* nouvelle categorie dans mapconfig.xml pour les footways
-* foot=no pour les routes avec trottoir disponible (cf p23)
+OK: nouvelle categorie dans mapconfig.xml pour les footways
+OK: foot=no pour les routes avec trottoir disponible (cf p23)
 * choix méthode affectation coût (raster ou vecteur ?)
 * coûts profil espace naturel
 * coûts profil shopping

@@ -163,6 +163,88 @@ $$
 LANGUAGE plpgsql;
 
 
+CREATE OR REPLACE FUNCTION ShortestPathGeojsonLinestring2(lat1 text, lon1 text, lat2 text, lon2 text)
+RETURNS text AS
+$$
+DECLARE
+	geojson text;
+	point record;
+	linegeom record;
+	i integer;
+	pvid integer;
+	point_length double precision;
+	length_tot double precision;
+	point_start geometry;
+	point_target geometry;
+	line_start record;
+	line_target record;
+	position_start double precision;
+	position_target double precision;
+BEGIN
+	-- Initialize the variables
+	i:=1;
+	length_tot:=0;
+	length_tot:=0;
+	SELECT * INTO point_start FROM ST_GeomFromText('POINT(' || lon1 || ' ' || lat1 || ')',4326);
+	SELECT * INTO point_target FROM ST_GeomFromText('POINT(' || lon2 || ' ' || lat2 || ')',4326);
+	
+	-- Get the nearest linestrings from the start and target points
+	SELECT gid,length,the_geom,source,target
+	INTO line_start
+	FROM ways
+	WHERE foot IS NOT FALSE
+	ORDER BY the_geom <-> point_start
+	LIMIT 1;
+	
+	SELECT ST_Line_Locate_Point
+	INTO position_start
+	FROM ST_Line_Locate_Point(line_start.the_geom,point_start);
+	
+	SELECT gid,length,the_geom,source,target
+	INTO line_target
+	FROM ways
+	WHERE foot IS NOT FALSE
+	ORDER BY the_geom <-> point_target
+	LIMIT 1;
+		
+	SELECT ST_Line_Locate_Point
+	INTO position_target
+	FROM ST_Line_Locate_Point(line_target.the_geom,point_target);
+	
+	geojson:='{"type":"FeatureCollection","features":[';
+	FOR point IN (SELECT * FROM shortest_path('
+						SELECT gid as id,
+							source::integer,
+							target::integer,
+							length::double precision as cost
+							FROM (SELECT * FROM ways WHERE foot IS NOT FALSE) as ways_foot
+								UNION (SELECT -11 as id, line_start.source as source, -1 as target, (position_start * line_start.length) as length FROM line_start)
+								UNION (SELECT -12 as id, -1 as source, line_start.target as target, ((1-position_start) * line_start.length) as length FROM line_start)
+								UNION (SELECT -21 as id, line_target.source as source, -2 as target, (position_target * line_target.length) as length FROM line_target)
+								UNION (SELECT -22 as id, -2 as source, line_target.target as target, ((1-position_target) * line_target.length) as length FROM line_target)
+							
+							', -1, -2, false, false) WHERE edge_id>0) LOOP
+		pvid:=point.edge_id;
+		SELECT length INTO point_length FROM ways WHERE ways.gid=pvid;
+		length_tot:=length_tot + point_length;
+		geojson:=geojson || '{"type":"Feature","geometry":';
+		FOR linegeom IN (SELECT ST_AsGeoJSON(ways.the_geom) FROM ways WHERE ways.gid=pvid) LOOP
+			geojson:=geojson || linegeom.st_asgeojson;
+		END LOOP;
+		geojson:=geojson || ', "properties":{"id":';
+		geojson:=geojson || i;
+		geojson:=geojson || '}},';
+		i:=i+1;
+	END LOOP;
+	geojson:=substring(geojson from 1 for char_length(geojson)-1);	
+	geojson:=geojson || '],"properties": {"length":' || length_tot || '}';
+	geojson:=geojson || '}';
+	RETURN geojson;
+END;
+$$
+LANGUAGE plpgsql;
+
+
 
 CREATE OR REPLACE FUNCTION NearestVertex(lat text,lon text)
 RETURNS integer AS
