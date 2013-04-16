@@ -66,7 +66,7 @@ curRouting.execute("WITH nummax AS (SELECT max(gid) FROM ways)" +
 curRouting.execute("ALTER TABLE ways ADD COLUMN foot boolean;")
 
 curRouting.execute("INSERT INTO ways(the_geom,name,class_id,gid,osm_id,foot) " +
-						 "SELECT lines_openspace,lines_name,114,nextval('ways_openspace_id'),lines_osm_id,TRUE " +
+						 "SELECT lines_openspace,lines_name,116,nextval('ways_openspace_id'),lines_osm_id,TRUE " +
 						 "FROM dblink('dbname=gis user=postgres password=corpus', " +
 						 "'select st_transform(geom,4326),name,osm_id from lines_from_polygon') " +
 						 "AS t1(lines_openspace geometry,lines_name text,lines_osm_id integer);")
@@ -76,6 +76,8 @@ curRouting.execute("SELECT assign_vertex_id('ways', 0.00001, 'the_geom', 'gid');
 curRouting.execute("UPDATE ways SET length = St_length(st_transform(ways.the_geom,3857));")
 
 curRouting.execute("SELECT UpdateFootAttribute()")
+
+curRouting.execute("SELECT UpdateSideWalks()")
 
 # close the "routing" database connection
 connRouting.commit()

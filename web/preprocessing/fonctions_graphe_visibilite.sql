@@ -200,7 +200,7 @@ SELECT setval('ways_openspace_id', ((SELECT * FROM nummax)+1));
 ALTER TABLE ways ADD COLUMN foot boolean;
 
 INSERT INTO ways(the_geom,name,class_id,gid,osm_id,foot)
-SELECT lines_openspace,lines_name,114,nextval('ways_openspace_id'),lines_osm_id,TRUE
+SELECT lines_openspace,lines_name,116,nextval('ways_openspace_id'),lines_osm_id,TRUE
 FROM dblink('dbname=gis user=postgres password=corpus',
             'select st_transform(geom,4326),name,osm_id from lines_from_polygon')
        AS t1(lines_openspace geometry,lines_name text,lines_osm_id integer);
@@ -239,9 +239,27 @@ LANGUAGE plpgsql;
 SELECT UpdateFootAttribute()
 
 
+CREATE OR REPLACE FUNCTION UpdateSidewalks()
+RETURNS VOID AS
+$$
+DECLARE
+    line record;
+    buffer geometry;
+BEGIN
+	FOR line IN SELECT gid,the_geom FROM ways WHERE gid in (SELECT way_id FROM way_tag WHERE class_id = 501) LOOP
+		SELECT st_transform(ST_BUFFER((SELECT st_transform(line.the_geom,3857)),20, 'endcap=square'),4326) INTO buffer;
+		UPDATE ways SET foot=FALSE WHERE ST_Contains(buffer,ways.the_geom) AND 
+		(ways.class_id !=115) AND 
+		(ways.class_id !=116) AND 
+		(ways.class_id !=119) AND 
+		(ways.class_id !=120) AND 
+		(ways.class_id !=121) AND 
+		(ways.class_id !=122) AND 
+		(ways.class_id !=123) AND 
+		(ways.class_id !=124);
+	END LOOP;
+END;
+$$
+LANGUAGE plpgsql;
 
-
-SELECT 1 as id,ST_BUFFER((SELECT st_transform(the_geom,3857) FROM ways WHERE gid=75988),30, 'endcap=square')
-
-SELECT w.gid,w.the_geom FROM ways w
-	WHERE ST_DWithin(w.the_geom,(SELECT the_geom FROM ways WHERE gid=75988),0.0001)
+SELECT UpdateSidewalks()
