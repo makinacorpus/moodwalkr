@@ -32,8 +32,8 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				lon2 = params.group(4)
 			conn = psycopg2.connect("dbname=routing user=postgres")
 			cur = conn.cursor()
-			cur.execute("SELECT * FROM ShortestPathGeojsonLinestring(NearestVertex('"+lat1+"','"+lon1+"'),NearestVertex('"+lat2+"','"+lon2+"'))")
-			# cur.execute("SELECT * FROM ShortestPathGeojsonLinestring2('"+lat1+"','"+lon1+"','"+lat2+"','"+lon2+"')")
+			# cur.execute("SELECT * FROM ShortestPathGeojsonLinestring(NearestVertex('"+lat1+"','"+lon1+"'),NearestVertex('"+lat2+"','"+lon2+"'))")
+			cur.execute("SELECT * FROM ShortestPathGeojsonLinestring2('"+lat1+"','"+lon1+"','"+lat2+"','"+lon2+"')")
 			result=cur.fetchone()[0]
 			cur.close()
 			conn.close()
