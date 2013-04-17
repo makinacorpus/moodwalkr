@@ -212,46 +212,54 @@ BEGIN
 	FROM ST_Line_Locate_Point(line_target.the_geom,point_target);
 	
 	geojson:='{"type":"FeatureCollection","features":[';
-	-- Loop across edges. Last edge_id is -1, and is not taken into account. (n vertices, n-1 edges) 
-	FOR point IN (SELECT * FROM shortest_path('
-						SELECT gid as id,
-							source::integer,
-							target::integer,
-							length::double precision as cost
-							FROM (SELECT * FROM ways WHERE foot IS NOT FALSE) as ways_foot
-								UNION (SELECT -11 as gid,' ||  line_start.source || ' as source, -1 as target, (' || position_start || ' * ' || line_start.length || ') as length)
-								UNION (SELECT -12 as gid, -1 as source,' ||  line_start.target || ' as target, ((1-' || position_start || ') * ' || line_start.length || ') as length)
-								UNION (SELECT -21 as gid,' ||  line_target.source || ' as source, -2 as target, (' || position_target || ' * ' || line_target.length || ') as length)
-								UNION (SELECT -22 as gid, -2 as source,' ||  line_target.target || ' as target, ((1-' || position_target || ') * ' || line_target.length || ') as length)
-							', -1, -2, false, false) WHERE edge_id != -1) LOOP
-		pvid:=point.edge_id;
-		SELECT length 
-		INTO point_length 
-		FROM ((SELECT gid,length FROM ways) UNION
-		     (SELECT -11 as gid, ( position_start * line_start.length ) as length) UNION
-		     (SELECT -12 as gid, ((1- position_start ) * line_start.length ) as length) UNION
-		     (SELECT -21 as gid, ( position_target * line_target.length ) as length) UNION
-		     (SELECT -22 as gid, ((1- position_target ) * line_target.length ) as length)) as ways_foot
-		WHERE ways_foot.gid=pvid;
-		
-		length_tot:=length_tot + point_length;
+	IF (line_start.gid = line_target.gid) THEN 
 		geojson:=geojson || '{"type":"Feature","geometry":';
+		geojson:=geojson || ST_AsGeoJSON(ST_Line_Substring(line_start.the_geom,LEAST(position_start,position_target),GREATEST(position_start,position_target)));
+		geojson:=geojson || ', "properties":{"id":1}},';
+		length_tot:=length_tot + line_start.length * abs(position_target - position_start);
 
-		SELECT ST_AsGeoJSON(ways_foot.the_geom)
-		INTO linegeom
-		FROM (SELECT gid, the_geom FROM ways UNION
-		     SELECT -11 as gid, ST_Line_Substring(line_start.the_geom,0,position_start) AS the_geom UNION
-		     SELECT -12 as gid, ST_Line_Substring(line_start.the_geom,position_start,1) AS the_geom UNION
-		     SELECT -21 as gid, ST_Line_Substring(line_target.the_geom,0,position_target) AS the_geom UNION
-		     SELECT -22 as gid, ST_Line_Substring(line_target.the_geom,position_target,1) AS the_geom) as ways_foot
-		WHERE ways_foot.gid=pvid;
+	ELSE
+		-- Loop across edges. Last edge_id is -1, and is not taken into account. (n vertices, n-1 edges)
+		FOR point IN (SELECT * FROM shortest_path('
+							SELECT gid as id,
+								source::integer,
+								target::integer,
+								length::double precision as cost
+								FROM (SELECT * FROM ways WHERE foot IS NOT FALSE) as ways_foot
+									UNION (SELECT -11 as gid,' ||  line_start.source || ' as source, -1 as target, (' || position_start || ' * ' || line_start.length || ') as length)
+									UNION (SELECT -12 as gid, -1 as source,' ||  line_start.target || ' as target, ((1-' || position_start || ') * ' || line_start.length || ') as length)
+									UNION (SELECT -21 as gid,' ||  line_target.source || ' as source, -2 as target, (' || position_target || ' * ' || line_target.length || ') as length)
+									UNION (SELECT -22 as gid, -2 as source,' ||  line_target.target || ' as target, ((1-' || position_target || ') * ' || line_target.length || ') as length)
+								', -1, -2, false, false) WHERE edge_id != -1) LOOP
+			pvid:=point.edge_id;
+			SELECT length 
+			INTO point_length 
+			FROM ((SELECT gid,length FROM ways) UNION
+			     (SELECT -11 as gid, ( position_start * line_start.length ) as length) UNION
+			     (SELECT -12 as gid, ((1- position_start ) * line_start.length ) as length) UNION
+			     (SELECT -21 as gid, ( position_target * line_target.length ) as length) UNION
+			     (SELECT -22 as gid, ((1- position_target ) * line_target.length ) as length)) as ways_foot
+			WHERE ways_foot.gid=pvid;
+			
+			length_tot:=length_tot + point_length;
+			geojson:=geojson || '{"type":"Feature","geometry":';
 
-		geojson:=geojson || linegeom;
-		geojson:=geojson || ', "properties":{"id":';
-		geojson:=geojson || i;
-		geojson:=geojson || '}},';
-		i:=i+1;
-	END LOOP;
+			SELECT ST_AsGeoJSON(ways_foot.the_geom)
+			INTO linegeom
+			FROM (SELECT gid, the_geom FROM ways UNION
+			     SELECT -11 as gid, ST_Line_Substring(line_start.the_geom,0,position_start) AS the_geom UNION
+			     SELECT -12 as gid, ST_Line_Substring(line_start.the_geom,position_start,1) AS the_geom UNION
+			     SELECT -21 as gid, ST_Line_Substring(line_target.the_geom,0,position_target) AS the_geom UNION
+			     SELECT -22 as gid, ST_Line_Substring(line_target.the_geom,position_target,1) AS the_geom) as ways_foot
+			WHERE ways_foot.gid=pvid;
+
+			geojson:=geojson || linegeom;
+			geojson:=geojson || ', "properties":{"id":';
+			geojson:=geojson || i;
+			geojson:=geojson || '}},';
+			i:=i+1;
+		END LOOP;
+	END IF;
 	geojson:=substring(geojson from 1 for char_length(geojson)-1);	
 	geojson:=geojson || '],"properties": {"length":' || length_tot || '}';
 	geojson:=geojson || '}';

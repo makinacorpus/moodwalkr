@@ -1,5 +1,5 @@
 OK: Départ et arrivée : Nouvelles aretes dans le graphe issues de la découpe des lignes les plus proches des points de départ et d'arrivée
-* Test si les points de départ et arrivée sont sur la même ligne
+OK: Test si les points de départ et arrivée sont sur la même ligne
 * Fichier de conf (xml ?) pour les zones à prendre en compte
 * Fichier de conf (xml ?) pour les obstacles à prendre en compte
 * preprocessing à faire propre
