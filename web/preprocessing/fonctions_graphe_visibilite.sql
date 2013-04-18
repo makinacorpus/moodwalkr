@@ -9,7 +9,7 @@ DECLARE
 BEGIN
     polygontmp := polygon ;
     FOR obstacle IN SELECT way FROM planet_osm_line WHERE barrier='fence' AND ST_Contains(polygon,way) LOOP
-	SELECT * INTO polygontmp FROM ST_Difference(polygontmp,ST_Buffer(obstacle, 0.3, 'endcap=square join=mitre mitre_limit=1.0')) ;
+	SELECT * INTO polygontmp FROM ST_Difference(polygontmp,ST_Buffer(obstacle, 0.75, 'endcap=square join=mitre mitre_limit=1.0')) ;
     END LOOP;
 RETURN polygontmp;
 END;
@@ -314,7 +314,7 @@ FROM dblink('dbname=gis user=postgres password=corpus',
 
 SELECT assign_vertex_id('ways', 0.00001, 'the_geom', 'gid');
 
-UPDATE ways SET length = St_length(st_transform(ways.the_geom,3857));
+UPDATE ways SET length = ST_Length_Spheroid(ways.the_geom,'SPHEROID["WGS 84",6378137,298.257223563]');
 
 
 

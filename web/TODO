@@ -14,3 +14,4 @@ OK: foot=no pour les routes avec trottoir disponible (cf p23)
 * coûts profil espace naturel
 * coûts profil shopping
 * switch entre différents profils (interface web et requetes)
+* Pas de routing sur access=no
