@@ -1,5 +1,6 @@
 OK: Départ et arrivée : Nouvelles aretes dans le graphe issues de la découpe des lignes les plus proches des points de départ et d'arrivée
 OK: Test si les points de départ et arrivée sont sur la même ligne
+* Points de départ et arrivée sur zone ouverte : mauvais itinéraire possible (cf p25)
 * Fichier de conf (xml ?) pour les zones à prendre en compte
 * Fichier de conf (xml ?) pour les obstacles à prendre en compte
 * preprocessing à faire propre
@@ -15,3 +16,4 @@ OK: foot=no pour les routes avec trottoir disponible (cf p23)
 * coûts profil shopping
 * switch entre différents profils (interface web et requetes)
 * Pas de routing sur access=no
+* Mode itinéraire circulaire

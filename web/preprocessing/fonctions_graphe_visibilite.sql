@@ -22,10 +22,8 @@ CREATE OR REPLACE FUNCTION PointsFromPolygon(polygon geometry,osm_id integer)
 RETURNS SETOF geometry AS
 $$
 DECLARE
-	buffer geometry;
 	point geometry;
 BEGIN
-buffer:=ST_Buffer(polygon, 0.1);
 FOR point IN SELECT DISTINCT points.geom FROM ( SELECT (ST_DumpPoints(polygon)).* ) AS points LOOP
 	RETURN NEXT point;
 END LOOP;
@@ -43,12 +41,12 @@ DECLARE
     i integer;
 BEGIN
 i:=1;
-    FOR point1 IN SELECT * FROM PointsFromPolygon(polygon,osm_id) LOOP
-	FOR point2 IN SELECT * FROM PointsFromPolygon(polygon,osm_id) OFFSET i LOOP
-	RETURN NEXT ST_MakeLine(point1,point2);
- 	END LOOP;
-    i:= i+1;
-    END LOOP;
+	FOR point1 IN SELECT * FROM PointsFromPolygon(polygon,osm_id) LOOP
+		FOR point2 IN SELECT * FROM PointsFromPolygon(polygon,osm_id) OFFSET i LOOP
+			RETURN NEXT ST_MakeLine(point1,point2);
+		END LOOP;
+	i:= i+1;
+	END LOOP;
 END;
 $$
 LANGUAGE plpgsql;
@@ -75,8 +73,7 @@ BEGIN
 	-- check : no line crosses any ring
 	validsegment := validsegment AND NOT (ST_CROSSES(polygon,line));
 	-- if there is one or more inner ring, check if the line is inside this ring
-	IF ninteriorrings > 0
-	THEN
+	IF ninteriorrings > 0 THEN
 	    FOR i IN 1..ninteriorrings LOOP
 	         validsegment := validsegment AND NOT ST_within(line,ST_BuildArea(ST_InteriorRingN(polygon,i)));
 	    END LOOP;
@@ -92,18 +89,22 @@ END;
 $$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION PolygonToVisibilityGraph()
+
+
+CREATE OR REPLACE FUNCTION PolygonToVisibilityGraph(col text, value text)
 RETURNS VOID AS
 $$
 DECLARE
     polygon record;
 BEGIN
-FOR polygon IN SELECT way,osm_id,name FROM planet_osm_polygon WHERE highway='pedestrian' LOOP
+FOR polygon IN SELECT way,osm_id,name FROM planet_osm_polygon WHERE col=value LOOP
 	PERFORM VisibilityLines(PolygonWithObstacles(polygon.way),polygon.osm_id,polygon.name);
 END LOOP;
 END;
 $$
 LANGUAGE plpgsql;
+
+
 
 -- base gis
 CREATE TABLE lines_from_polygon

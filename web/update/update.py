@@ -3,6 +3,7 @@
 
 import sys,os
 import psycopg2
+import config
 
 # path to the osm file
 osmPath=sys.argv[1]
@@ -28,8 +29,12 @@ curGis.execute("CREATE TABLE lines_from_polygon (" +
 					"geom geometry(Geometry,900913)," +
 					"name text," +
 					"osm_id integer);")
-					
+
+#for zone in config.pedestrianAreas:		
+#	request = "SELECT PolygonToVisibilityGraph(%s,%s)" % (zone[0],zone[1])
+#	curGis.execute(request)
 curGis.execute("SELECT PolygonToVisibilityGraph();")
+
 
 # close the "gis" database connection
 connGis.commit()
