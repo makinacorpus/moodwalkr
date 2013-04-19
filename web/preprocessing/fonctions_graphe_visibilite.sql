@@ -18,35 +18,19 @@ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION PointsFromPolygon(polygon geometry,osm_id integer) 
-RETURNS SETOF geometry AS
-$$
-DECLARE
-	point geometry;
-BEGIN
-FOR point IN SELECT DISTINCT points.geom FROM ( SELECT (ST_DumpPoints(polygon)).* ) AS points LOOP
-	RETURN NEXT point;
-END LOOP;
-END;
-$$
-LANGUAGE plpgsql ;
-
-
 CREATE OR REPLACE FUNCTION AllSegmentsFromPoints(polygon geometry,osm_id integer)
 RETURNS SETOF geometry AS
 $$
-DECLARE
-    point1 geometry;
-    point2 geometry;
-    i integer;
 BEGIN
-i:=1;
-	FOR point1 IN SELECT * FROM PointsFromPolygon(polygon,osm_id) LOOP
-		FOR point2 IN SELECT * FROM PointsFromPolygon(polygon,osm_id) OFFSET i LOOP
-			RETURN NEXT ST_MakeLine(point1,point2);
-		END LOOP;
-	i:= i+1;
-	END LOOP;
+RETURN QUERY
+	EXECUTE
+	'WITH poly_geom AS (SELECT way FROM planet_osm_polygon WHERE osm_id=$1),
+		points1 AS (SELECT (ST_DumpPoints(poly_geom.way)).* FROM poly_geom),
+		points2 AS (SELECT (ST_DumpPoints(poly_geom.way)).* FROM poly_geom)
+	SELECT DISTINCT ST_MakeLine(points1.geom, points2.geom)
+	FROM points1,points2
+	WHERE points1.path <> points2.path;'
+	USING osm_id;
 END;
 $$
 LANGUAGE plpgsql;
@@ -104,6 +88,32 @@ END;
 $$
 LANGUAGE plpgsql;
 
+
+CREATE OR REPLACE FUNCTION PolygonToVisibilityGraphHighway(value text)
+RETURNS VOID AS
+$$
+DECLARE
+    polygon record;
+BEGIN
+FOR polygon IN SELECT way,osm_id,name FROM planet_osm_polygon WHERE highway=quote_ident(value) LOOP
+	PERFORM VisibilityLines(PolygonWithObstacles(polygon.way),polygon.osm_id,polygon.name);
+END LOOP;
+END;
+$$
+LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION PolygonToVisibilityGraphAmenity(value text)
+RETURNS VOID AS
+$$
+DECLARE
+    polygon record;
+BEGIN
+FOR polygon IN SELECT way,osm_id,name FROM planet_osm_polygon WHERE amenity=value LOOP
+	PERFORM VisibilityLines(PolygonWithObstacles(polygon.way),polygon.osm_id,polygon.name);
+END LOOP;
+END;
+$$
+LANGUAGE plpgsql;
 
 
 -- base gis

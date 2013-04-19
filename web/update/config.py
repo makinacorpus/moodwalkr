@@ -1,2 +1,3 @@
 # List of walkable areas
-pedestrianAreas=[["highway","pedestrian"],["amenity","parking"]]
+pedestrianAreasHighway=["pedestrian"]
+pedestrianAreasAmenity=["parking"]

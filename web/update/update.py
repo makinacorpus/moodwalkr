@@ -30,11 +30,11 @@ curGis.execute("CREATE TABLE lines_from_polygon (" +
 					"name text," +
 					"osm_id integer);")
 
-#for zone in config.pedestrianAreas:		
-#	request = "SELECT PolygonToVisibilityGraph(%s,%s)" % (zone[0],zone[1])
-#	curGis.execute(request)
-curGis.execute("SELECT PolygonToVisibilityGraph();")
+for zone in config.pedestrianAreasHighway:		
+	curGis.execute('SELECT PolygonToVisibilityGraphHighway(%s)',(zone,))
 
+for zone in config.pedestrianAreasAmenity:		
+	curGis.execute('SELECT PolygonToVisibilityGraphAmenity(%s)',(zone,))
 
 # close the "gis" database connection
 connGis.commit()

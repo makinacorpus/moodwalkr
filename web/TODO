@@ -11,9 +11,11 @@ OK: length en mètres
 OK: longueur totale trajet
 OK: nouvelle categorie dans mapconfig.xml pour les footways
 OK: foot=no pour les routes avec trottoir disponible (cf p23)
-* choix méthode affectation coût (raster ou vecteur ?)
+OK: choix méthode affectation coût (raster ou vecteur ?) -> mailles vectorielles
+* créer carroyage : taille maille ? (100m ?)
 * coûts profil espace naturel
 * coûts profil shopping
 * switch entre différents profils (interface web et requetes)
 * Pas de routing sur access=no
+* Supprimer les lignes inutiles pour le routing sur les surfaces (simplification topologique ?)
 * Mode itinéraire circulaire
