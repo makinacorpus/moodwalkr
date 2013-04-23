@@ -1,8 +1,0 @@
-# osm2pgsql : http://packages.ubuntu.com/quantal/osm2pgsql
-
-sudo su postgres
-createdb gis
-psql -d gis -c "CREATE EXTENSION postgis;"
-psql gis -c "ALTER TABLE geometry_columns OWNER TO postgres"
-psql gis -c "ALTER TABLE spatial_ref_sys OWNER TO postgres"
-osm2pgsql -s --style /usr/share/osm2pgsql/default.style -W -U postgres -d gis /file/path/toosm/fileorpbf/name.osm

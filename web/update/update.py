@@ -69,9 +69,10 @@ curRouting.execute("WITH nummax AS (SELECT max(gid) FROM ways)" +
 						 "SELECT setval('ways_openspace_id', ((SELECT * FROM nummax)+1));")
 						 
 curRouting.execute("ALTER TABLE ways ADD COLUMN foot boolean;")
+curRouting.execute("ALTER TABLE ways ADD COLUMN frompolygon boolean;")
 
-curRouting.execute("INSERT INTO ways(the_geom,name,class_id,gid,osm_id,foot) " +
-						 "SELECT lines_openspace,lines_name,116,nextval('ways_openspace_id'),lines_osm_id,TRUE " +
+curRouting.execute("INSERT INTO ways(the_geom,name,class_id,gid,osm_id,foot,frompolygon) " +
+						 "SELECT lines_openspace,lines_name,116,nextval('ways_openspace_id'),lines_osm_id,TRUE,TRUE " +
 						 "FROM dblink('dbname=gis user=postgres password=corpus', " +
 						 "'select st_transform(geom,4326),name,osm_id from lines_from_polygon') " +
 						 "AS t1(lines_openspace geometry,lines_name text,lines_osm_id integer);")
