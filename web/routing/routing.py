@@ -24,16 +24,17 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				self.wfile.close()
 		elif self.path[0:11] == '/route.json':
 			print self.path
-			params = re.search(r'\?lat1=([0-9.]+)&lon1=([0-9.]+)&lat2=([0-9.]+)&lon2=([0-9.]+)', self.path)
+			params = re.search(r'\?lat1=([0-9.]+)&lon1=([0-9.]+)&lat2=([0-9.]+)&lon2=([0-9.]+)&type=(\w+)', self.path)
 			if params is not None:
 				lat1 = params.group(1)
 				lon1 = params.group(2)
 				lat2 = params.group(3)
 				lon2 = params.group(4)
+				profile = params.group(5)
 			conn = psycopg2.connect("dbname=routing user=postgres")
 			cur = conn.cursor()
 			# cur.execute("SELECT * FROM ShortestPathGeojsonLinestring(NearestVertex('"+lat1+"','"+lon1+"'),NearestVertex('"+lat2+"','"+lon2+"'))")
-			cur.execute("SELECT * FROM ShortestPathGeojsonLinestring2('"+lat1+"','"+lon1+"','"+lat2+"','"+lon2+"')")
+			cur.execute("SELECT * FROM ShortestPathGeojsonLinestring2('"+lat1+"','"+lon1+"','"+lat2+"','"+lon2+"','"+profile+"')")
 			result=cur.fetchone()[0]
 			cur.close()
 			conn.close()

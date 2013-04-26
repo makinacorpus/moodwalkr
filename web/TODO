@@ -1,8 +1,8 @@
 OK: Départ et arrivée : Nouvelles aretes dans le graphe issues de la découpe des lignes les plus proches des points de départ et d'arrivée
 OK: Test si les points de départ et arrivée sont sur la même ligne
 * Points de départ et arrivée sur zone ouverte : mauvais itinéraire possible (cf p25)
-* Fichier de conf (xml ?) pour les zones à prendre en compte
-* Fichier de conf (xml ?) pour les obstacles à prendre en compte
+OK: Fichier de conf (xml ?) pour les zones à prendre en compte
+OK: Fichier de conf (xml ?) pour les obstacles à prendre en compte
 * preprocessing à faire propre
 OK: ways_openspace : ajouter le nom de la place aux segments générés
 OK: attributs foot=yes avec index pour les routes où les piétons peuvent circuler
@@ -12,10 +12,11 @@ OK: longueur totale trajet
 OK: nouvelle categorie dans mapconfig.xml pour les footways
 OK: foot=no pour les routes avec trottoir disponible (cf p23)
 OK: choix méthode affectation coût (raster ou vecteur ?) -> mailles vectorielles
-* créer carroyage : taille maille ? (100m ?)
-* coûts profil espace naturel
-* coûts profil shopping
-* switch entre différents profils (interface web et requetes)
-* Pas de routing sur access=no
+OK: créer carroyage : taille maille ?
+OK: coûts profil espace naturel
+OK: coûts profil shopping
+OK: switch entre différents profils (interface web et requetes)
+* Coût en fonction du type de voie
+OK: Pas de routing sur access=no et access=private
 * Supprimer les lignes inutiles pour le routing sur les surfaces (simplification topologique ?)
 * Mode itinéraire circulaire

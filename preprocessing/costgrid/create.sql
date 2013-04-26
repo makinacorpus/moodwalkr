@@ -37,6 +37,15 @@ SET e_park=1
 FROM (SELECT way,leisure FROM planet_osm_polygon WHERE leisure='park') as park
 WHERE ST_Intersects(cost_grid.geom,park.way);
 
+-- Environment - natural features
+
+ALTER TABLE cost_grid ADD COLUMN e_natural float DEFAULT 0;
+
+UPDATE cost_grid
+SET e_natural=1
+FROM (SELECT way,"natural" FROM planet_osm_polygon WHERE "natural" LIKE '%') as naturalf
+WHERE ST_Intersects(cost_grid.geom,naturalf.way);
+
 -- Transport - bus stops
 
 ALTER TABLE cost_grid ADD COLUMN t_bus float DEFAULT 0;
@@ -144,6 +153,28 @@ WITH max_a_public_building AS (SELECT max(a_public_building) FROM cost_grid)
 UPDATE cost_grid
 SET a_public_building=(a_public_building/(SELECT max FROM max_a_public_building));
 
+-- Activity - restaurants and pubs
+
+ALTER TABLE cost_grid ADD COLUMN a_food float DEFAULT 0;
+
+UPDATE cost_grid
+SET a_food=(SELECT count(*)
+	     FROM (SELECT way,amenity FROM planet_osm_point WHERE amenity='bar' OR amenity='bbq' OR amenity='biergarten' OR amenity='cafe' OR amenity='fast_food' OR amenity='ice_cream' OR amenity='pub' OR amenity='restaurant') as food
+	     WHERE ST_Contains(cost_grid.geom,food.way)
+	    )
+;
+
+UPDATE cost_grid
+SET a_food=a_food+(SELECT count(*)
+	     FROM (SELECT way,amenity FROM planet_osm_polygon WHERE amenity='bar' OR amenity='bbq' OR amenity='biergarten' OR amenity='cafe' OR amenity='fast_food' OR amenity='ice_cream' OR amenity='pub' OR amenity='restaurant') as food
+	     WHERE ST_Intersects(cost_grid.geom,food.way)
+	    )
+;
+
+WITH max_a_food AS (SELECT max(a_food) FROM cost_grid)
+UPDATE cost_grid
+SET a_food=(a_food/(SELECT max FROM max_a_food));
+
 -- Culture - tourism
 
 ALTER TABLE cost_grid ADD COLUMN c_tourism float DEFAULT 0;
@@ -187,3 +218,48 @@ SET c_pow=c_pow+(SELECT count(*)
 WITH max_c_pow AS (SELECT max(c_pow) FROM cost_grid)
 UPDATE cost_grid
 SET c_pow=(c_pow/(SELECT max FROM max_c_pow));
+
+
+
+
+ALTER TABLE ways ADD COLUMN cost_activity float;
+ALTER TABLE ways ADD COLUMN cost_nature float;
+
+UPDATE cost_grid
+   SET test_activite=t_heavy_transport+a_shops+a_leisure+c_tourism+c_pow+a_food;
+
+WITH max_test_activite AS (SELECT max(test_activite) FROM cost_grid)
+UPDATE cost_grid
+SET test_activite=(test_activite/(SELECT max FROM max_test_activite));
+
+UPDATE cost_grid
+   SET test_nature=e_water+e_park+e_natural;
+
+WITH max_test_nature AS (SELECT max(test_nature) FROM cost_grid)
+UPDATE cost_grid
+SET test_nature=(test_nature/(SELECT max FROM max_test_nature));
+
+
+
+UPDATE ways
+SET cost_activity =
+	(SELECT length * cost.activity / cost.nbtiles
+	FROM dblink('dbname=gis user=postgres password=corpus',
+	'select test_activite,count(*),geom from cost_grid')
+	AS cost(activity float, nbtiles integer,geom geometry)
+	WHERE ST_Intersects(cost.geom,ways.the_geom));
+	
+
+UPDATE ways
+SET cost_activity = length * cinter.activity
+FROM (
+	SELECT w.gid as id, avg(c.test_activite) as activity
+	FROM dblink('dbname=gis user=postgres password=corpus',
+	'SELECT test_activite, geom FROM cost_grid')
+	AS c(test_activite float, geom geometry), ways AS w
+	WHERE ST_Intersects(c.geom,w.the_geom)
+	GROUP BY w.gid
+	) AS cinter
+WHERE cinter.id = ways.gid
+		        
+

@@ -15,6 +15,11 @@
 	<!-- Add Leaflet library -->
 	<div id="map" style="height:600px;" ></div>
 	<div id="routeLength"></div>
+	<div id="profile">
+		<input type="radio" name="profile" id="profileShortest" value="length" onclick="computeRoute()" checked/>Shortest path<br />
+		<input type="radio" name="profile" id="profileActivity" value="cost_activity" onclick="computeRoute()" />Activity<br />
+		<input type="radio" name="profile" id="profileActivity" value="cost_nature" onclick="computeRoute()" />Nature
+	</div>
 	<script type='text/javascript'>
 		map = new L.Map('map');
 		// create the tile layer with correct attribution
@@ -62,14 +67,20 @@
 		lonStop = markerStop.getLatLng().lng;
 		computeRoute()
 		});
-		
+
 		// get the route
 		routeLayer = undefined;
 		function computeRoute() {
 			$.ajax({
 				dataType: "json",
+				data: {
+					lat1: latStart,
+					lon1: lonStart,
+					lat2: latStop,
+					lon2: lonStop,
+					type: $('input[name=profile]:checked').val()
+				},
 				url: 'http://localhost:8000/route.json',
-				data: {lat1: latStart, lon1: lonStart, lat2: latStop, lon2: lonStop},
 				success: function(route) {
 					if (routeLayer != undefined) {
 					map.removeLayer(routeLayer);

@@ -174,7 +174,7 @@ $$
 LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION ShortestPathGeojsonLinestring2(lat1 text, lon1 text, lat2 text, lon2 text)
+CREATE OR REPLACE FUNCTION ShortestPathGeojsonLinestring2(lat1 text, lon1 text, lat2 text, lon2 text, profile text)
 RETURNS text AS
 $$
 DECLARE
@@ -235,7 +235,7 @@ BEGIN
 							SELECT gid as id,
 								source::integer,
 								target::integer,
-								length::double precision as cost
+								' || profile || '::double precision as cost
 								FROM (SELECT * FROM ways WHERE foot IS NOT FALSE) as ways_foot
 									UNION (SELECT -11 as gid,' ||  line_start.source || ' as source, -1 as target, (' || position_start || ' * ' || line_start.length || ') as length)
 									UNION (SELECT -12 as gid, -1 as source,' ||  line_start.target || ' as target, ((1-' || position_start || ') * ' || line_start.length || ') as length)
@@ -334,18 +334,18 @@ RETURNS VOID AS
 $$
 DECLARE
     line record;
-    line_foot text;
+    line_attr record ;
     line_osm_id integer;
 BEGIN
 	FOR line IN SELECT gid,osm_id FROM ways WHERE (foot IS NULL) LOOP
 		line_osm_id := line.osm_id;
-		SELECT foot_gis INTO line_foot
+		SELECT foot_gis,access_gis INTO line_attr
 		FROM dblink('dbname=gis user=postgres password=corpus',
-            'select foot from planet_osm_line WHERE osm_id=' || line_osm_id)
-      AS t1(foot_gis text);
-      IF (line_foot='yes') OR (line_foot='designated') OR (line_foot='permissive') THEN
+            'select foot,access from planet_osm_line WHERE osm_id=' || line_osm_id)
+      AS t1(foot_gis text, access_gis text);
+      IF (line_attr.foot_gis='yes') OR (line_attr.foot_gis='designated') OR (line_attr.foot_gis='permissive') THEN
 		UPDATE ways SET foot=TRUE WHERE gid=line.gid;
-	ELSEIF (line_foot='no') THEN
+	ELSEIF (line_attr.foot_gis='no') OR (line_attr.access_gis='no') OR (line_attr.access_gis='private') THEN
 		UPDATE ways SET foot=FALSE WHERE gid=line.gid;
 	END IF;
 	END LOOP;
