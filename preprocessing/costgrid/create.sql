@@ -87,6 +87,49 @@ WITH max_t_heavy_transport AS (SELECT max(t_heavy_transport) FROM cost_grid)
 UPDATE cost_grid
 SET t_heavy_transport=(t_heavy_transport/(SELECT max FROM max_t_heavy_transport));
 
+-- Transport - Highway classification
+
+ALTER TABLE cost_grid ADD COLUMN t_highway float DEFAULT 1;
+
+UPDATE cost_grid
+SET t_highway=(SELECT avg(rating)
+	     FROM (SELECT way,highway,
+			  CASE WHEN highway='motorway' THEN 0
+			       WHEN highway='motorway_link' THEN 0
+			       WHEN highway='motorway_junction' THEN 0
+			       WHEN highway='trunk' THEN 0
+			       WHEN highway='trunk_link' THEN 0
+			       WHEN highway='primary' THEN 0.1
+			       WHEN highway='primary_link' THEN 0.1
+			       WHEN highway='secondary' THEN 0.2
+			       WHEN highway='secondary_link' THEN 0.2
+			       WHEN highway='tertiary' THEN 0.4
+			       WHEN highway='tertiary_link' THEN 0.4
+			       WHEN highway='unclassified' THEN 0.6
+			       WHEN highway='residential' THEN 0.7
+			       WHEN highway='bus_guideway' THEN 0.8
+			       WHEN highway='service' THEN 0.8
+			       WHEN highway='living_street' THEN 0.8
+			       WHEN highway='track' THEN 0.9
+			       WHEN highway='path' THEN 0.9
+			       WHEN highway='steps' THEN 0.9
+			       WHEN highway='cycleway' THEN 0.9
+			       WHEN highway='bridleway' THEN 1
+			       WHEN highway='byway' THEN 1
+			       WHEN highway='footway' THEN 1
+			       WHEN highway='path' THEN 1
+			       WHEN highway='pedestrian' THEN 1
+			       ELSE 0
+			  END AS rating
+	           FROM planet_osm_line WHERE highway LIKE '%') as road
+	     WHERE ST_Intersects(cost_grid.geom,road.way)
+	    )
+;
+
+UPDATE cost_grid
+SET t_highway=1
+WHERE t_highway IS NULL;
+
 -- Activity - shops
 
 ALTER TABLE cost_grid ADD COLUMN a_shops float DEFAULT 0;
@@ -226,28 +269,18 @@ ALTER TABLE ways ADD COLUMN cost_activity float;
 ALTER TABLE ways ADD COLUMN cost_nature float;
 
 UPDATE cost_grid
-   SET test_activite=t_heavy_transport+a_shops+a_leisure+c_tourism+c_pow+a_food;
+   SET test_activite=2*t_highway+t_heavy_transport+a_shops+a_leisure+c_tourism+c_pow+a_food;
 
 WITH max_test_activite AS (SELECT max(test_activite) FROM cost_grid)
 UPDATE cost_grid
 SET test_activite=(test_activite/(SELECT max FROM max_test_activite));
 
 UPDATE cost_grid
-   SET test_nature=e_water+e_park+e_natural;
+   SET test_nature=4*t_highway+e_water+e_park+e_natural;
 
 WITH max_test_nature AS (SELECT max(test_nature) FROM cost_grid)
 UPDATE cost_grid
 SET test_nature=(test_nature/(SELECT max FROM max_test_nature));
-
-
-
-UPDATE ways
-SET cost_activity =
-	(SELECT length * cost.activity / cost.nbtiles
-	FROM dblink('dbname=gis user=postgres password=corpus',
-	'select test_activite,count(*),geom from cost_grid')
-	AS cost(activity float, nbtiles integer,geom geometry)
-	WHERE ST_Intersects(cost.geom,ways.the_geom));
 	
 
 UPDATE ways

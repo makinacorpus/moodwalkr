@@ -15,6 +15,7 @@
 	<!-- Add Leaflet library -->
 	<div id="map" style="height:600px;" ></div>
 	<div id="routeLength"></div>
+	<div id="responseTime"></div>
 	<div id="profile">
 		<input type="radio" name="profile" id="profileShortest" value="length" onclick="computeRoute()" checked/>Shortest path<br />
 		<input type="radio" name="profile" id="profileActivity" value="cost_activity" onclick="computeRoute()" />Activity<br />
@@ -71,6 +72,7 @@
 		// get the route
 		routeLayer = undefined;
 		function computeRoute() {
+			var ajaxTime= new Date().getTime();
 			$.ajax({
 				dataType: "json",
 				data: {
@@ -89,7 +91,10 @@
 					routeLayer = L.geoJson(route);
 					routeLayer.addTo(map);
 			  }
-			});
+			}).done(function () {
+   		var totalTime = new Date().getTime()-ajaxTime;
+   		$("#responseTime").html("Temps de réponse : " + totalTime+ " ms");
+		})
 		};
 	</script>
 </body>

@@ -35,6 +35,26 @@ END;
 $$
 LANGUAGE plpgsql;
 
+--CREATE OR REPLACE FUNCTION AllSegmentsFromPoints(polygon geometry,osm_id integer)
+--RETURNS SETOF geometry AS
+--$$
+--BEGIN
+--RETURN QUERY
+--	EXECUTE
+--	'WITH poly_geom AS (SELECT way FROM planet_osm_polygon WHERE osm_id=$1),
+--		other_ways AS (SELECT planet_osm_line.way FROM planet_osm_line,poly_geom WHERE osm_id != $1 AND ST_DWithin(planet_osm_line.way,poly_geom.way,0.00001)),
+--		points1 AS (SELECT (ST_DumpPoints(poly_geom.way)).* FROM poly_geom),
+--		points1_filter AS (SELECT points1.* FROM points1,poly_geom,other_ways WHERE (ST_Contains(ST_ConvexHull(poly_geom.way),points1.geom) OR ST_DWithin(other_ways.way,points1.geom,0.00001))),
+--		points2 AS (SELECT (ST_DumpPoints(poly_geom.way)).* FROM poly_geom),
+--		points2_filter AS (SELECT points2.* FROM points2,poly_geom,other_ways WHERE (ST_Contains(ST_ConvexHull(poly_geom.way),points2.geom) OR ST_DWithin(other_ways.way,points2.geom,0.00001)))
+--	SELECT DISTINCT ST_MakeLine(points1.geom, points2.geom)
+--	FROM points1,points2,poly_geom,other_ways
+--	WHERE points1.path <> points2.path;'
+--	USING osm_id;
+--END;
+--$$
+--LANGUAGE plpgsql;
+
 
 
 CREATE OR REPLACE FUNCTION VisibilityLines(polygon geometry,osm_id integer,line_name text)
@@ -343,10 +363,10 @@ BEGIN
 		FROM dblink('dbname=gis user=postgres password=corpus',
             'select foot,access from planet_osm_line WHERE osm_id=' || line_osm_id)
       AS t1(foot_gis text, access_gis text);
-      IF (line_attr.foot_gis='yes') OR (line_attr.foot_gis='designated') OR (line_attr.foot_gis='permissive') THEN
-		UPDATE ways SET foot=TRUE WHERE gid=line.gid;
-	ELSEIF (line_attr.foot_gis='no') OR (line_attr.access_gis='no') OR (line_attr.access_gis='private') THEN
+	IF (line_attr.foot_gis='no') OR (line_attr.access_gis='no') OR (line_attr.access_gis='private') THEN
 		UPDATE ways SET foot=FALSE WHERE gid=line.gid;
+	ELSEIF (line_attr.foot_gis='yes') OR (line_attr.foot_gis='designated') OR (line_attr.foot_gis='permissive') THEN
+		UPDATE ways SET foot=TRUE WHERE gid=line.gid;
 	END IF;
 	END LOOP;
 END;
