@@ -1,0 +1,22 @@
+# Add the Ubuntugis PPA in order to install Postgis 2
+sudo add-apt-repository ppa:ubuntugis/ppa
+sudo apt-get update
+
+# Install PostGis and its dependencies
+sudo apt-get install build-essential postgresql-9.1 postgresql-server-dev-9.1 libxml2-dev proj libjson0-dev xsltproc docbook-xsl docbook-mathml gettext postgresql-contrib-9.1 pgadmin3 postgis
+
+# Get a recent version of osm2pgsql, e.G. from here http://packages.ubuntu.com/quantal/amd64/osm2pgsql/download and install it.
+
+# Install osm2pgrouting
+git clone git@github.com:pgRouting/osm2pgrouting.git
+cd osm2pgrouting
+make
+
+# Install pgrouting
+git clone git@github.com:pgRouting/pgrouting.git
+cd pgrouting
+git checkout sew-devel-2_0
+# Use cmake  2.8.10 or newer
+cmake  -DWITH_TSP=ON -DWITH_DD=ON .
+make
+sudo make install

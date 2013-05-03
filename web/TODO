@@ -21,3 +21,4 @@ OK: Coût en fonction du type de voie
 OK: Pas de routing sur access=no et access=private
 * Supprimer les lignes inutiles pour le routing sur les surfaces (simplification topologique ?)
 * Mode itinéraire circulaire
+* Interface utilisateur
