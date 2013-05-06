@@ -8,6 +8,10 @@ osmFile="/file/path/toosm/fileorpbf/name.osm" # wget http://www.overpass-api.de/
 gisDB="gis"
 routingDB="routing"
 
+# Create user "postgres"
+echo "sudo -i -u postgres"
+sudo -i -u postgres
+
 # Create gis database
 su postgres
 createdb $gisDB
@@ -25,5 +29,9 @@ psql -d $routingDB -c "CREATE EXTENSION dblink;"
 psql -d $routingDB -f /usr/share/postgresql/9.1/contrib/postgis-2.0/legacy.sql
 
 # Create PostGis functions
-psql -U postgres -d $gisDB -a -f functions_gis.sql
-psql -U postgres -d $routingDB -a -f functions_routing.sql
+psql -U postgres -d $gisDB -a -f functions_gis.sql -h localhost
+psql -U postgres -d $routingDB -a -f functions_routing.sql -h localhost
+
+# Create cost_grid
+psql -U postgres -d $gisDB -a -f /installation/create_costgrid.sql -h localhost
+psql -U postgres -d $gisDB -a -f /preprocessing/costgrid/update.sql -h localhost

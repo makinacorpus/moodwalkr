@@ -9,7 +9,7 @@ import config
 osmPath=sys.argv[1]
 
 # "gis" database connection
-connGis = psycopg2.connect("dbname=gis user=postgres")
+connGis = psycopg2.connect("dbname=gis user=postgres host=localhost")
 connGis.autocommit = True
 curGis = connGis.cursor()
 

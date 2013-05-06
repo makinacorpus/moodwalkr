@@ -150,3 +150,5 @@ BEGIN
 END;
 $$
 LANGUAGE plpgsql;
+
+CREATE SEQUENCE ways_openspace_id;

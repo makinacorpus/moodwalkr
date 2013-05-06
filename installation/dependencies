@@ -1,3 +1,22 @@
+sudo apt-get install python-software-properties
+sudo apt-get install libprotobuf-c0
+sudo apt-get install git
+sudo apt-get install expat libexpat1-dev
+sudo apt-get install libcgal-dev 
+sudo apt-get install wget
+sudo apt-get install python-psycopg2
+
+
+# cmake2.8.10
+wget http://www.cmake.org/files/v2.8/cmake-2.8.10.2.tar.gz
+tar xvzf cmake-2.8.10.2.tar.gz 
+rm cmake-2.8.10.2.tar.gz 
+cd cmake-2.8.10.2/
+./bootstrap 
+make
+sudo make install
+
+
 # Add the Ubuntugis PPA in order to install Postgis 2
 sudo add-apt-repository ppa:ubuntugis/ppa
 sudo apt-get update
@@ -6,6 +25,9 @@ sudo apt-get update
 sudo apt-get install build-essential postgresql-9.1 postgresql-server-dev-9.1 libxml2-dev proj libjson0-dev xsltproc docbook-xsl docbook-mathml gettext postgresql-contrib-9.1 pgadmin3 postgis
 
 # Get a recent version of osm2pgsql, e.G. from here http://packages.ubuntu.com/quantal/amd64/osm2pgsql/download and install it.
+
+# osm2pgrouting dependencies
+sudo apt-get install libboost-graph-dev libboost-graph1.48.0 
 
 # Install osm2pgrouting
 git clone git@github.com:pgRouting/osm2pgrouting.git
