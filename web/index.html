@@ -15,6 +15,7 @@
 	<!-- Add Leaflet library -->
 	<div id="map" style="height:600px;" ></div>
 	<div id="routeLength"></div>
+	<div id="routeTime"></div>
 	<div id="responseTime"></div>
 	<div id="profile">
 		<input type="radio" name="profile" id="profileShortest" value="length" onclick="computeRoute()" checked/>Shortest path<br />
@@ -82,12 +83,13 @@
 					lon2: lonStop,
 					type: $('input[name=profile]:checked').val()
 				},
-				url: 'http://localhost:8000/route.json',
+				url: '/route.json',
 				success: function(route) {
 					if (routeLayer != undefined) {
 					map.removeLayer(routeLayer);
 					}
 					$("#routeLength").html("Longueur : " + Math.round(route.properties.length) + " m");
+					$("#routeTime").html("Temps : " + Math.round(route.properties.length*3.6/5) + " s");
 					routeLayer = L.geoJson(route);
 					routeLayer.addTo(map);
 			  }
