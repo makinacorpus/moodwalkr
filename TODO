@@ -22,3 +22,5 @@ OK: Pas de routing sur access=no et access=private
 * Supprimer les lignes inutiles pour le routing sur les surfaces (simplification topologique ?)
 * Mode itinéraire circulaire
 * Interface utilisateur
+* Afficher POI autour de l'itinéraire
+* Données bruit et trafic -> S Le Corre (16-17 mai)

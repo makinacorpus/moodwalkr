@@ -4,11 +4,14 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<title>Routing</title>
 	 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
+	 <link rel="stylesheet" href="http://medialize.github.com/jQuery-contextMenu/src/jquery.contextMenu.css" />
 	<!--[if lte IE 8]>
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.ie.css" />
 	<![endif]-->
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
+	<script src="http://medialize.github.com/jQuery-contextMenu/src/jquery.ui.position.js"></script>
+	<script src="http://medialize.github.com/jQuery-contextMenu/src/jquery.contextMenu.js"></script>
 </head>
 
 <body>
@@ -69,6 +72,55 @@
 		lonStop = markerStop.getLatLng().lng;
 		computeRoute()
 		});
+		
+<!--		var markerStart = null;-->
+<!--		var latStart;-->
+<!--		var lonStart;-->
+<!--		var markerStop = null;-->
+<!--		var latStop;-->
+<!--		var lonStop;-->
+<!--		map.on('contextmenu', function(e) {-->
+<!--			console.log('e=' + e.latlng)-->
+<!--			$.contextMenu({-->
+<!--				 pos: e.latlng,-->
+<!--				 selector: '#map',-->
+<!--				 callback: function(key, options) {-->
+<!--				 		if (key == "start") {-->
+<!--					 		if (markerStart == null) {-->
+<!--								markerStart = L.marker(options.pos);-->
+<!--								markerStart.addTo(map);-->
+<!--							} else {-->
+<!--								markerStart.setLatLng(options.pos);-->
+<!--							};-->
+<!--							latStart = markerStart.getLatLng().lat;-->
+<!--							lonStart = markerStart.getLatLng().lng;-->
+<!--							console.log("start" + latStart);-->
+<!--							console.log("start" + lonStart);-->
+<!--							computeRoute()-->
+<!--				 		} else if (key == "stop") {-->
+<!--				 			if (markerStop == null) {-->
+<!--								markerStop = L.marker(options.pos);-->
+<!--								markerStop.addTo(map);-->
+<!--							} else {-->
+<!--								markerStop.setLatLng(options.pos);-->
+<!--							};-->
+<!--							latStop = markerStop.getLatLng().lat;-->
+<!--							lonStop = markerStop.getLatLng().lng;-->
+<!--							console.log("stop" + latStop);-->
+<!--							console.log("stop" + lonStop);-->
+<!--							computeRoute()-->
+<!--				 		}-->
+<!--				 },-->
+<!--				 items: {-->
+<!--					  "start": {-->
+<!--						   name: "Start position"-->
+<!--					  },-->
+<!--					  "stop": {-->
+<!--						   name: "Arrival position"-->
+<!--					  }-->
+<!--				 }-->
+<!--			});-->
+<!--		});-->
 
 		// get the route
 		routeLayer = undefined;

@@ -2,7 +2,6 @@ sudo apt-get install python-software-properties
 sudo apt-get install libprotobuf-c0
 sudo apt-get install git
 sudo apt-get install expat libexpat1-dev
-sudo apt-get install libcgal-dev 
 sudo apt-get install wget
 sudo apt-get install python-psycopg2
 
@@ -17,8 +16,8 @@ make
 sudo make install
 
 
-# Add the Ubuntugis PPA in order to install Postgis 2
-sudo add-apt-repository ppa:ubuntugis/ppa
+# Add the Ubuntugis unstable PPA in order to install Postgis 2
+sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
 sudo apt-get update
 
 # Install PostGis and its dependencies
@@ -26,8 +25,8 @@ sudo apt-get install build-essential postgresql-9.1 postgresql-server-dev-9.1 li
 
 # Get a recent version of osm2pgsql, e.G. from here http://packages.ubuntu.com/quantal/amd64/osm2pgsql/download and install it.
 
-# osm2pgrouting dependencies
-sudo apt-get install libboost-graph-dev libboost-graph1.48.0 
+# osm2pgrouting and pgrouting dependencies
+sudo apt-get install libboost-dev libboost-graph-dev libboost-graph1.48.0 libboost-thread-dev libcgal-dev
 
 # Install osm2pgrouting
 git clone git@github.com:pgRouting/osm2pgrouting.git
@@ -39,6 +38,6 @@ git clone git@github.com:pgRouting/pgrouting.git
 cd pgrouting
 git checkout sew-devel-2_0
 # Use cmake  2.8.10 or newer
-cmake  -DWITH_TSP=ON -DWITH_DD=ON .
+cmake -DWITH_DD=ON .
 make
 sudo make install
