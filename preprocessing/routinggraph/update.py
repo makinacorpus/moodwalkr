@@ -20,7 +20,7 @@ cur = conn.cursor()
 cur.execute("DROP TABLE IF EXISTS lines_from_polygon")
 
 print "***** download OSM data"
-r = requests.get("http://www.overpass-api.de/api/xapi?map?bbox=%s" % bbox, stream=True)
+r = requests.get("http://www.overpass-api.de/api/xapi?map?bbox=%s,%s,%s,%s" % (lon_inf, lat_inf,lon_sup, lat_sup), stream=True)
 f = tempfile.NamedTemporaryFile(delete=False)
 for data in r.iter_content(chunk_size=1024):
     f.write(data)
@@ -38,6 +38,21 @@ cur.execute("CREATE TABLE lines_from_polygon (" +
 
 print "***** update cost grid"
 if costgrid_update:
+    cur.execute("DELETE FROM cost_grid;")
+    cur.execute("WITH pointi AS (SELECT ST_Transform(ST_GeomFromText('POINT(%s %s)',4326),3035))," +
+                "     points AS (SELECT ST_Transform(ST_GeomFromText('POINT(%s %s)',4326),3035))," +
+                "     x_i AS (SELECT ST_X(pointi.st_transform) FROM pointi)," +
+                "     y_i AS (SELECT ST_Y(pointi.st_transform) FROM pointi)," +
+                "     x_s AS (SELECT ST_X(points.st_transform) FROM points)," +
+                "     y_s AS (SELECT ST_Y(points.st_transform) FROM points)," +
+                "     x_inf AS (SELECT (x_i.st_x::numeric - (x_i.st_x::numeric % 50::numeric))::integer AS c FROM x_i)," +
+                "     y_inf AS (SELECT (y_i.st_y::numeric - (y_i.st_y::numeric % 50::numeric))::integer AS c FROM y_i)," +
+                "     x_sup AS (SELECT (x_s.st_x::numeric - (x_s.st_x::numeric % 50::numeric) + 50)::integer AS c FROM x_s)," +
+                "     y_sup AS (SELECT (y_s.st_y::numeric - (y_s.st_y::numeric % 50::numeric) + 50)::integer AS c FROM y_s)" +
+                "INSERT INTO cost_grid (geom)" +
+                "SELECT ST_Transform(ST_geomfromtext('POLYGON(('||X||' '||Y||', '||(X+50)||' '||Y||', '||(X+50)||' '||(Y+50)||', '||X||' '||(Y+50)||', '||X||' '||Y||'))',3035),900913)" +
+	            "FROM (SELECT generate_series(x_inf.c,x_sup.c,50) FROM x_inf,x_sup) as X," +
+	            "     (SELECT generate_series(y_inf.C,y_sup.c,50) FROM y_inf,y_sup) as Y;" % (lon_inf, lon_sup, lat_inf, lat_sup))
     f2 = open('%s/preprocessing/costgrid/update.sql' % base_path, 'r')
     sql = f2.read()
     f2.close()
