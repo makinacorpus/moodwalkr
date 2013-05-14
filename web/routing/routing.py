@@ -7,6 +7,9 @@ import BaseHTTPServer
 import re
 
 PORT = 8000
+db_name="routing"
+db_user="routing"
+db_pass="KadufZyn8Dr"
 
 class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 	def do_HEAD(self):
@@ -31,7 +34,7 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 				lat2 = params.group(3)
 				lon2 = params.group(4)
 				profile = params.group(5)
-			conn = psycopg2.connect("dbname=routing user=postgres")
+			conn = psycopg2.connect("host=localhost dbname=%s user=%s password=%s" % (db_name, db_user, db_pass))
 			cur = conn.cursor()
 			# cur.execute("SELECT * FROM ShortestPathGeojsonLinestring(NearestVertex('"+lat1+"','"+lon1+"'),NearestVertex('"+lat2+"','"+lon2+"'))")
 			cur.execute("SELECT * FROM ShortestPathGeojsonLinestring2('"+lat1+"','"+lon1+"','"+lat2+"','"+lon2+"','"+profile+"')")
@@ -45,7 +48,7 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 			self.wfile.close()
 
 try:
-    server = BaseHTTPServer.HTTPServer(('localhost', PORT), MyHandler)
+    server = BaseHTTPServer.HTTPServer(('', PORT), MyHandler)
     print('Started http server')
     server.serve_forever()
 except KeyboardInterrupt:

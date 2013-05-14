@@ -114,10 +114,8 @@ DECLARE
 BEGIN
 	FOR line IN SELECT gid,osm_id FROM ways WHERE (foot IS NULL) LOOP
 		line_osm_id := line.osm_id;
-		SELECT foot_gis,access_gis INTO line_attr
-		FROM dblink('dbname=gis user=postgres password=corpus',
-            'select foot,access from planet_osm_line WHERE osm_id=' || line_osm_id)
-      AS t1(foot_gis text, access_gis text);
+		SELECT p.foot_gis,p.access_gis INTO line_attr
+		FROM (SELECT foot AS foot_gis,access AS access_gis FROM planet_osm_line WHERE osm_id=line_osm_id) AS p;
 	IF (line_attr.foot_gis='no') OR (line_attr.access_gis='no') OR (line_attr.access_gis='private') THEN
 		UPDATE ways SET foot=FALSE WHERE gid=line.gid;
 	ELSEIF (line_attr.foot_gis='yes') OR (line_attr.foot_gis='designated') OR (line_attr.foot_gis='permissive') THEN
@@ -151,4 +149,12 @@ END;
 $$
 LANGUAGE plpgsql;
 
-CREATE SEQUENCE ways_openspace_id;
+DO LANGUAGE plpgsql $$
+BEGIN
+    IF NOT EXISTS (SELECT 0 FROM pg_class where relname='ways_openspace_id')
+    THEN
+        CREATE SEQUENCE ways_openspace_id;
+    END IF;
+END
+$$;
+

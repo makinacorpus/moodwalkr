@@ -1,4 +1,4 @@
-CREATE TABLE cost_grid
+CREATE TABLE IF NOT EXISTS cost_grid
 (
   geom geometry(Geometry,900913),
   x integer,
@@ -21,9 +21,21 @@ CREATE TABLE cost_grid
   test_activite double precision DEFAULT 0
 );
 
+DELETE FROM cost_grid;
+
 INSERT INTO cost_grid (geom)
 SELECT ST_Transform(ST_geomfromtext('POLYGON(('||X||' '||Y||', '||(X+50)||' '||Y||', '||(X+50)||' '||(Y+50)||', '||X||' '||(Y+50)||', '||X||' '||Y||'))',3035),900913)
 	FROM generate_series(3621600,3637600,50) as X,
 	generate_series(2307400,2325000,50) as Y;
 
-CREATE INDEX cost_grid_geom_idx ON cost_grid USING gist(geom);
+
+DO LANGUAGE plpgsql $$
+BEGIN
+    IF NOT EXISTS (SELECT 0 FROM pg_class where relname='cost_grid_geom_idx')
+    THEN
+        CREATE INDEX cost_grid_geom_idx ON cost_grid USING gist(geom);
+    END IF;
+END
+$$;
+
+

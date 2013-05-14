@@ -43,7 +43,7 @@ SET t_bicycle_rental=( SELECT count(*)
 	    WHERE ST_Contains(cost_grid.geom,bicycle_rental.way));
 
 
-WITH max_t_bicycle_rental AS (SELECT max(t_bicycle_rental) FROM cost_grid)
+WITH max_t_bicycle_rental AS (SELECT GREATEST(max(t_bicycle_rental), 1) as max FROM cost_grid)
 UPDATE cost_grid
 SET t_bicycle_rental=(t_bicycle_rental/(SELECT max FROM max_t_bicycle_rental));
 
@@ -55,7 +55,7 @@ SET t_heavy_transport=( SELECT count(*)
 	    WHERE ST_Contains(cost_grid.geom,heavy_transport.way));
 
 
-WITH max_t_heavy_transport AS (SELECT max(t_heavy_transport) FROM cost_grid)
+WITH max_t_heavy_transport AS (SELECT GREATEST(max(t_heavy_transport), 1) as max FROM cost_grid)
 UPDATE cost_grid
 SET t_heavy_transport=(t_heavy_transport/(SELECT max FROM max_t_heavy_transport));
 
@@ -116,7 +116,7 @@ SET a_shops=a_shops+(SELECT count(*)
 	    )
 ;
 
-WITH max_a_shops AS (SELECT max(a_shops) FROM cost_grid)
+WITH max_a_shops AS (SELECT GREATEST(max(a_shops), 1) as max FROM cost_grid)
 UPDATE cost_grid
 SET a_shops=(a_shops/(SELECT max FROM max_a_shops));
 
@@ -136,7 +136,7 @@ SET a_leisure=a_leisure+(SELECT count(*)
 	    )
 ;
 
-WITH max_a_leisure AS (SELECT max(a_leisure) FROM cost_grid)
+WITH max_a_leisure AS (SELECT GREATEST(max(a_leisure), 1) as max FROM cost_grid)
 UPDATE cost_grid
 SET a_leisure=(a_leisure/(SELECT max FROM max_a_leisure));
 
@@ -156,7 +156,7 @@ SET a_public_building=a_public_building+(SELECT count(*)
 	    )
 ;
 
-WITH max_a_public_building AS (SELECT max(a_public_building) FROM cost_grid)
+WITH max_a_public_building AS (SELECT GREATEST(max(a_public_building), 1) as max FROM cost_grid)
 UPDATE cost_grid
 SET a_public_building=(a_public_building/(SELECT max FROM max_a_public_building));
 
@@ -176,7 +176,7 @@ SET a_food=a_food+(SELECT count(*)
 	    )
 ;
 
-WITH max_a_food AS (SELECT max(a_food) FROM cost_grid)
+WITH max_a_food AS (SELECT GREATEST(max(a_food), 1) as max FROM cost_grid)
 UPDATE cost_grid
 SET a_food=(a_food/(SELECT max FROM max_a_food));
 
@@ -196,7 +196,7 @@ SET c_tourism=c_tourism+(SELECT count(*)
 	    )
 ;
 
-WITH max_c_tourism AS (SELECT max(c_tourism) FROM cost_grid)
+WITH max_c_tourism AS (SELECT GREATEST(max(c_tourism), 1) as max FROM cost_grid)
 UPDATE cost_grid
 SET c_tourism=(c_tourism/(SELECT max FROM max_c_tourism));
 
@@ -216,7 +216,7 @@ SET c_pow=c_pow+(SELECT count(*)
 	    )
 ;
 
-WITH max_c_pow AS (SELECT max(c_pow) FROM cost_grid)
+WITH max_c_pow AS (SELECT GREATEST(max(c_pow), 1) as max FROM cost_grid)
 UPDATE cost_grid
 SET c_pow=(c_pow/(SELECT max FROM max_c_pow));
 
@@ -225,13 +225,13 @@ SET c_pow=(c_pow/(SELECT max FROM max_c_pow));
 UPDATE cost_grid
    SET test_activite=t_highway+t_heavy_transport+a_shops+a_leisure+c_tourism+c_pow+a_food;
 
-WITH max_test_activite AS (SELECT max(test_activite) FROM cost_grid)
+WITH max_test_activite AS (SELECT GREATEST(max(test_activite), 1) as max FROM cost_grid)
 UPDATE cost_grid
 SET test_activite=(test_activite/(SELECT max FROM max_test_activite));
 
 UPDATE cost_grid
    SET test_nature=t_highway+e_water+e_park+e_natural;
 
-WITH max_test_nature AS (SELECT max(test_nature) FROM cost_grid)
+WITH max_test_nature AS (SELECT GREATEST(max(test_nature), 1) as max FROM cost_grid)
 UPDATE cost_grid
 SET test_nature=(test_nature/(SELECT max FROM max_test_nature));

@@ -1,37 +1,102 @@
 #!/bin/bash
+
 set -e
+set -x
 
-#Install everything needed for pedestrian-routing
+# Install everything needed for pedestrian-routing
 
-# Variables
-osmFile="/file/path/toosm/fileorpbf/name.osm" # wget http://www.overpass-api.de/api/xapi?map?bbox=1.35,43.53,1.52,43.67 -O toulouse.osm
-gisDB="gis"
-routingDB="routing"
+# Get config
+source config.sh
+
+# Add the Ubuntugis unstable PPA in order to install Postgis 2
+sudo apt-get -y install python-software-properties
+sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
+sudo apt-get update
+
+# Install packages
+sudo apt-get -y install \
+    wget \
+    postgresql-9.1 \
+    git \
+    python-psycopg2 \
+    build-essential \
+    postgis \
+    libgeos-3.3.3 \
+    libprotobuf-c0 \
+    postgresql-server-dev-9.1 \
+    libcgal-dev \
+    libboost-dev \
+    python-pip \
+    libexpat1-dev
+
+sudo pip install requests
+
+
+#sudo apt-get install expat 
+#sudo apt-get install  libxml2-dev proj libjson0-dev xsltproc docbook-xsl docbook-mathml gettext postgresql-contrib-9.1 pgadmin3
+#sudo apt-get install libboost-graph-dev libboost-graph1.48.0 libboost-thread-dev 
+
+# cmake2.8.10
+if test ! -d cmake-2.8.10.2; then
+    wget http://www.cmake.org/files/v2.8/cmake-2.8.10.2.tar.gz
+    tar xvzf cmake-2.8.10.2.tar.gz 
+    rm cmake-2.8.10.2.tar.gz 
+    pushd cmake-2.8.10.2/
+    ./bootstrap 
+    make
+    sudo make install
+    popd
+fi
+
+# Get a recent version of osm2pgsql and install it
+if ! (dpkg -l | grep "osm2pgsql *0.80.0+r27899-4"); then
+    wget http://archive.ubuntu.com/ubuntu/pool/universe/o/osm2pgsql/osm2pgsql_0.80.0+r27899-4_amd64.deb
+    sudo dpkg -i osm2pgsql_0.80.0+r27899-4_amd64.deb
+fi
+
+# Install osm2pgrouting
+if test ! -d osm2pgrouting; then
+    git clone git@github.com:pgRouting/osm2pgrouting.git
+    pushd osm2pgrouting
+    make
+    popd
+fi
+
+# Install pgrouting
+if test ! -d pgrouting; then
+    git clone git@github.com:pgRouting/pgrouting.git
+    pushd pgrouting
+    git checkout 3be3aef5
+    cmake -DWITH_DD=ON .
+    make
+    sudo make install
+    popd
+fi
+
+# Set .pgpass file
+if ! grep "^localhost:5432:${db_name}:${db_user}:" ~/.pgpass; then
+    echo "localhost:5432:${db_name}:${db_user}:${db_pass}" >> ~/.pgpass
+fi
 
 # Create user "postgres"
-echo "sudo -i -u postgres"
-sudo -i -u postgres
+if ! sudo -u postgres psql -tAc "SELECT 'ok' FROM pg_roles WHERE rolname='${db_user}'" | grep "ok"; then
+    sudo -u postgres psql -c "CREATE USER ${db_user} PASSWORD '${db_pass}';"
+fi
 
-# Create gis database
-su postgres
-createdb $gisDB
-psql -d $gisDB -c "CREATE EXTENSION postgis;"
-psql $gisDB -c "ALTER TABLE geometry_columns OWNER TO postgres"
-psql $gisDB -c "ALTER TABLE spatial_ref_sys OWNER TO postgres"
-
-# Create routing database
-su postgres
-createdb $routingDB
-createlang plpgsql $routingDB
-psql -d $routingDB -c "CREATE EXTENSION postgis;"
-psql -d $routingDB -c "CREATE EXTENSION pgrouting;"
-psql -d $routingDB -c "CREATE EXTENSION dblink;"
-psql -d $routingDB -f /usr/share/postgresql/9.1/contrib/postgis-2.0/legacy.sql
+# Create database
+if ! sudo -u postgres psql -tAl | grep "^${db_name}"; then
+    $root_psql -c "CREATE DATABASE ${db_name} OWNER ${db_user};"
+    $root_psql ${db_name} -c "CREATE EXTENSION postgis;"
+    $root_psql ${db_name} -c "ALTER TABLE geometry_columns OWNER TO ${db_user};"
+    $root_psql ${db_name} -c "ALTER TABLE spatial_ref_sys OWNER TO ${db_user};"
+    $root_psql ${db_name} -c "CREATE EXTENSION pgrouting;"
+    $user_psql -f /usr/share/postgresql/9.1/contrib/postgis-2.0/legacy.sql
+fi
 
 # Create PostGis functions
-psql -U postgres -d $gisDB -a -f functions_gis.sql -h localhost
-psql -U postgres -d $routingDB -a -f functions_routing.sql -h localhost
+$user_psql -f functions_gis.sql
+$user_psql -f functions_routing.sql
 
 # Create cost_grid
-psql -U postgres -d $gisDB -a -f /installation/create_costgrid.sql -h localhost
-psql -U postgres -d $gisDB -a -f /preprocessing/costgrid/update.sql -h localhost
+$user_psql -f create_costgrid.sql
+

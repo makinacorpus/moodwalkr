@@ -3,138 +3,130 @@
 
 import sys,os
 import psycopg2
-import config
+from config import *
+import requests
+import tempfile
 
-# path to the osm file
-osmPath=sys.argv[1]
+# options parsing
+costgrid_update = '-c' in sys.argv
+base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # "gis" database connection
-connGis = psycopg2.connect("dbname=gis user=postgres host=localhost")
-connGis.autocommit = True
-curGis = connGis.cursor()
+conn = psycopg2.connect("dbname=%s user=%s host=localhost password=%s" % (db_name, db_user, db_pass))
+conn.autocommit = True
+cur = conn.cursor()
 
 # Drop existing tables
-curGis.execute("DROP TABLE IF EXISTS lines_from_polygon")
-# curGis.execute("DELETE FROM planet_osm_line")
-# curGis.execute("DELETE FROM planet_osm_nodes")
-# curGis.execute("DELETE FROM planet_osm_point")
-# curGis.execute("DELETE FROM planet_osm_polygon")
-# curGis.execute("DELETE FROM planet_osm_rels")
-# curGis.execute("DELETE FROM planet_osm_roads")
-# curGis.execute("DELETE FROM planet_osm_ways")
+cur.execute("DROP TABLE IF EXISTS lines_from_polygon")
+
+print "***** download OSM data"
+r = requests.get("http://www.overpass-api.de/api/xapi?map?bbox=%s" % bbox, stream=True)
+f = tempfile.NamedTemporaryFile(delete=False)
+for data in r.iter_content(chunk_size=1024):
+    f.write(data)
+f.flush()
 
 print "***** osm2pgsql"
-os.system("osm2pgsql -s --style /usr/share/osm2pgsql/default.style -U postgres -d gis " + osmPath)
+command = "osm2pgsql -s -H localhost -U %s -d %s %s" % (db_user, db_name, f.name)
+print command
+os.system(command)
 
+cur.execute("CREATE TABLE lines_from_polygon (" +
+			"geom geometry(Geometry,900913)," +
+			"name text," +
+			"osm_id integer);")
 
-curGis.execute("CREATE TABLE lines_from_polygon (" +
-					"geom geometry(Geometry,900913)," +
-					"name text," +
-					"osm_id integer);")
+print "***** update cost grid"
+if costgrid_update:
+    f2 = open('%s/preprocessing/costgrid/update.sql' % base_path, 'r')
+    sql = f2.read()
+    f2.close()
+    cur.execute(sql)
+
 
 print "***** Visibility graphs creation"
-for zone in config.pedestrianAreasHighway:		
-	curGis.execute('SELECT PolygonToVisibilityGraphHighway(%s)',(zone,))
+for zone in pedestrianAreasHighway:		
+	cur.execute('SELECT PolygonToVisibilityGraphHighway(%s)',(zone,))
 
-#for zone in config.pedestrianAreasAmenity:		
-#	curGis.execute('SELECT PolygonToVisibilityGraphAmenity(%s)',(zone,))
-
-# close the "gis" database connection
-connGis.commit()
-curGis.close()
-connGis.close()
+#for zone in pedestrianAreasAmenity:		
+#	cur.execute('SELECT PolygonToVisibilityGraphAmenity(%s)',(zone,))
 
 
-# "routing" database connection
-connRouting = psycopg2.connect("dbname=routing user=postgres")
-connRouting.autocommit = True
-curRouting = connRouting.cursor()
-
-# Drop existing tables
-# curRouting.execute("DELETE FROM classes")
-# curRouting.execute("DELETE FROM nodes")
-# curRouting.execute("DELETE FROM relation_ways")
-# curRouting.execute("DELETE FROM relations")
-# curRouting.execute("DELETE FROM types")
-# curRouting.execute("DELETE FROM vertices_tmp")
-# curRouting.execute("DELETE FROM way_tag")
-# curRouting.execute("DELETE FROM ways")
-curRouting.execute("DROP TABLE IF EXISTS ways_openspace")
+cur.execute("DROP TABLE IF EXISTS ways_openspace")
 
 print "***** osm2pgrouting"
-os.system("/home/makina/osm2pgrouting/osm2pgrouting -file " + osmPath + " -conf '/home/makina/pedestrian-routing/preprocessing/osm2pgrouting/mapconfig.xml' -host localhost -dbname routing -user postgres -clean")
+command = "%s/installation/osm2pgrouting/osm2pgrouting -file %s -conf %s/preprocessing/osm2pgrouting/mapconfig.xml -host localhost -dbname %s -user %s -clean" % (base_path, f.name, base_path, db_name, db_user)
+print command
+os.system(command)
 
-curRouting.execute("CREATE TABLE ways_openspace (" +
-						 "geom geometry(LineString,4326)," +
-						 "id integer," +
-						 "source integer," +
-						 "target integer);")
+cur.execute("CREATE TABLE ways_openspace (" +
+			"geom geometry(LineString,4326)," +
+			"id integer," +
+			"source integer," +
+			"target integer);")
 
-curRouting.execute("WITH nummax AS (SELECT max(gid) FROM ways)" +
+cur.execute("WITH nummax AS (SELECT max(gid) FROM ways)" +
 						 "SELECT setval('ways_openspace_id', ((SELECT * FROM nummax)+1));")
 						 
-curRouting.execute("ALTER TABLE ways ADD COLUMN foot boolean;")
-curRouting.execute("ALTER TABLE ways ADD COLUMN frompolygon boolean;")
-curRouting.execute("ALTER TABLE ways ADD COLUMN cost_activity float;")
-curRouting.execute("ALTER TABLE ways ADD COLUMN cost_nature float;")
+cur.execute("ALTER TABLE ways ADD COLUMN foot boolean;")
+cur.execute("ALTER TABLE ways ADD COLUMN frompolygon boolean;")
+cur.execute("ALTER TABLE ways ADD COLUMN cost_activity float;")
+cur.execute("ALTER TABLE ways ADD COLUMN cost_nature float;")
 
 print "***** Import ways from polygon"
-curRouting.execute("INSERT INTO ways(the_geom,name,class_id,gid,osm_id,foot,frompolygon) " +
-						 "SELECT lines_openspace,lines_name,116,nextval('ways_openspace_id'),lines_osm_id,TRUE,TRUE " +
-						 "FROM dblink('dbname=gis user=postgres password=corpus', " +
-						 "'select st_transform(geom,4326),name,osm_id from lines_from_polygon') " +
-						 "AS t1(lines_openspace geometry,lines_name text,lines_osm_id integer);")
+cur.execute("INSERT INTO ways(the_geom,name,class_id,gid,osm_id,foot,frompolygon) " +
+			"SELECT st_transform(geom,4326),name,116,nextval('ways_openspace_id'),osm_id,TRUE,TRUE " +
+			"FROM lines_from_polygon;")
 
 print "***** Assign vertex id"
-curRouting.execute("SELECT assign_vertex_id('ways', 0.00001, 'the_geom', 'gid');")
+cur.execute("SELECT assign_vertex_id('ways', 0.00001, 'the_geom', 'gid');")
 
 print "***** Update legnth"
-curRouting.execute("UPDATE ways SET length = ST_Length_Spheroid(ways.the_geom,'SPHEROID[\"WGS 84\",6378137,298.257223563]');")
+cur.execute("UPDATE ways SET length = ST_Length_Spheroid(ways.the_geom,'SPHEROID[\"WGS 84\",6378137,298.257223563]');")
 
 print "***** Update foot attribute"
-curRouting.execute("SELECT UpdateFootAttribute()")
+cur.execute("SELECT UpdateFootAttribute()")
 
 print "***** Update sidewalks"
-curRouting.execute("SELECT UpdateSideWalks()")
+cur.execute("SELECT UpdateSideWalks()")
 
 print "***** Create index geom on ways"
-curRouting.execute("CREATE INDEX ways_geom_idx ON ways USING gist(the_geom);")
+cur.execute("CREATE INDEX ways_geom_idx ON ways USING gist(the_geom);")
 
 print "***** Update cost_activity"
-curRouting.execute("UPDATE ways " +
-						 "SET cost_activity = length * (1 - cinter.activity/2) " +
-						 "FROM ( " +
-						 "	SELECT w.gid as id, avg(c.test_activite) as activity " +
-						 "	FROM dblink('dbname=gis user=postgres password=corpus', " +
-						 "	'SELECT test_activite, ST_Transform(geom,4326) FROM cost_grid') " +
-						 "	AS c(test_activite float, geom geometry), ways AS w " +
-						 "	WHERE ST_Intersects(c.geom,w.the_geom) " +
-						 "	GROUP BY w.gid " +
-						 "	) AS cinter " +
-						 "WHERE cinter.id = ways.gid")
+cur.execute("UPDATE ways " +
+			"SET cost_activity = length * (1 - cinter.activity/2) " +
+			"FROM ( " +
+			"	SELECT w.gid as id, w.the_geom, c.geom, avg(c.test_activite) as activity " +
+			"	FROM cost_grid AS c, ways AS w " +
+			"	WHERE ST_Intersects(ST_Transform(c.geom,4326),w.the_geom) " +
+			"	GROUP BY w.gid, w.the_geom, c.geom " +
+			"	) AS cinter " +
+			"WHERE cinter.id = ways.gid")			
+			
 						 
-curRouting.execute("UPDATE ways " +
-						 "SET cost_activity = length " +
-						 "WHERE cost_activity IS NULL;")
+cur.execute("UPDATE ways " +
+			"SET cost_activity = length " +
+			"WHERE cost_activity IS NULL;")
 						 
 print "***** Update cost_nature"						 				 
-curRouting.execute("UPDATE ways " +
-						 "SET cost_nature = length * (1 - cinter.nature/2) " +
-						 "FROM ( " +
-						 "	SELECT w.gid as id, avg(c.test_nature) as nature " +
-						 "	FROM dblink('dbname=gis user=postgres password=corpus', " +
-						 "	'SELECT test_nature, ST_Transform(geom,4326) FROM cost_grid') " +
-						 "	AS c(test_nature float, geom geometry), ways AS w " +
-						 "	WHERE ST_Intersects(c.geom,w.the_geom) " +
-						 "	GROUP BY w.gid " +
-						 "	) AS cinter " +
-						 "WHERE cinter.id = ways.gid")
+cur.execute("UPDATE ways " +
+			"SET cost_nature = length * (1 - cinter.nature/2) " +
+		    "FROM ( " +
+		    "	SELECT w.gid as id, w.the_geom, c.geom, avg(c.test_nature) as nature " +
+		    "	FROM cost_grid AS c, ways AS w " +
+		    "	WHERE ST_Intersects(ST_Transform(c.geom,4326),w.the_geom) " +
+		    "	GROUP BY w.gid, w.the_geom, c.geom " +
+		    "	) AS cinter " +
+		    "WHERE cinter.id = ways.gid")
 
-curRouting.execute("UPDATE ways " +
-						 "SET cost_nature = length " +
-						 "WHERE cost_nature IS NULL;")
+cur.execute("UPDATE ways " +
+			"SET cost_nature = length " +
+			"WHERE cost_nature IS NULL;")
 
 # close the "routing" database connection
-connRouting.commit()
-curRouting.close()
-connRouting.close()
+conn.commit()
+cur.close()
+conn.close()
+f.close()
+

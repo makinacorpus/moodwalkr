@@ -86,7 +86,7 @@
 				    console.log('e.latlng=' + e.latlng)
 		     		if (key == "start") {
 			     		if (markerStart == null) {
-						    markerStart = L.marker(e.latlng);
+						    markerStart = L.marker(e.latlng, {draggable:true});
 						    markerStart.addTo(map);
 					    } else {
 						    markerStart.setLatLng(e.latlng);
@@ -98,7 +98,7 @@
 					    computeRoute();
 		     		} else if (key == "stop") {
 		     			if (markerStop == null) {
-						    markerStop = L.marker(e.latlng);
+						    markerStop = L.marker(e.latlng, {draggable:true});
 						    markerStop.addTo(map);
 					    } else {
 						    markerStop.setLatLng(e.latlng);
@@ -111,16 +111,19 @@
 		     		}
              		$.contextMenu('destroy', '#map');
                 },
-            items: {
-                "start": {
-                    name: "Start position"
-                },
-                "stop": {
-        	        name: "Arrival position"
-    	        }
-        	}
+                items: {
+                    "start": {
+                        name: "Start position"
+                    },
+                    "stop": {
+            	        name: "Arrival position"
+        	        }
+            	}
+            });
         });
-    });
+        
+        // Compute the route when a marker is dragged
+        markerStart.on('click', computeRoute());
 
 		// get the route
 		routeLayer = undefined;
@@ -146,9 +149,9 @@
 					routeLayer.addTo(map);
 			  }
 			}).done(function () {
-   		var totalTime = new Date().getTime()-ajaxTime;
-   		$("#responseTime").html("Temps de réponse : " + totalTime+ " ms");
-		})
+       		    var totalTime = new Date().getTime()-ajaxTime;
+       		    $("#responseTime").html("Temps de réponse : " + totalTime+ " ms");
+		    })
 		};
 	</script>
 </body>
