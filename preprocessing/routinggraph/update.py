@@ -36,11 +36,11 @@ cur.execute("CREATE TABLE lines_from_polygon (" +
 			"name text," +
 			"osm_id integer);")
 
-print "***** update cost grid"
 if costgrid_update:
-    cur.execute("DELETE FROM cost_grid;")
-    cur.execute("WITH pointi AS (SELECT ST_Transform(ST_GeomFromText('POINT(%s %s)',4326),3035))," +
-                "     points AS (SELECT ST_Transform(ST_GeomFromText('POINT(%s %s)',4326),3035))," +
+    print "***** create cost grid"
+    cur.execute("TRUNCATE cost_grid;")
+    cur.execute("WITH pointi AS (SELECT ST_Transform(ST_GeomFromText('POINT(%s %s)',4326),3035))," % (lon_inf, lat_inf) +
+                "     points AS (SELECT ST_Transform(ST_GeomFromText('POINT(%s %s)',4326),3035))," % (lon_sup, lat_sup) +
                 "     x_i AS (SELECT ST_X(pointi.st_transform) FROM pointi)," +
                 "     y_i AS (SELECT ST_Y(pointi.st_transform) FROM pointi)," +
                 "     x_s AS (SELECT ST_X(points.st_transform) FROM points)," +
@@ -51,8 +51,9 @@ if costgrid_update:
                 "     y_sup AS (SELECT (y_s.st_y::numeric - (y_s.st_y::numeric % 50::numeric) + 50)::integer AS c FROM y_s)" +
                 "INSERT INTO cost_grid (geom)" +
                 "SELECT ST_Transform(ST_geomfromtext('POLYGON(('||X||' '||Y||', '||(X+50)||' '||Y||', '||(X+50)||' '||(Y+50)||', '||X||' '||(Y+50)||', '||X||' '||Y||'))',3035),900913)" +
-	            "FROM (SELECT generate_series(x_inf.c,x_sup.c,50) FROM x_inf,x_sup) as X," +
-	            "     (SELECT generate_series(y_inf.C,y_sup.c,50) FROM y_inf,y_sup) as Y;" % (lon_inf, lon_sup, lat_inf, lat_sup))
+	            "FROM generate_series((SELECT x_inf.c FROM x_inf),(SELECT x_sup.c FROM x_sup),50) AS X," +
+	            "     generate_series((SELECT y_inf.c FROM y_inf),(SELECT y_sup.c FROM y_sup),50) AS Y;")
+    print "***** update cost grid"
     f2 = open('%s/preprocessing/costgrid/update.sql' % base_path, 'r')
     sql = f2.read()
     f2.close()

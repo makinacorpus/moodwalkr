@@ -33,7 +33,7 @@ sudo pip install requests
 
 
 #sudo apt-get install expat 
-#sudo apt-get install  libxml2-dev proj libjson0-dev xsltproc docbook-xsl docbook-mathml gettext postgresql-contrib-9.1 pgadmin3
+#sudo apt-get install  libxml2-dev proj libjson0-dev xsltproc docbook-xsl docbook-mathml gettext
 #sudo apt-get install libboost-graph-dev libboost-graph1.48.0 libboost-thread-dev 
 
 # cmake2.8.10
@@ -90,7 +90,7 @@ if ! sudo -u postgres psql -tAl | grep "^${db_name}"; then
     $root_psql ${db_name} -c "ALTER TABLE geometry_columns OWNER TO ${db_user};"
     $root_psql ${db_name} -c "ALTER TABLE spatial_ref_sys OWNER TO ${db_user};"
     $root_psql ${db_name} -c "CREATE EXTENSION pgrouting;"
-    $user_psql -f /usr/share/postgresql/9.1/contrib/postgis-2.0/legacy.sql
+    $root_psql ${db_name} -f /usr/share/postgresql/9.1/contrib/postgis-2.0/legacy.sql
 fi
 
 # Create PostGis functions

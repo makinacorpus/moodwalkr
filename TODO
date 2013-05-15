@@ -20,9 +20,10 @@ OK: switch entre différents profils (interface web et requetes)
 OK: Coût en fonction du type de voie
 OK: Pas de routing sur access=no et access=private
 * costgrid : technique générique et fichier de conf
-* costgrid : la générer sur l'emprise de la bounding box, pas que Toulouse
+OK: costgrid : la générer sur l'emprise de la bounding box, pas que Toulouse
 * Supprimer les lignes inutiles pour le routing sur les surfaces (simplification topologique ?)
 * Mode itinéraire circulaire
 * Interface utilisateur
 * Afficher POI autour de l'itinéraire
+* optimiser requetes -> passer à A* ?
 * Données bruit et trafic -> S Le Corre (16-17 mai)
