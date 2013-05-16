@@ -21,11 +21,11 @@
 	<!-- Add Leaflet library -->
 	<div class="row-fluid">
 	    <div class="span12" id="map" style="height:600px;" ></div>
-	    <div id="action">
+	    <div class="span3" id="action">
 	        <form>
               <fieldset>
-                <input type="text" placeholder="Start"><br />
-                <input type="text" placeholder="Destination">
+                <input style='width:100%' type="text" id="startField" placeholder="Start"><br />
+                <input style='width:100%' type="text" id="destinationField" placeholder="Destination">
               </fieldset>
             </form>
         </div>
@@ -105,8 +105,6 @@
 					    };
 					    latStart = markerStart.getLatLng().lat;
 					    lonStart = markerStart.getLatLng().lng;
-					    console.log("start" + latStart);
-					    console.log("start" + lonStart);
 					    computeRoute("length");
 					    computeRoute("cost_activity");
 					    computeRoute("cost_nature");
@@ -119,8 +117,6 @@
 					    };
 					    latStop = markerStop.getLatLng().lat;
 					    lonStop = markerStop.getLatLng().lng;
-					    console.log("stop" + latStop);
-					    console.log("stop" + lonStop);
 					    computeRoute("length");
 					    computeRoute("cost_activity");
 					    computeRoute("cost_nature");
@@ -167,6 +163,57 @@
        		    $("#responseTime").html("Temps de réponse : " + totalTime+ " ms");
 		    })
 		};
+		
+		// 
+		$("#startField").keyup(function (e) {
+            if (e.keyCode == 13) {
+                $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + document.getElementById('startField').value, function(data) {
+                    console.log(data);
+                    $.each(data, function(key, val) {
+                        var lat = val['lat'];
+                        var lon = val['lon'];
+                        console.log(lat);
+                        console.log(lon);
+                    	if (markerStart == null) {
+				            markerStart = L.marker(new L.LatLng(lat, lon), {draggable:true});
+				            markerStart.addTo(map);
+			            } else {
+				            markerStart.setLatLng(new L.LatLng(lat, lon));
+			            };
+					    latStart = markerStart.getLatLng().lat;
+					    lonStart = markerStart.getLatLng().lng;
+					    computeRoute("length");
+					    computeRoute("cost_activity");
+					    computeRoute("cost_nature");
+                    });
+                }); 
+            }
+        });
+        
+		$("#destinationField").keyup(function (e) {
+            if (e.keyCode == 13) {
+                $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + document.getElementById('destinationField').value, function(data) {
+                    console.log(data);
+                    $.each(data, function(key, val) {
+                        var lat = val['lat'];
+                        var lon = val['lon'];
+                        console.log(lat);
+                        console.log(lon);
+                    	if (markerStop == null) {
+				            markerStop = L.marker(new L.LatLng(lat, lon), {draggable:true});
+				            markerStop.addTo(map);
+			            } else {
+				            markerStop.setLatLng(new L.LatLng(lat, lon));
+			            };
+					    latStop = markerStop.getLatLng().lat;
+					    lonStop = markerStop.getLatLng().lng;
+					    computeRoute("length");
+					    computeRoute("cost_activity");
+					    computeRoute("cost_nature");
+                    });
+                }); 
+            }
+        });
 	</script>
 </body>
 </html>
