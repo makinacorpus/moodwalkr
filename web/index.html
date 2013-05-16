@@ -5,6 +5,8 @@
 	<title>Routing</title>
 	 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
 	 <link rel="stylesheet" href="http://medialize.github.com/jQuery-contextMenu/src/jquery.contextMenu.css" />
+	 <link rel="stylesheet" href="css/bootstrap.css" media="screen">
+	 <link rel="stylesheet" href="css/main.css">
 	<!--[if lte IE 8]>
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.ie.css" />
 	<![endif]-->
@@ -12,18 +14,24 @@
 	<script src="http://cdn.leafletjs.com/leaflet-0.5/leaflet.js"></script>
 	<script src="http://medialize.github.com/jQuery-contextMenu/src/jquery.ui.position.js"></script>
 	<script src="http://medialize.github.com/jQuery-contextMenu/src/jquery.contextMenu.js"></script>
+	<script src="js/bootstrap.min.js"></script>
 </head>
 
 <body>
 	<!-- Add Leaflet library -->
-	<div id="map" style="height:600px;" ></div>
-	<div id="routeLength"></div>
-	<div id="routeTime"></div>
-	<div id="responseTime"></div>
-	<div id="profile">
-		<input type="radio" name="profile" id="profileShortest" value="length" onclick="computeRoute()" checked/>Shortest path<br />
-		<input type="radio" name="profile" id="profileActivity" value="cost_activity" onclick="computeRoute()" />Activity<br />
-		<input type="radio" name="profile" id="profileActivity" value="cost_nature" onclick="computeRoute()" />Nature
+	<div class="row-fluid">
+	    <div class="span12" id="map" style="height:600px;" ></div>
+	    <div id="action">
+	        <form>
+              <fieldset>
+                <input type="text" placeholder="Start"><br />
+                <input type="text" placeholder="Destination">
+              </fieldset>
+            </form>
+        </div>
+	    <div id="routeLength"></div>
+	    <div id="routeTime"></div>
+	    <div id="responseTime"></div>
 	</div>
 	<script type='text/javascript'>
 		map = new L.Map('map', {zoomControl:false});
@@ -121,10 +129,10 @@
                 },
                 items: {
                     "start": {
-                        name: "Start position"
+                        name: "Start"
                     },
                     "stop": {
-            	        name: "Arrival position"
+            	        name: "Destination"
         	        }
             	}
             });
