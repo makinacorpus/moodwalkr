@@ -96,7 +96,7 @@ BEGIN
 		END LOOP;
 	END IF;
 	geojson:=substring(geojson from 1 for char_length(geojson)-1);	
-	geojson:=geojson || '],"properties": {"length":' || length_tot || '}';
+	geojson:=geojson || '],"properties": {"length":' || length_tot || ',"profile":"' || profile ||  '"}';
 	geojson:=geojson || '}';
 	RETURN geojson;
 END;

@@ -26,7 +26,7 @@
 		<input type="radio" name="profile" id="profileActivity" value="cost_nature" onclick="computeRoute()" />Nature
 	</div>
 	<script type='text/javascript'>
-		map = new L.Map('map');
+		map = new L.Map('map', {zoomControl:false});
 		// create the tile layer with correct attribution
 		var osmUrl='http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png';
 		var osmAttrib='Carte <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png"> Données <a href="http://www.openstreetmap.org/copyright">© Contributeurs OpenStreetMap</a>';
@@ -35,44 +35,48 @@
 
 		// Don't show the 'Powered by Leaflet' text	
 		map.attributionControl.setPrefix('');
-
+		
+		// Zoom buttons position
+		var zoomp = new L.Control.Zoom({position: 'topright'});
+        zoomp.addTo(map);
+        
 		// Start the map in Toulouse
 		map.addLayer(osm);
 		map.setView(new L.LatLng(43.6, 1.4),12);
 		
-<!--		// markerStart-->
-<!--		var markerStart = null;-->
-<!--		var latStart;-->
-<!--		var lonStart;-->
-<!--		map.on('click', function(e) {-->
-<!--			if (markerStart == null) {-->
-<!--				markerStart = L.marker(e.latlng);-->
-<!--				markerStart.addTo(map);-->
-<!--			} else {-->
-<!--				markerStart.setLatLng(e.latlng);-->
-<!--			};-->
-<!--		latStart = markerStart.getLatLng().lat;-->
-<!--		lonStart = markerStart.getLatLng().lng;-->
-<!--		computeRoute()-->
-<!--		});-->
-
-<!--		-->
-<!--		// markerStop-->
-<!--		var markerStop = null;-->
-<!--		var latStop;-->
-<!--		var lonStop;-->
-<!--		map.on('contextmenu', function(e) {-->
-<!--			if (markerStop == null) {-->
-<!--				markerStop = L.marker(e.latlng);-->
-<!--				markerStop.addTo(map);-->
-<!--			} else {-->
-<!--				markerStop.setLatLng(e.latlng);-->
-<!--			};-->
-<!--		latStop = markerStop.getLatLng().lat;-->
-<!--		lonStop = markerStop.getLatLng().lng;-->
-<!--		computeRoute()-->
-<!--		});-->
+		// Route style
+		var routeStyles = {
+		    "length":  {
+                "color": "red",
+                "weight": 5,
+                "opacity": 0.5,
+                "clickable": false
+            },
+            "cost_activity" : {
+                "color": "blue",
+                "weight": 5,
+                "opacity": 0.5,
+                "clickable": false
+            },
+            "cost_nature": {
+                "color": "green",
+                "weight": 5,
+                "opacity": 0.5,
+                "clickable": false
+            }
+        };
 		
+		// Layers
+		var routeLayers = {
+		    "length": "routeShortestLayer",
+            "cost_activity": "routeActivityLayer",
+            "cost_nature": "routeNatureLayer"
+        };
+		routeShortestLayer = undefined;
+		routeActivityLayer = undefined;
+		routeNatureLayer = undefined;
+		
+		// Set the start and end points
 		var markerStart = null;
 		var latStart;
 		var lonStart;
@@ -95,7 +99,9 @@
 					    lonStart = markerStart.getLatLng().lng;
 					    console.log("start" + latStart);
 					    console.log("start" + lonStart);
-					    computeRoute();
+					    computeRoute("length");
+					    computeRoute("cost_activity");
+					    computeRoute("cost_nature");
 		     		} else if (key == "stop") {
 		     			if (markerStop == null) {
 						    markerStop = L.marker(e.latlng, {draggable:true});
@@ -107,7 +113,9 @@
 					    lonStop = markerStop.getLatLng().lng;
 					    console.log("stop" + latStop);
 					    console.log("stop" + lonStop);
-					    computeRoute();
+					    computeRoute("length");
+					    computeRoute("cost_activity");
+					    computeRoute("cost_nature");
 		     		}
              		$.contextMenu('destroy', '#map');
                 },
@@ -123,8 +131,7 @@
         });
         
 		// get the route
-		routeLayer = undefined;
-		function computeRoute() {
+		function computeRoute(profile) {
 			var ajaxTime= new Date().getTime();
 			$.ajax({
 				dataType: "json",
@@ -133,17 +140,19 @@
 					lon1: lonStart,
 					lat2: latStop,
 					lon2: lonStop,
-					type: $('input[name=profile]:checked').val()
+					type: profile
 				},
 				url: '/route.json',
 				success: function(route) {
-					if (routeLayer != undefined) {
-					map.removeLayer(routeLayer);
-					}
 					$("#routeLength").html("Longueur : " + Math.round(route.properties.length) + " m");
 					$("#routeTime").html("Temps : " + Math.round(route.properties.length*3.6/5) + " s");
-					routeLayer = L.geoJson(route);
-					routeLayer.addTo(map);
+					console.log(route.properties.profile);
+			            if (routeLayers[route.properties.profile] != undefined) {
+			                map.removeLayer(routeLayers[route.properties.profile]);
+			            }
+			            console.log("in case length");
+			            routeLayers[route.properties.profile] = L.geoJson(route, {style: routeStyles[route.properties.profile]});
+			            routeLayers[route.properties.profile].addTo(map);
 			  }
 			}).done(function () {
        		    var totalTime = new Date().getTime()-ajaxTime;
