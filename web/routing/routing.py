@@ -41,6 +41,14 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.wfile.write(f.read())
             f.close()
             return
+        if self.path.endswith(".svg"):
+            f = open('../' + self.path)
+            self.send_response(200)
+            self.send_header("Content-type", "image/svg+xml")
+            self.end_headers()
+            self.wfile.write(f.read())
+            f.close()
+            return
         if self.path[0:11] == '/route.json':
             print self.path
             params = re.search(r'\?lat1=([0-9.]+)&lon1=([0-9.]+)&lat2=([0-9.]+)&lon2=([0-9.]+)&type=(\w+)', self.path)

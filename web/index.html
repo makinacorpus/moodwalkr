@@ -96,6 +96,7 @@
             }
         };
         
+        var firstRoute = true;
 		routeShortestLayer = undefined;
 		routeActivityLayer = undefined;
 		routeNatureLayer = undefined;
@@ -110,9 +111,7 @@
 	        };
 	        markersList[marker]["lat"] = markersList[marker]["marker"].getLatLng().lat;
 	        markersList[marker]["lon"] = markersList[marker]["marker"].getLatLng().lng;
-	        computeRoute("length");
-	        computeRoute("cost_activity");
-	        computeRoute("cost_nature");
+	        computeAllRoutes();
 	    };
 	    
 		// Set the start and end points
@@ -135,37 +134,76 @@
             });
         });
         
-		// get the route
-		function computeRoute(profile) {
+        // get all the routes
+		function computeAllRoutes() {
 		    if ((markersList["start"]["marker"] != null) && (markersList["stop"]["marker"] != null)) {
-			    var ajaxTime= new Date().getTime();
-			    $.ajax({
-				    dataType: "json",
-				    data: {
-					    lat1: markersList["start"]["lat"],
-					    lon1: markersList["start"]["lon"],
-					    lat2: markersList["stop"]["lat"],
-					    lon2: markersList["stop"]["lon"],
-					    type: profile
-				    },
-				    url: '/route.json',
-				    success: function(route) {
-					    $("#routeLength").html("Longueur : " + Math.round(route.properties.length) + " m");
-					    $("#routeTime").html("Temps : " + Math.round(route.properties.length*3.6/5) + " s");
-					    console.log(route.properties.profile);
-			                if (routeLayers[route.properties.profile] != undefined) {
-			                    map.removeLayer(routeLayers[route.properties.profile]);
-			                }
-			                console.log("in case length");
-			                routeLayers[route.properties.profile] = L.geoJson(route, {style: routeStyles[route.properties.profile]});
-			                routeLayers[route.properties.profile].addTo(map);
-			      }
-			    }).done(function () {
-           		    var totalTime = new Date().getTime()-ajaxTime;
-           		    $("#responseTime").html("Temps de réponse : " + totalTime+ " ms");
-				    document.getElementById('action').style.height="200px";
-		        })
-		    }
+		        computeRoute("length");
+	            computeRoute("cost_activity");
+	            computeRoute("cost_nature");
+		        document.getElementById('action').style.height="200px";
+		        if (firstRoute) {
+           		    $("#action").append("<img src='img/p_shortest.svg' onclick='chooseRoute(\"length\")'/>");
+           		    $("#action").append("<img src='img/p_activity.svg' onclick='chooseRoute(\"activity\")'/>");
+           		    $("#action").append("<img src='img/p_nature.svg' onclick='chooseRoute(\"nature\")'/>");
+           		};
+           		firstRoute = false;
+       		};
+        };
+        
+        // keep only one route
+        function chooseRoute(profile) {
+            switch(profile) {
+                case "length":
+		            routeLayers["length"].addTo(map);
+		            map.removeLayer(routeLayers["cost_activity"]);
+		            map.removeLayer(routeLayers["cost_nature"]);
+                break;
+                case "activity":
+		            routeLayers["cost_activity"].addTo(map);
+		            map.removeLayer(routeLayers["length"]);
+		            map.removeLayer(routeLayers["cost_nature"]);
+                break;
+                case "nature":
+                    routeLayers["cost_nature"].addTo(map);
+		            map.removeLayer(routeLayers["cost_activity"]);
+		            map.removeLayer(routeLayers["length"]);
+                break;
+            }
+            infoRoute(profile);
+        };
+        
+        //Informations about the chosen route
+		function infoRoute(profile) {
+            document.getElementById('action').style.height="300px";
+        };
+		
+		// get the routes
+		function computeRoute(profile) {
+		    var ajaxTime= new Date().getTime();
+		    $.ajax({
+			    dataType: "json",
+			    data: {
+				    lat1: markersList["start"]["lat"],
+				    lon1: markersList["start"]["lon"],
+				    lat2: markersList["stop"]["lat"],
+				    lon2: markersList["stop"]["lon"],
+				    type: profile
+			    },
+			    url: '/route.json',
+			    success: function(route) {
+				    $("#routeLength").html("Longueur : " + Math.round(route.properties.length) + " m");
+				    $("#routeTime").html("Temps : " + Math.round(route.properties.length*3.6/5) + " s");
+				    console.log(route.properties.profile);
+		                if (routeLayers[route.properties.profile] != undefined) {
+		                    map.removeLayer(routeLayers[route.properties.profile]);
+		                }
+		                routeLayers[route.properties.profile] = L.geoJson(route, {style: routeStyles[route.properties.profile]});
+		                routeLayers[route.properties.profile].addTo(map);
+		      }
+		    }).done(function () {
+       		    var totalTime = new Date().getTime()-ajaxTime;
+       		    $("#responseTime").html("Temps de réponse : " + totalTime+ " ms");
+	        })
 		};
 		
 		// 
