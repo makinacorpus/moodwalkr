@@ -29,8 +29,6 @@
               </fieldset>
             </form>
         </div>
-	    <div id="routeLength"></div>
-	    <div id="routeTime"></div>
 	    <div id="responseTime"></div>
 	</div>
 	<script type='text/javascript'>
@@ -96,7 +94,15 @@
             }
         };
         
+        // Length of the routes
+        var routeLengths = {
+            "length": null,
+            "cost_activity": null,
+            "cost_nature": null
+        };
+        
         var firstRoute = true;
+        var firstRouteInfo = true;
 		routeShortestLayer = undefined;
 		routeActivityLayer = undefined;
 		routeNatureLayer = undefined;
@@ -112,6 +118,10 @@
 	        markersList[marker]["lat"] = markersList[marker]["marker"].getLatLng().lat;
 	        markersList[marker]["lon"] = markersList[marker]["marker"].getLatLng().lng;
 	        computeAllRoutes();
+	        (markersList[marker]["marker"]).on('dragend', function(event) {
+                var markerEvent = event.target;
+                setMarker(marker,markerEvent.getLatLng());
+            });
 	    };
 	    
 		// Set the start and end points
@@ -143,10 +153,14 @@
 		        document.getElementById('action').style.height="200px";
 		        if (firstRoute) {
            		    $("#action").append("<img src='img/p_shortest.svg' onclick='chooseRoute(\"length\")'/>");
-           		    $("#action").append("<img src='img/p_activity.svg' onclick='chooseRoute(\"activity\")'/>");
-           		    $("#action").append("<img src='img/p_nature.svg' onclick='chooseRoute(\"nature\")'/>");
+           		    $("#action").append("<img src='img/p_activity.svg' onclick='chooseRoute(\"cost_activity\")'/>");
+           		    $("#action").append("<img src='img/p_nature.svg' onclick='chooseRoute(\"cost_nature\")'/>");
+               		firstRoute = false;
            		};
-           		firstRoute = false;
+           		if (! firstRouteInfo) {
+		            var div = document.getElementById("routeLength");
+                    div.parentNode.removeChild(div);
+           		};
        		};
         };
         
@@ -158,12 +172,12 @@
 		            map.removeLayer(routeLayers["cost_activity"]);
 		            map.removeLayer(routeLayers["cost_nature"]);
                 break;
-                case "activity":
+                case "cost_activity":
 		            routeLayers["cost_activity"].addTo(map);
 		            map.removeLayer(routeLayers["length"]);
 		            map.removeLayer(routeLayers["cost_nature"]);
                 break;
-                case "nature":
+                case "cost_nature":
                     routeLayers["cost_nature"].addTo(map);
 		            map.removeLayer(routeLayers["cost_activity"]);
 		            map.removeLayer(routeLayers["length"]);
@@ -175,6 +189,9 @@
         //Informations about the chosen route
 		function infoRoute(profile) {
             document.getElementById('action').style.height="300px";
+            $("#action").append("<div id=\"routeLength\"></div>");
+       		firstRouteInfo = false;
+       		$("#routeLength").html("Longueur : " + routeLengths[profile] + " m <br \> Temps de parcours : " + Math.round(routeLengths[profile]*3.6/5) + " s");
         };
 		
 		// get the routes
@@ -191,14 +208,13 @@
 			    },
 			    url: '/route.json',
 			    success: function(route) {
-				    $("#routeLength").html("Longueur : " + Math.round(route.properties.length) + " m");
-				    $("#routeTime").html("Temps : " + Math.round(route.properties.length*3.6/5) + " s");
 				    console.log(route.properties.profile);
 		                if (routeLayers[route.properties.profile] != undefined) {
 		                    map.removeLayer(routeLayers[route.properties.profile]);
 		                }
 		                routeLayers[route.properties.profile] = L.geoJson(route, {style: routeStyles[route.properties.profile]});
 		                routeLayers[route.properties.profile].addTo(map);
+			            routeLengths[route.properties.profile] = Math.round(route.properties.length);
 		      }
 		    }).done(function () {
        		    var totalTime = new Date().getTime()-ajaxTime;
@@ -206,7 +222,7 @@
 	        })
 		};
 		
-		// 
+		// Search bar
 		$("#startField").keyup(function (e) {
             if (e.keyCode == 13) {
                 $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + document.getElementById('startField').value, function(data) {
