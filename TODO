@@ -1,10 +1,10 @@
-* Script d'installation
+OK: Script d'installation
 OK: Départ et arrivée : Nouvelles aretes dans le graphe issues de la découpe des lignes les plus proches des points de départ et d'arrivée
 OK: Test si les points de départ et arrivée sont sur la même ligne
 * Points de départ et arrivée sur zone ouverte : mauvais itinéraire possible (cf p25)
 OK: Fichier de conf (xml ?) pour les zones à prendre en compte
 OK: Fichier de conf (xml ?) pour les obstacles à prendre en compte
-* preprocessing à faire propre
+OK: preprocessing à faire propre
 OK: ways_openspace : ajouter le nom de la place aux segments générés
 OK: attributs foot=yes avec index pour les routes où les piétons peuvent circuler
 OK: routing uniquement sur ways avec où foot!=no
@@ -21,9 +21,11 @@ OK: Coût en fonction du type de voie
 OK: Pas de routing sur access=no et access=private
 * costgrid : technique générique et fichier de conf
 OK: costgrid : la générer sur l'emprise de la bounding box, pas que Toulouse
+* costgrid culture
 * Supprimer les lignes inutiles pour le routing sur les surfaces (simplification topologique ?)
 * Mode itinéraire circulaire
 * Interface utilisateur
 * Afficher POI autour de l'itinéraire
 * optimiser requetes -> passer à A* ?
-* Données bruit et trafic -> S Le Corre (16-17 mai)
+* Données bruit et trafic
+* carte walkability Toulouse multi-critères

@@ -101,6 +101,7 @@
             "cost_nature": null
         };
         
+        
         var firstRoute = true;
         var firstRouteInfo = true;
 		routeShortestLayer = undefined;
@@ -112,18 +113,18 @@
 		    if (markersList[marker]["marker"] == null) {
 		        markersList[marker]["marker"] = L.marker(latlng, {draggable:true});
 		        markersList[marker]["marker"].addTo(map);
+                (markersList[marker]["marker"]).on('dragend', function(event) {
+                    var markerEvent = event.target;
+                    setMarker(marker,markerEvent.getLatLng())
+                    computeAllRoutes();
+                });
 	        } else {
 		        markersList[marker]["marker"].setLatLng(latlng);
 	        };
 	        markersList[marker]["lat"] = markersList[marker]["marker"].getLatLng().lat;
 	        markersList[marker]["lon"] = markersList[marker]["marker"].getLatLng().lng;
-	        computeAllRoutes();
-	        (markersList[marker]["marker"]).on('dragend', function(event) {
-                var markerEvent = event.target;
-                setMarker(marker,markerEvent.getLatLng());
-            });
 	    };
-	    
+        
 		// Set the start and end points
 
 		map.on('contextmenu', function(e) {
@@ -131,6 +132,7 @@
        	        selector: '#map',
             	callback: function(key, options) {
 				    setMarker(key,e.latlng);
+	    	        computeAllRoutes();
              		$.contextMenu('destroy', '#map');
                 },
                 items: {
@@ -160,6 +162,7 @@
            		if (! firstRouteInfo) {
 		            var div = document.getElementById("routeLength");
                     div.parentNode.removeChild(div);
+                    firstRouteInfo = true;
            		};
        		};
         };
@@ -228,6 +231,7 @@
                 $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + document.getElementById('startField').value, function(data) {
                     $.each(data, function(key, val) {
                         setMarker("start",new L.LatLng(val['lat'], val['lon']));
+            	        computeAllRoutes();
                     });
                 }); 
             }
@@ -239,6 +243,7 @@
                     console.log(data);
                     $.each(data, function(key, val) {
                         setMarker("stop",new L.LatLng(val['lat'], val['lon']));
+            	        computeAllRoutes();
                     });
                 }); 
             }
