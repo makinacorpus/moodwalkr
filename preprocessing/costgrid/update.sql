@@ -184,14 +184,14 @@ SET a_food=(a_food/(SELECT max FROM max_a_food));
 
 UPDATE cost_grid
 SET c_tourism=(SELECT count(*)
-	     FROM (SELECT way,amenity FROM planet_osm_point WHERE tourism LIKE '%') as tourism
+	     FROM (SELECT way,tourism FROM planet_osm_point WHERE tourism LIKE '%') as tourism
 	     WHERE ST_Contains(cost_grid.geom,tourism.way)
 	    )
 ;
 
 UPDATE cost_grid
 SET c_tourism=c_tourism+(SELECT count(*)
-	     FROM (SELECT way,amenity FROM planet_osm_polygon WHERE tourism LIKE '%') as tourism
+	     FROM (SELECT way,tourism FROM planet_osm_polygon WHERE tourism LIKE '%') as tourism
 	     WHERE ST_Intersects(cost_grid.geom,tourism.way)
 	    )
 ;
@@ -221,6 +221,13 @@ UPDATE cost_grid
 SET c_pow=(c_pow/(SELECT max FROM max_c_pow));
 
 
+
+UPDATE cost_grid
+   SET test_culture=t_highway+c_tourism*3+c_pow*2;
+
+WITH max_test_culture AS (SELECT GREATEST(max(test_culture), 1) as max FROM cost_grid)
+UPDATE cost_grid
+SET test_culture=(test_culture/(SELECT max FROM max_test_culture));
 
 UPDATE cost_grid
    SET test_activite=t_highway+t_heavy_transport+a_shops+a_leisure+c_tourism+c_pow+a_food;

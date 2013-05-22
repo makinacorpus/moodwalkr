@@ -5,7 +5,7 @@
 	<title>Routing</title>
 	 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
 	 <link rel="stylesheet" href="http://medialize.github.com/jQuery-contextMenu/src/jquery.contextMenu.css" />
-	 <link rel="stylesheet" href="css/bootstrap.css" media="screen">
+	 <link rel="stylesheet" href="css/bootstrap.css">
 	 <link rel="stylesheet" href="css/main.css">
 	<!--[if lte IE 8]>
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.ie.css" />
@@ -21,8 +21,8 @@
 	<!-- Add Leaflet library -->
 	<div class="row-fluid">
 	    <div class="span12" id="map" style="height:600px;" ></div>
-	    <div class="span3" id="action">
-	        <form>
+	    <div class="span2" id="action">
+	        <form id="actionForm">
               <fieldset>
                 <input style='width:90%' type="text" id="startField" placeholder="Start"><br />
                 <input style='width:90%' type="text" id="destinationField" placeholder="Destination">
@@ -50,7 +50,7 @@
 		map.addLayer(osm);
 		map.setView(new L.LatLng(43.6, 1.4),12);
 		
-		// Route style
+		// Route styles for display
 		var routeStyles = {
 		    "length":  {
                 "color": "red",
@@ -69,6 +69,12 @@
                 "weight": 5,
                 "opacity": 0.5,
                 "clickable": false
+            },
+            "cost_culture": {
+                "color": "black",
+                "weight": 5,
+                "opacity": 0.5,
+                "clickable": false
             }
         };
 		
@@ -76,7 +82,8 @@
 		var routeLayers = {
 		    "length": "routeShortestLayer",
             "cost_activity": "routeActivityLayer",
-            "cost_nature": "routeNatureLayer"
+            "cost_nature": "routeNatureLayer",
+            "cost_culture": "routeCultureLayer"
         };
         		
 
@@ -98,7 +105,8 @@
         var routeLengths = {
             "length": null,
             "cost_activity": null,
-            "cost_nature": null
+            "cost_nature": null,
+            "cost_culture": null
         };
         
         
@@ -107,6 +115,7 @@
 		routeShortestLayer = undefined;
 		routeActivityLayer = undefined;
 		routeNatureLayer = undefined;
+		routeCultureLayer = undefined;
 
 		// Set start and stop markers
 	    function setMarker(marker,latlng) {
@@ -125,8 +134,7 @@
 	        markersList[marker]["lon"] = markersList[marker]["marker"].getLatLng().lng;
 	    };
         
-		// Set the start and end points
-
+		// Create the context menu in order to set the start and stop points
 		map.on('contextmenu', function(e) {
     		$.contextMenu({
        	        selector: '#map',
@@ -152,11 +160,15 @@
 		        computeRoute("length");
 	            computeRoute("cost_activity");
 	            computeRoute("cost_nature");
-		        document.getElementById('action').style.height="200px";
+	            computeRoute("cost_culture");
 		        if (firstRoute) {
-           		    $("#action").append("<img src='img/p_shortest.svg' onclick='chooseRoute(\"length\")'/>");
-           		    $("#action").append("<img src='img/p_activity.svg' onclick='chooseRoute(\"cost_activity\")'/>");
-           		    $("#action").append("<img src='img/p_nature.svg' onclick='chooseRoute(\"cost_nature\")'/>");
+		            $("#action").append('<ul class="nav nav-list"><li class="divider"></li></ul>');
+		            $("#action").append('<div class="btn-group">');
+		            $("#action").append('<button type="button" class="btn" onclick="chooseRoute(\'length\')"><i class="icon-arrow-right"></i></button>');
+		            $("#action").append('<button type="button" class="btn" onclick="chooseRoute(\'cost_activity\')"><i class="icon-leaf"></i></button>');
+		            $("#action").append('<button type="button" class="btn" onclick="chooseRoute(\'cost_nature\')"><i class="icon-shopping-cart"></i></button>');
+		            $("#action").append('<button type="button" class="btn" onclick="chooseRoute(\'cost_culture\')"><i class="icon-book"></i></button>');
+		            $("#action").append('</div>');
                		firstRoute = false;
            		};
            		if (! firstRouteInfo) {
@@ -174,30 +186,40 @@
 		            routeLayers["length"].addTo(map);
 		            map.removeLayer(routeLayers["cost_activity"]);
 		            map.removeLayer(routeLayers["cost_nature"]);
+		            map.removeLayer(routeLayers["cost_culture"]);
                 break;
                 case "cost_activity":
 		            routeLayers["cost_activity"].addTo(map);
 		            map.removeLayer(routeLayers["length"]);
 		            map.removeLayer(routeLayers["cost_nature"]);
+		            map.removeLayer(routeLayers["cost_culture"]);
                 break;
                 case "cost_nature":
                     routeLayers["cost_nature"].addTo(map);
 		            map.removeLayer(routeLayers["cost_activity"]);
 		            map.removeLayer(routeLayers["length"]);
+		            map.removeLayer(routeLayers["cost_culture"]);
+                break;
+                case "cost_culture":
+                    routeLayers["cost_culture"].addTo(map);
+		            map.removeLayer(routeLayers["cost_activity"]);
+		            map.removeLayer(routeLayers["length"]);
+		            map.removeLayer(routeLayers["cost_nature"]);
                 break;
             }
             infoRoute(profile);
         };
         
-        //Informations about the chosen route
+        // Informations about the chosen route
 		function infoRoute(profile) {
-            document.getElementById('action').style.height="300px";
-            $("#action").append("<div id=\"routeLength\"></div>");
-       		firstRouteInfo = false;
+	        if (firstRouteInfo) {
+                $("#action").append("<div id=\"routeLength\"></div>");
+           		firstRouteInfo = false;
+            };
        		$("#routeLength").html("Longueur : " + routeLengths[profile] + " m <br \> Temps de parcours : " + Math.round(routeLengths[profile]*3.6/5) + " s");
         };
 		
-		// get the routes
+		// get the route according to the profile passed as argument
 		function computeRoute(profile) {
 		    var ajaxTime= new Date().getTime();
 		    $.ajax({
@@ -225,7 +247,7 @@
 	        })
 		};
 		
-		// Search bar
+		// Call Nominatim to set the start or end points when using the search bar
 		$("#startField").keyup(function (e) {
             if (e.keyCode == 13) {
                 $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + document.getElementById('startField').value, function(data) {
@@ -240,7 +262,6 @@
 		$("#destinationField").keyup(function (e) {
             if (e.keyCode == 13) {
                 $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + document.getElementById('destinationField').value, function(data) {
-                    console.log(data);
                     $.each(data, function(key, val) {
                         setMarker("stop",new L.LatLng(val['lat'], val['lon']));
             	        computeAllRoutes();

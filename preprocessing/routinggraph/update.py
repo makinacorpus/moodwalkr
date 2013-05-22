@@ -88,6 +88,7 @@ cur.execute("ALTER TABLE ways ADD COLUMN foot boolean;")
 cur.execute("ALTER TABLE ways ADD COLUMN frompolygon boolean;")
 cur.execute("ALTER TABLE ways ADD COLUMN cost_activity float;")
 cur.execute("ALTER TABLE ways ADD COLUMN cost_nature float;")
+cur.execute("ALTER TABLE ways ADD COLUMN cost_culture float;")
 
 print "***** Import ways from polygon"
 cur.execute("INSERT INTO ways(the_geom,name,class_id,gid,osm_id,foot,frompolygon) " +
@@ -139,6 +140,22 @@ cur.execute("UPDATE ways " +
 cur.execute("UPDATE ways " +
 			"SET cost_nature = length " +
 			"WHERE cost_nature IS NULL;")
+
+						 
+print "***** Update cost_culture"						 				 
+cur.execute("UPDATE ways " +
+			"SET cost_culture = length * (1 - cinter.culture*0.8) " +
+		    "FROM ( " +
+		    "	SELECT w.gid as id, w.the_geom, c.geom, avg(c.test_culture) as culture " +
+		    "	FROM cost_grid AS c, ways AS w " +
+		    "	WHERE ST_Intersects(ST_Transform(c.geom,4326),w.the_geom) " +
+		    "	GROUP BY w.gid, w.the_geom, c.geom " +
+		    "	) AS cinter " +
+		    "WHERE cinter.id = ways.gid")
+
+cur.execute("UPDATE ways " +
+			"SET cost_culture = length " +
+			"WHERE cost_culture IS NULL;")
 
 # close the "routing" database connection
 conn.commit()

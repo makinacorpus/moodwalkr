@@ -21,11 +21,13 @@ OK: Coût en fonction du type de voie
 OK: Pas de routing sur access=no et access=private
 * costgrid : technique générique et fichier de conf
 OK: costgrid : la générer sur l'emprise de la bounding box, pas que Toulouse
-* costgrid culture
+OK: costgrid culture
+* utiliser tag "heritage"
 * Supprimer les lignes inutiles pour le routing sur les surfaces (simplification topologique ?)
 * Mode itinéraire circulaire
 * Interface utilisateur
 * Afficher POI autour de l'itinéraire
-* optimiser requetes -> passer à A* ?
+OK: optimiser requetes -> recherche dans bbox
 * Données bruit et trafic
 * carte walkability Toulouse multi-critères
+* marqueurs début et arrivée différents

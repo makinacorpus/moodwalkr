@@ -18,7 +18,8 @@ CREATE TABLE IF NOT EXISTS cost_grid
   c_pow double precision DEFAULT 0,
   test_tot double precision DEFAULT 0,
   test_nature double precision DEFAULT 0,
-  test_activite double precision DEFAULT 0
+  test_activite double precision DEFAULT 0,
+  test_culture double precision DEFAULT 0
 );
 
 

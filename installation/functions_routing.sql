@@ -56,16 +56,16 @@ BEGIN
 	ELSE
 		-- Loop across edges. Last edge_id is -1, and is not taken into account. (n vertices, n-1 edges)
 		FOR point IN (SELECT * FROM shortest_path('
-							SELECT gid as id,
-								source::integer,
-								target::integer,
-								' || profile || '::double precision as cost
-								FROM (SELECT * FROM ways WHERE foot IS NOT FALSE) as ways_foot
-									UNION (SELECT -11 as gid,' ||  line_start.source || ' as source, -1 as target, (' || position_start || ' * ' || line_start.length || ') as length)
-									UNION (SELECT -12 as gid, -1 as source,' ||  line_start.target || ' as target, ((1-' || position_start || ') * ' || line_start.length || ') as length)
-									UNION (SELECT -21 as gid,' ||  line_target.source || ' as source, -2 as target, (' || position_target || ' * ' || line_target.length || ') as length)
-									UNION (SELECT -22 as gid, -2 as source,' ||  line_target.target || ' as target, ((1-' || position_target || ') * ' || line_target.length || ') as length)
-								', -1, -2, false, false) WHERE edge_id != -1) LOOP
+                SELECT gid as id,
+	                source::integer,
+	                target::integer,
+	                ' || profile || '::double precision as cost
+	                FROM (SELECT * FROM ways WHERE foot IS NOT FALSE AND ways.the_geom && ST_MakeEnvelope(LEAST(' ||lon1|| ',' ||lon2|| ')-0.1,LEAST(' ||lat1|| ',' ||lat2|| ')-0.1,GREATEST(' ||lon1|| ',' ||lon2|| ')+0.1,GREATEST(' ||lat1|| ',' ||lat2|| ')+0.1)) as ways_foot
+		                UNION (SELECT -11 as gid,' ||  line_start.source || ' as source, -1 as target, (' || position_start || ' * ' || line_start.length || ') as length)
+		                UNION (SELECT -12 as gid, -1 as source,' ||  line_start.target || ' as target, ((1-' || position_start || ') * ' || line_start.length || ') as length)
+		                UNION (SELECT -21 as gid,' ||  line_target.source || ' as source, -2 as target, (' || position_target || ' * ' || line_target.length || ') as length)
+		                UNION (SELECT -22 as gid, -2 as source,' ||  line_target.target || ' as target, ((1-' || position_target || ') * ' || line_target.length || ') as length)
+	                ', -1, -2, false, false) WHERE edge_id != -1) LOOP
 			pvid:=point.edge_id;
 			SELECT length 
 			INTO point_length 
