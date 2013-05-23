@@ -220,10 +220,26 @@ WITH max_c_pow AS (SELECT GREATEST(max(c_pow), 1) as max FROM cost_grid)
 UPDATE cost_grid
 SET c_pow=(c_pow/(SELECT max FROM max_c_pow));
 
+-- Culture - Heritage
+
+UPDATE cost_grid
+SET c_heritage=(SELECT sum(1/heritage::double precision)
+        FROM (SELECT way,heritage FROM planet_osm_polygon WHERE "heritage" LIKE '%') as heritage
+        WHERE ST_Intersects(cost_grid.geom,heritage.way)
+        )
+;
+
+WITH max_c_heritage AS (SELECT GREATEST(max(c_heritage), 1) as max FROM cost_grid)
+UPDATE cost_grid
+SET c_heritage=(c_heritage/(SELECT max FROM max_c_heritage));
+
+UPDATE cost_grid
+SET c_heritage=0
+WHERE c_heritage IS NULL;
 
 
 UPDATE cost_grid
-   SET test_culture=t_highway+c_tourism*3+c_pow*2;
+   SET test_culture=t_highway+c_tourism*3+c_pow*2+c_heritage*3;
 
 WITH max_test_culture AS (SELECT GREATEST(max(test_culture), 1) as max FROM cost_grid)
 UPDATE cost_grid

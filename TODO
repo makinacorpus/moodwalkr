@@ -22,7 +22,7 @@ OK: Pas de routing sur access=no et access=private
 * costgrid : technique générique et fichier de conf
 OK: costgrid : la générer sur l'emprise de la bounding box, pas que Toulouse
 OK: costgrid culture
-* utiliser tag "heritage"
+OK: utiliser tag "heritage"
 * Supprimer les lignes inutiles pour le routing sur les surfaces (simplification topologique ?)
 * Mode itinéraire circulaire
 * Interface utilisateur
@@ -31,3 +31,4 @@ OK: optimiser requetes -> recherche dans bbox
 * Données bruit et trafic
 * carte walkability Toulouse multi-critères
 * marqueurs début et arrivée différents
+* reconstruire carte bruit/trafic avec données OSM

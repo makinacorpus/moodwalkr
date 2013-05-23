@@ -24,8 +24,8 @@
 	    <div class="span2" id="action">
 	        <form id="actionForm">
               <fieldset>
-                <input style='width:90%' type="text" id="startField" placeholder="Start"><br />
-                <input style='width:90%' type="text" id="destinationField" placeholder="Destination">
+                <input type="text" id="startField" placeholder="Start"><br />
+                <input type="text" id="destinationField" placeholder="Destination">
               </fieldset>
             </form>
         </div>
@@ -71,7 +71,7 @@
                 "clickable": false
             },
             "cost_culture": {
-                "color": "black",
+                "color": "orange",
                 "weight": 5,
                 "opacity": 0.5,
                 "clickable": false
@@ -164,10 +164,10 @@
 		        if (firstRoute) {
 		            $("#action").append('<ul class="nav nav-list"><li class="divider"></li></ul>');
 		            $("#action").append('<div class="btn-group">');
-		            $("#action").append('<button type="button" class="btn" onclick="chooseRoute(\'length\')"><i class="icon-arrow-right"></i></button>');
-		            $("#action").append('<button type="button" class="btn" onclick="chooseRoute(\'cost_activity\')"><i class="icon-leaf"></i></button>');
-		            $("#action").append('<button type="button" class="btn" onclick="chooseRoute(\'cost_nature\')"><i class="icon-shopping-cart"></i></button>');
-		            $("#action").append('<button type="button" class="btn" onclick="chooseRoute(\'cost_culture\')"><i class="icon-book"></i></button>');
+		            $("#action").append('<button type="button" class="btn btn-danger" onclick="chooseRoute(\'length\')"><i class="icon-arrow-right"></i></button>');
+		            $("#action").append('<button type="button" class="btn btn-primary" onclick="chooseRoute(\'cost_activity\')"><i class="icon-shopping-cart"></i></button>');
+		            $("#action").append('<button type="button" class="btn btn-success" onclick="chooseRoute(\'cost_nature\')"><i class="icon-leaf"></i></button>');
+		            $("#action").append('<button type="button" class="btn btn-warning" onclick="chooseRoute(\'cost_culture\')"><i class="icon-book"></i></button>');
 		            $("#action").append('</div>');
                		firstRoute = false;
            		};
@@ -213,10 +213,10 @@
         // Informations about the chosen route
 		function infoRoute(profile) {
 	        if (firstRouteInfo) {
-                $("#action").append("<div id=\"routeLength\"></div>");
+                $("#action").append('<div id="routeLength"><ul class="nav nav-list"><li class="divider"></li></ul><div id="routeLengthContent"></div></div>');
            		firstRouteInfo = false;
             };
-       		$("#routeLength").html("Longueur : " + routeLengths[profile] + " m <br \> Temps de parcours : " + Math.round(routeLengths[profile]*3.6/5) + " s");
+       		$("#routeLengthContent").html("Longueur : " + routeLengths[profile] + " m <br \> Temps de parcours : " + Math.round(routeLengths[profile]*3.6/5) + " s");
         };
 		
 		// get the route according to the profile passed as argument

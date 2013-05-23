@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS cost_grid
   a_food double precision DEFAULT 0,
   c_tourism double precision DEFAULT 0,
   c_pow double precision DEFAULT 0,
+  c_heritage double precision DEFAULT 0,
   test_tot double precision DEFAULT 0,
   test_nature double precision DEFAULT 0,
   test_activite double precision DEFAULT 0,

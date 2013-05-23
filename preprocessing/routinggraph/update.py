@@ -27,7 +27,7 @@ for data in r.iter_content(chunk_size=1024):
 f.flush()
 
 print "***** osm2pgsql"
-command = "osm2pgsql -s -H localhost -U %s -d %s %s" % (db_user, db_name, f.name)
+command = "osm2pgsql -s -H localhost -U %s -d %s -S %s/preprocessing/osm2pgsql/default.style %s" % (db_user, db_name, base_path, f.name)
 print command
 os.system(command)
 
