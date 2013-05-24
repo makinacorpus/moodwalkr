@@ -20,7 +20,7 @@
 <body>
 	<!-- Add Leaflet library -->
 	<div class="row-fluid">
-	    <div class="span12" id="map" style="height:600px;" ></div>
+	    <div class="span12" id="map" style="height:650px;" ></div>
 	    <div class="span2" id="action">
 	        <form id="actionForm">
               <fieldset>
@@ -38,7 +38,6 @@
 	
 	    // To be prompted. In hours
 	    var circularTime=1;
-	
 	
 		map = new L.Map('map', {zoomControl:false});
 		// create the tile layer with correct attribution
@@ -203,7 +202,7 @@
             var degreeKm = degreeKmEquator * Math.cos(latlng.lat);
             // set c_start, the start and end point of the circular route
             if (markersList["c_start"]["marker"] == null) {
-		        markersList["c_start"]["marker"] = L.marker(latlng, {draggable:true});
+		        markersList["c_start"]["marker"] = L.marker(latlng);
 		        markersList["c_start"]["marker"].addTo(map);
                 (markersList["c_start"]["marker"]).on('dragend', function(event) {
                     var markerEvent = event.target;
