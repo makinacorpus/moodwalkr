@@ -32,6 +32,14 @@
 	    <div id="responseTime"></div>
 	</div>
 	<script type='text/javascript'>
+	
+	    // Walking speed. In km/h
+	    var walkingSpeed=5; 
+	
+	    // To be prompted. In hours
+	    var circularTime=1;
+	
+	
 		map = new L.Map('map', {zoomControl:false});
 		// create the tile layer with correct attribution
 		var osmUrl='http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png';
@@ -98,6 +106,26 @@
                 "marker": null,
                 "lat": null,
                 "lon": null
+            },
+            "c_start": {
+                "marker": null,
+                "lat": null,
+                "lon": null
+            },
+            "c_step1": {
+                "marker": null,
+                "lat": null,
+                "lon": null
+            },
+            "c_step2": {
+                "marker": null,
+                "lat": null,
+                "lon": null
+            },
+            "c_step3": {
+                "marker": null,
+                "lat": null,
+                "lon": null
             }
         };
         
@@ -109,7 +137,7 @@
             "cost_culture": null
         };
         
-        
+
         var firstRoute = true;
         var firstRouteInfo = true;
 		routeShortestLayer = undefined;
@@ -139,9 +167,15 @@
     		$.contextMenu({
        	        selector: '#map',
             	callback: function(key, options) {
-				    setMarker(key,e.latlng);
-	    	        computeAllRoutes();
-             		$.contextMenu('destroy', '#map');
+            	    if (key=="start" || key=="stop") {
+				            setMarker(key,e.latlng);
+	    	                computeAllRoutes();
+             		        $.contextMenu('destroy', '#map');
+                    };
+            	    if (key=="c_start") {
+				            setCircularMarkers(e.latlng);
+             		        $.contextMenu('destroy', '#map');
+                    };
                 },
                 items: {
                     "start": {
@@ -149,18 +183,63 @@
                     },
                     "stop": {
             	        name: "Destination"
+        	        },
+        	        "sep1": "---------",
+                    "c_start": {
+            	        name: "Circular route from here"
         	        }
+
             	}
             });
         });
         
+        // set the markers for circular routing
+        function setCircularMarkers(latlng) {
+            // Variables and parameters
+            var circularLength = circularTime * walkingSpeed;
+            var direction = Math.random()*360;
+            var distanceOpposite = circularLength/Math.PI; // geographic distance to the point opposite to the starting point
+            var degreeKmEquator = 111.2; // Multiply by cos(lat) for the value at the current lat
+            var degreeKm = degreeKmEquator * Math.cos(latlng.lat);
+            // set c_start, the start and end point of the circular route
+            if (markersList["c_start"]["marker"] == null) {
+		        markersList["c_start"]["marker"] = L.marker(latlng, {draggable:true});
+		        markersList["c_start"]["marker"].addTo(map);
+                (markersList["c_start"]["marker"]).on('dragend', function(event) {
+                    var markerEvent = event.target;
+                    setMarker("c_start",markerEvent.getLatLng())
+                    //Compute circular route
+                });
+	        } else {
+		        markersList["c_start"]["marker"].setLatLng(latlng);
+	        };
+	        markersList["c_start"]["lat"] = markersList["c_start"]["marker"].getLatLng().lat;
+	        markersList["c_start"]["lon"] = markersList["c_start"]["marker"].getLatLng().lng;
+	        
+	        // set the intermediate point:c_step2
+	        markersList["c_step2"]["lat"] = markersList["c_start"]["marker"].getLatLng().lat+distanceOpposite*Math.sin(direction)/degreeKm;
+	        markersList["c_step2"]["lon"] = markersList["c_start"]["marker"].getLatLng().lng+distanceOpposite*Math.cos(direction)/degreeKm;
+	        
+	        // set the intermediate point:c_step1
+	        markersList["c_step1"]["lat"] = markersList["c_start"]["marker"].getLatLng().lat+(distanceOpposite/Math.sqrt(2))*Math.sin(direction-Math.PI/4)/degreeKm;
+	        markersList["c_step1"]["lon"] = markersList["c_start"]["marker"].getLatLng().lng+(distanceOpposite/Math.sqrt(2))*Math.cos(direction-Math.PI/4)/degreeKm;
+	        
+	        // set the intermediate point:c_step3
+	        markersList["c_step3"]["lat"] = markersList["c_start"]["marker"].getLatLng().lat+(distanceOpposite/Math.sqrt(2))*Math.sin(direction+Math.PI/4)/degreeKm;
+	        markersList["c_step3"]["lon"] = markersList["c_start"]["marker"].getLatLng().lng+(distanceOpposite/Math.sqrt(2))*Math.cos(direction+Math.PI/4)/degreeKm;
+	        computeRoute("length",markersList["c_start"]["lat"],markersList["c_start"]["lon"],markersList["c_step1"]["lat"],markersList["c_step1"]["lon"]);
+            computeRoute("cost_activity",markersList["c_step1"]["lat"],markersList["c_step1"]["lon"],markersList["c_step2"]["lat"],markersList["c_step2"]["lon"]);
+            computeRoute("cost_nature",markersList["c_step2"]["lat"],markersList["c_step2"]["lon"],markersList["c_step3"]["lat"],markersList["c_step3"]["lon"]);
+            computeRoute("cost_culture",markersList["c_step3"]["lat"],markersList["c_step3"]["lon"],markersList["c_start"]["lat"],markersList["c_start"]["lon"]);
+        };
+        
         // get all the routes
 		function computeAllRoutes() {
 		    if ((markersList["start"]["marker"] != null) && (markersList["stop"]["marker"] != null)) {
-		        computeRoute("length");
-	            computeRoute("cost_activity");
-	            computeRoute("cost_nature");
-	            computeRoute("cost_culture");
+		        computeRoute("length",markersList["start"]["lat"],markersList["start"]["lon"],markersList["stop"]["lat"],markersList["stop"]["lon"]);
+	            computeRoute("cost_activity",markersList["start"]["lat"],markersList["start"]["lon"],markersList["stop"]["lat"],markersList["stop"]["lon"]);
+	            computeRoute("cost_nature",markersList["start"]["lat"],markersList["start"]["lon"],markersList["stop"]["lat"],markersList["stop"]["lon"]);
+	            computeRoute("cost_culture",markersList["start"]["lat"],markersList["start"]["lon"],markersList["stop"]["lat"],markersList["stop"]["lon"]);
 		        if (firstRoute) {
 		            $("#action").append('<ul class="nav nav-list"><li class="divider"></li></ul>');
 		            $("#action").append('<div class="btn-group">');
@@ -216,19 +295,19 @@
                 $("#action").append('<div id="routeLength"><ul class="nav nav-list"><li class="divider"></li></ul><div id="routeLengthContent"></div></div>');
            		firstRouteInfo = false;
             };
-       		$("#routeLengthContent").html("Longueur : " + routeLengths[profile] + " m <br \> Temps de parcours : " + Math.round(routeLengths[profile]*3.6/5) + " s");
+       		$("#routeLengthContent").html("Longueur : " + routeLengths[profile] + " m <br \> Temps de parcours : " + Math.round(routeLengths[profile]*3.6/walkingSpeed) + " s");
         };
 		
 		// get the route according to the profile passed as argument
-		function computeRoute(profile) {
+		function computeRoute(profile,vlat1,vlon1,vlat2,vlon2) {
 		    var ajaxTime= new Date().getTime();
 		    $.ajax({
 			    dataType: "json",
 			    data: {
-				    lat1: markersList["start"]["lat"],
-				    lon1: markersList["start"]["lon"],
-				    lat2: markersList["stop"]["lat"],
-				    lon2: markersList["stop"]["lon"],
+				    lat1: vlat1,
+				    lon1: vlon1,
+				    lat2: vlat2,
+				    lon2: vlon2,
 				    type: profile
 			    },
 			    url: '/route.json',

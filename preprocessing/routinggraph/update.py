@@ -112,7 +112,7 @@ cur.execute("CREATE INDEX ways_geom_idx ON ways USING gist(the_geom);")
 
 print "***** Update cost_activity"
 cur.execute("UPDATE ways " +
-			"SET cost_activity = length * (1 - cinter.activity*0.8) " +
+			"SET cost_activity = length * (1 - cinter.activity) " +
 			"FROM ( " +
 			"	SELECT w.gid as id, w.the_geom, c.geom, avg(c.test_activite) as activity " +
 			"	FROM cost_grid AS c, ways AS w " +
@@ -128,7 +128,7 @@ cur.execute("UPDATE ways " +
 						 
 print "***** Update cost_nature"						 				 
 cur.execute("UPDATE ways " +
-			"SET cost_nature = length * (1 - cinter.nature*0.8) " +
+			"SET cost_nature = length * (1 - cinter.nature) " +
 		    "FROM ( " +
 		    "	SELECT w.gid as id, w.the_geom, c.geom, avg(c.test_nature) as nature " +
 		    "	FROM cost_grid AS c, ways AS w " +
@@ -144,7 +144,7 @@ cur.execute("UPDATE ways " +
 						 
 print "***** Update cost_culture"						 				 
 cur.execute("UPDATE ways " +
-			"SET cost_culture = length * (1 - cinter.culture*0.8) " +
+			"SET cost_culture = length * (1 - cinter.culture) " +
 		    "FROM ( " +
 		    "	SELECT w.gid as id, w.the_geom, c.geom, avg(c.test_culture) as culture " +
 		    "	FROM cost_grid AS c, ways AS w " +
