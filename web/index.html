@@ -226,7 +226,8 @@
 	        // set the intermediate point:c_step3
 	        markersList["c_step3"]["lat"] = markersList["c_start"]["marker"].getLatLng().lat+(distanceOpposite/Math.sqrt(2))*Math.sin(direction+Math.PI/4)/degreeKm;
 	        markersList["c_step3"]["lon"] = markersList["c_start"]["marker"].getLatLng().lng+(distanceOpposite/Math.sqrt(2))*Math.cos(direction+Math.PI/4)/degreeKm;
-	        computeCircularRoute("length",markersList["c_start"]["lat"],markersList["c_start"]["lon"],markersList["c_step1"]["lat"],markersList["c_step1"]["lon"],markersList["c_step2"]["lat"],markersList["c_step2"]["lon"],markersList["c_step3"]["lat"],markersList["c_step3"]["lon"]);
+	        // Compute the circular route
+	        computeCircularRoute("cost_nature",markersList["c_start"]["lat"],markersList["c_start"]["lon"],markersList["c_step1"]["lat"],markersList["c_step1"]["lon"],markersList["c_step2"]["lat"],markersList["c_step2"]["lon"],markersList["c_step3"]["lat"],markersList["c_step3"]["lon"]);
         };
         
         // get all the routes
