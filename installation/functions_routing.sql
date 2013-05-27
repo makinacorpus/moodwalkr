@@ -1,11 +1,8 @@
-CREATE OR REPLACE FUNCTION ShortestPathGeojsonLinestring2(lat1 text, lon1 text, lat2 text, lon2 text, profile text)
-RETURNS text AS
+CREATE OR REPLACE FUNCTION Routing(lat1 text, lon1 text, lat2 text, lon2 text, profile text)
+RETURNS record AS
 $$
 DECLARE
-	geojson text;
 	point record;
-	linegeom text;
-	i integer;
 	pvid integer;
 	point_length double precision;
 	length_tot double precision;
@@ -15,10 +12,12 @@ DECLARE
 	line_target record;
 	position_start double precision;
 	position_target double precision;
+	route geometry;
+	routearray geometry[];
+	result record;
+	linegeom geometry;
 BEGIN
 	-- Initialize the variables
-	i:=1;
-	length_tot:=0;
 	length_tot:=0;
 	SELECT * INTO point_start FROM ST_GeomFromText('POINT(' || lon1 || ' ' || lat1 || ')',4326);
 	SELECT * INTO point_target FROM ST_GeomFromText('POINT(' || lon2 || ' ' || lat2 || ')',4326);
@@ -46,13 +45,10 @@ BEGIN
 	INTO position_target
 	FROM ST_Line_Locate_Point(line_target.the_geom,point_target);
 	
-	geojson:='{"type":"FeatureCollection","features":[';
+	-- Test if the start and end points are on the same edge
 	IF (line_start.gid = line_target.gid) THEN 
-		geojson:=geojson || '{"type":"Feature","geometry":';
-		geojson:=geojson || ST_AsGeoJSON(ST_Line_Substring(line_start.the_geom,LEAST(position_start,position_target),GREATEST(position_start,position_target)));
-		geojson:=geojson || ', "properties":{"id":1}},';
-		length_tot:=length_tot + line_start.length * abs(position_target - position_start);
-
+		route:=ST_Line_Substring(line_start.the_geom,LEAST(position_start,position_target),GREATEST(position_start,position_target));
+		length_tot:=line_start.length * abs(position_target - position_start);
 	ELSE
 		-- Loop across edges. Last edge_id is -1, and is not taken into account. (n vertices, n-1 edges)
 		FOR point IN (SELECT * FROM shortest_path('
@@ -72,6 +68,7 @@ BEGIN
 	                UNION (SELECT -22 as gid, -2 as source,' ||  line_target.target || ' as target, ((1-' || position_target || ') * ' || line_target.length || ') as length)
 	                ', -1, -2, false, false) WHERE edge_id != -1) LOOP
 			pvid:=point.edge_id;
+			
 			SELECT length 
 			INTO point_length 
 			FROM ((SELECT gid,length FROM ways) UNION
@@ -80,11 +77,9 @@ BEGIN
 			     (SELECT -21 as gid, ( position_target * line_target.length ) as length) UNION
 			     (SELECT -22 as gid, ((1- position_target ) * line_target.length ) as length)) as ways_foot
 			WHERE ways_foot.gid=pvid;
-			
 			length_tot:=length_tot + point_length;
-			geojson:=geojson || '{"type":"Feature","geometry":';
-
-			SELECT ST_AsGeoJSON(ways_foot.the_geom)
+			
+			SELECT ways_foot.the_geom
 			INTO linegeom
 			FROM (SELECT gid, the_geom FROM ways UNION
 			     SELECT -11 as gid, ST_Line_Substring(line_start.the_geom,0,position_start) AS the_geom UNION
@@ -92,18 +87,67 @@ BEGIN
 			     SELECT -21 as gid, ST_Line_Substring(line_target.the_geom,0,position_target) AS the_geom UNION
 			     SELECT -22 as gid, ST_Line_Substring(line_target.the_geom,position_target,1) AS the_geom) as ways_foot
 			WHERE ways_foot.gid=pvid;
-
-			geojson:=geojson || linegeom;
-			geojson:=geojson || ', "properties":{"id":';
-			geojson:=geojson || i;
-			geojson:=geojson || '}},';
-			i:=i+1;
+			routearray=array_append(routearray,linegeom);
 		END LOOP;
+		route := ST_Union(routearray);
 	END IF;
+	result:=(route,length_tot);
+	RETURN result;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION RouteToGeojson(route geometry, profile text, length double precision)
+RETURNS text AS
+$$
+DECLARE
+	geojson text;
+BEGIN
+	geojson:='{"type":"FeatureCollection","features":[';
+	geojson:=geojson || '{"type":"Feature","geometry":';
+	geojson:=geojson || ST_AsGeoJSON(route);
+	geojson:=geojson || ', "properties":{"id":1}},';
 	geojson:=substring(geojson from 1 for char_length(geojson)-1);	
-	geojson:=geojson || '],"properties": {"length":' || length_tot || ',"profile":"' || profile ||  '"}';
+	geojson:=geojson || '],"properties": {"length":' || length || ',"profile":"' || profile ||  '"}';
 	geojson:=geojson || '}';
 	RETURN geojson;
+END;
+$$
+LANGUAGE plpgsql;
+
+
+
+CREATE OR REPLACE FUNCTION ShortestPath(lat1 text, lon1 text, lat2 text, lon2 text, profile text)
+RETURNS text AS
+$$
+DECLARE
+    routeAndLength RECORD;
+BEGIN
+    SELECT route, length INTO routeAndLength FROM Routing(lat1, lon1, lat2, lon2, profile) AS (route geometry, length double precision);
+    RETURN RouteToGeojson(routeAndLength.route,profile,routeAndLength.length);
+END;
+$$
+LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION CircularRoute(c_start_lat text, c_start_lon text, c_step1_lat text, c_step1_lon text, c_step2_lat text, c_step2_lon text, c_step3_lat text, c_step3_lon text, profile text)
+RETURNS text AS
+$$
+DECLARE
+    route_s_1 geometry; -- Start to step1
+    route_1_2 geometry; -- Step1 to step2
+    route_2_3 geometry; -- Step2 to step3
+    route_3_s geometry; -- Step2 to start
+    routeComplete geometry;
+BEGIN
+    SELECT route INTO route_s_1 FROM Routing(c_start_lat, c_start_lon, c_step1_lat, c_step1_lon, profile) AS (route geometry, length double precision);
+    SELECT route INTO route_1_2 FROM Routing(c_step1_lat, c_step1_lon, c_step2_lat, c_step2_lon, profile) AS (route geometry, length double precision);
+    SELECT route INTO route_2_3 FROM Routing(c_step2_lat, c_step2_lon, c_step3_lat, c_step3_lon, profile) AS (route geometry, length double precision);
+    SELECT route INTO route_3_s FROM Routing(c_step3_lat, c_step3_lon, c_start_lat, c_start_lon, profile) AS (route geometry, length double precision);
+    routeComplete:=ST_UNION(ST_SymDifference(route_s_1,ST_SymDifference(route_1_2,ST_SymDifference(route_2_3,route_3_s))),ST_Intersection(route_s_1,route_3_s));
+    -- The length has to be calculated as some parts of the route are dropped by the symetrical difference
+    RETURN RouteToGeojson(routeComplete,profile,ST_Length_Spheroid(routeComplete,'SPHEROID["WGS 84",6378137,298.257223563]'));
 END;
 $$
 LANGUAGE plpgsql;

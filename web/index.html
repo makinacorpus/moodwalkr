@@ -226,10 +226,7 @@
 	        // set the intermediate point:c_step3
 	        markersList["c_step3"]["lat"] = markersList["c_start"]["marker"].getLatLng().lat+(distanceOpposite/Math.sqrt(2))*Math.sin(direction+Math.PI/4)/degreeKm;
 	        markersList["c_step3"]["lon"] = markersList["c_start"]["marker"].getLatLng().lng+(distanceOpposite/Math.sqrt(2))*Math.cos(direction+Math.PI/4)/degreeKm;
-	        computeRoute("length",markersList["c_start"]["lat"],markersList["c_start"]["lon"],markersList["c_step1"]["lat"],markersList["c_step1"]["lon"]);
-            computeRoute("cost_activity",markersList["c_step1"]["lat"],markersList["c_step1"]["lon"],markersList["c_step2"]["lat"],markersList["c_step2"]["lon"]);
-            computeRoute("cost_nature",markersList["c_step2"]["lat"],markersList["c_step2"]["lon"],markersList["c_step3"]["lat"],markersList["c_step3"]["lon"]);
-            computeRoute("cost_culture",markersList["c_step3"]["lat"],markersList["c_step3"]["lon"],markersList["c_start"]["lat"],markersList["c_start"]["lon"]);
+	        computeCircularRoute("length",markersList["c_start"]["lat"],markersList["c_start"]["lon"],markersList["c_step1"]["lat"],markersList["c_step1"]["lon"],markersList["c_step2"]["lat"],markersList["c_step2"]["lon"],markersList["c_step3"]["lat"],markersList["c_step3"]["lon"]);
         };
         
         // get all the routes
@@ -310,6 +307,38 @@
 				    type: profile
 			    },
 			    url: '/route.json',
+			    success: function(route) {
+				    console.log(route.properties.profile);
+		                if (routeLayers[route.properties.profile] != undefined) {
+		                    map.removeLayer(routeLayers[route.properties.profile]);
+		                }
+		                routeLayers[route.properties.profile] = L.geoJson(route, {style: routeStyles[route.properties.profile]});
+		                routeLayers[route.properties.profile].addTo(map);
+			            routeLengths[route.properties.profile] = Math.round(route.properties.length);
+		      }
+		    }).done(function () {
+       		    var totalTime = new Date().getTime()-ajaxTime;
+       		    $("#responseTime").html("Temps de réponse : " + totalTime+ " ms");
+	        })
+		};
+		
+		// get the circular route according to the profile passed as argument
+		function computeCircularRoute(profile,vlat1,vlon1,vlat2,vlon2,vlat3,vlon3,vlat4,vlon4) {
+		    var ajaxTime= new Date().getTime();
+		    $.ajax({
+			    dataType: "json",
+			    data: {
+				    lat1: vlat1,
+				    lon1: vlon1,
+				    lat2: vlat2,
+				    lon2: vlon2,
+				    lat3: vlat3,
+				    lon3: vlon3,
+				    lat4: vlat4,
+				    lon4: vlon4,
+				    type: profile
+			    },
+			    url: '/circularroute.json',
 			    success: function(route) {
 				    console.log(route.properties.profile);
 		                if (routeLayers[route.properties.profile] != undefined) {
