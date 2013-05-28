@@ -10,6 +10,26 @@
     transition:width 1000ms ease-in-out, height 1000ms ease-in-out;
     }
 
-#actionForm {
+.actionDiv {
     margin-bottom: 0;
+    }
+    
+#routingMode {
+    display:none;
+    }
+    
+#destinationAdress {
+    display:none;
+    }
+    
+#costType {
+    display:none;
+    }
+    
+#routeLength {
+    display:none;
+    }
+    
+#circularLengthPrompt {
+    display:none;
     }

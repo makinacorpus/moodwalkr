@@ -22,12 +22,41 @@
 	<div class="row-fluid">
 	    <div class="span12" id="map" style="height:650px;" ></div>
 	    <div class="span2" id="action">
-	        <form id="actionForm">
-              <fieldset>
-                <input type="text" id="startField" placeholder="Start"><br />
-                <input type="text" id="destinationField" placeholder="Destination">
-              </fieldset>
-            </form>
+	        <div id="startAdress">
+                <input type="text" class="actionDiv" id="startField" placeholder="Start">
+            </div>
+	        <div id="routingMode">
+	            <div class="btn-group">
+		            <button type="button" class="btn" onclick="chooseRoutingMode('shortestPath')"><i class="icon-share-alt"></i></button>
+		            <button type="button" class="btn" onclick="chooseRoutingMode('circular')"><i class="icon-repeat"></i></button>
+		        </div>
+            </div>
+	        <div id="destinationAdress">
+                <input type="text" class="actionDiv" id="destinationField" placeholder="Destination">
+            </div>
+            <div id="costType">
+	            <div class="btn-group" data-toggle="buttons-radio">
+	                <button type="button" class="btn btn-danger" onclick="chooseRoute('length')"><i class="icon-arrow-right"></i></button>
+		            <button type="button" class="btn btn-primary" onclick="chooseRoute('cost_activity')"><i class="icon-shopping-cart"></i></button>
+		            <button type="button" class="btn btn-success" onclick="chooseRoute('cost_nature')"><i class="icon-leaf"></i></button>
+		            <button type="button" class="btn btn-warning" onclick="chooseRoute('cost_culture')"><i class="icon-book"></i></button>
+	            </div>
+            </div>
+            <div id="routeLength">
+                <ul class="nav nav-list">
+                    <li class="divider"></li>
+                </ul>
+                <div id="routeLengthContent">
+                </div>
+            </div>
+	        <div id="circularLengthPrompt">
+	            <form class="form-inline">
+                    <fieldset>
+                        <input type="number" class="span6" min="0" max="100" id="circularLengthField" placeholder="Duration (h)">
+	                    <button type="button" class="btn" onclick="circularLengthSet()">Compute</button>
+                    </fieldset>
+                </form>            
+            </div>
         </div>
 	    <div id="responseTime"></div>
 	</div>
@@ -192,6 +221,12 @@
             });
         });
         
+        function circularLengthSet() {
+            circularTime = $('#circularLengthField').val();
+            setMarker("c_start",markersList["start"]["marker"].getLatLng());
+            setCircularMarkers(markersList["c_start"]["marker"].getLatLng());
+        };
+        
         // set the markers for circular routing
         function setCircularMarkers(latlng) {
             // Variables and parameters
@@ -238,13 +273,7 @@
 	            computeRoute("cost_nature",markersList["start"]["lat"],markersList["start"]["lon"],markersList["stop"]["lat"],markersList["stop"]["lon"]);
 	            computeRoute("cost_culture",markersList["start"]["lat"],markersList["start"]["lon"],markersList["stop"]["lat"],markersList["stop"]["lon"]);
 		        if (firstRoute) {
-		            $("#action").append('<ul class="nav nav-list"><li class="divider"></li></ul>');
-		            $("#action").append('<div class="btn-group">');
-		            $("#action").append('<button type="button" class="btn btn-danger" onclick="chooseRoute(\'length\')"><i class="icon-arrow-right"></i></button>');
-		            $("#action").append('<button type="button" class="btn btn-primary" onclick="chooseRoute(\'cost_activity\')"><i class="icon-shopping-cart"></i></button>');
-		            $("#action").append('<button type="button" class="btn btn-success" onclick="chooseRoute(\'cost_nature\')"><i class="icon-leaf"></i></button>');
-		            $("#action").append('<button type="button" class="btn btn-warning" onclick="chooseRoute(\'cost_culture\')"><i class="icon-book"></i></button>');
-		            $("#action").append('</div>');
+		            document.getElementById("costType").style.display = "block";
                		firstRoute = false;
            		};
            		if (! firstRouteInfo) {
@@ -253,6 +282,25 @@
                     firstRouteInfo = true;
            		};
        		};
+        };
+        
+        
+        function chooseRoutingMode(profile) {
+            console.log(profile);
+            switch(profile) {
+                case "shortestPath":
+                    document.getElementById("destinationAdress").style.display = "block";
+                    document.getElementById("circularLengthPrompt").style.display = "none";
+                    document.getElementById("costType").style.display = "none";
+                    
+                break;
+                case "circular":
+                    document.getElementById("circularLengthPrompt").style.display = "block";
+                    document.getElementById("destinationAdress").style.display = "none";
+                    document.getElementById("costType").style.display = "none";
+                    document.getElementById("routeLength").style.display = "none";
+                break;
+            }
         };
         
         // keep only one route
@@ -289,8 +337,8 @@
         // Informations about the chosen route
 		function infoRoute(profile) {
 	        if (firstRouteInfo) {
-                $("#action").append('<div id="routeLength"><ul class="nav nav-list"><li class="divider"></li></ul><div id="routeLengthContent"></div></div>');
-           		firstRouteInfo = false;
+                document.getElementById("routeLength").style.display = "block";
+                firstRouteInfo = false;
             };
        		$("#routeLengthContent").html("Longueur : " + routeLengths[profile] + " m <br \> Temps de parcours : " + Math.round(routeLengths[profile]*3.6/walkingSpeed) + " s");
         };
@@ -361,6 +409,7 @@
                 $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + document.getElementById('startField').value, function(data) {
                     $.each(data, function(key, val) {
                         setMarker("start",new L.LatLng(val['lat'], val['lon']));
+                        document.getElementById("routingMode").style.display = "block";
             	        computeAllRoutes();
                     });
                 }); 
