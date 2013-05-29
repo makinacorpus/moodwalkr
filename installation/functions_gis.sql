@@ -16,7 +16,7 @@ $$
 LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION AllSegmentsFromPoints(polygon geometry,osm_id integer)
+CREATE OR REPLACE FUNCTION AllSegmentsFromPoints(polygon geometry,osm_id bigint)
 RETURNS SETOF geometry AS
 $$
 BEGIN
@@ -34,7 +34,7 @@ $$
 LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION VisibilityLines(polygon geometry,osm_id integer,line_name text)
+CREATE OR REPLACE FUNCTION VisibilityLines(polygon geometry,osm_id bigint,line_name text)
 RETURNS SETOF geometry AS
 $$
 DECLARE
