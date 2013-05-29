@@ -22,14 +22,17 @@
 	<div class="row-fluid">
 	    <div class="span12" id="map" style="height:650px;" ></div>
 	    <div class="span2" id="action">
+	        <div id="routingMode">
+	            <div class="btn-group" data-toggle="buttons-radio">
+		            <button type="button" id="btnShortestPath" class="btn" onclick="chooseRoutingMode('shortestPath')"><i class="icon-share-alt"></i> Itinerary</button>
+		            <button type="button" id="btnCircular" class="btn" onclick="chooseRoutingMode('circular')"><i class="icon-repeat"></i> Loop route</button>
+		        </div>
+            </div>
 	        <div id="startAdress">
                 <input type="text" class="actionDiv" id="startField" placeholder="Start">
             </div>
-	        <div id="routingMode">
-	            <div class="btn-group">
-		            <button type="button" class="btn" onclick="chooseRoutingMode('shortestPath')"><i class="icon-share-alt"></i></button>
-		            <button type="button" class="btn" onclick="chooseRoutingMode('circular')"><i class="icon-repeat"></i></button>
-		        </div>
+	        <div id="startAdressCircular">
+                <input type="text" class="actionDiv" id="startFieldCircular" placeholder="Loop around this adress">
             </div>
 	        <div id="destinationAdress">
                 <input type="text" class="actionDiv" id="destinationField" placeholder="Destination">
@@ -49,10 +52,21 @@
                 <div id="routeLengthContent">
                 </div>
             </div>
+            <div id="costTypeCircular">
+	            <div class="btn-group" data-toggle="buttons-radio">
+	                <button type="button" class="btn btn-danger" onclick="circularProfile='length';"><i class="icon-arrow-right"></i></button>
+		            <button type="button" class="btn btn-primary" onclick="circularProfile='cost_activity';"><i class="icon-shopping-cart"></i></button>
+		            <button type="button" class="btn btn-success" onclick="circularProfile='cost_nature';"><i class="icon-leaf"></i></button>
+		            <button type="button" class="btn btn-warning" onclick="circularProfile='cost_culture';"><i class="icon-book"></i></button>
+	            </div>
+            </div>
 	        <div id="circularLengthPrompt">
 	            <form class="form-inline">
                     <fieldset>
-                        <input type="number" class="span6" min="0" max="100" id="circularLengthField" placeholder="Duration (h)">
+                        <div class="input-append">
+                            <input type="number" class="span10" min="0" max="100" id="circularLengthField" placeholder="Duration">
+                            <span class="add-on">h</span>
+                        </div>
 	                    <button type="button" class="btn" onclick="circularLengthSet()">Compute</button>
                     </fieldset>
                 </form>            
@@ -67,6 +81,9 @@
 	
 	    // To be prompted. In hours
 	    var circularTime=1;
+	    
+	    // Set a default value
+	    var circularProfile="length";
 	
 		map = new L.Map('map', {zoomControl:false});
 		// create the tile layer with correct attribution
@@ -126,34 +143,13 @@
         // Markers
         var markersList = {
             "start": {
-                "marker": null,
-                "lat": null,
-                "lon": null
+                "marker": null
             },
             "stop": {
-                "marker": null,
-                "lat": null,
-                "lon": null
+                "marker": null
             },
             "c_start": {
-                "marker": null,
-                "lat": null,
-                "lon": null
-            },
-            "c_step1": {
-                "marker": null,
-                "lat": null,
-                "lon": null
-            },
-            "c_step2": {
-                "marker": null,
-                "lat": null,
-                "lon": null
-            },
-            "c_step3": {
-                "marker": null,
-                "lat": null,
-                "lon": null
+                "marker": null
             }
         };
         
@@ -186,8 +182,6 @@
 	        } else {
 		        markersList[marker]["marker"].setLatLng(latlng);
 	        };
-	        markersList[marker]["lat"] = markersList[marker]["marker"].getLatLng().lat;
-	        markersList[marker]["lon"] = markersList[marker]["marker"].getLatLng().lng;
 	    };
         
 		// Create the context menu in order to set the start and stop points
@@ -195,12 +189,24 @@
     		$.contextMenu({
        	        selector: '#map',
             	callback: function(key, options) {
-            	    if (key=="start" || key=="stop") {
+            	    if (key=="start") {
+	                        chooseRoutingMode('shortestPath');
 				            setMarker(key,e.latlng);
+	                        document.getElementById("startAdress").style.display = "block";
+	    	                computeAllRoutes();
+             		        $.contextMenu('destroy', '#map');
+                    };                    
+            	    if (key=="stop") {
+	                        chooseRoutingMode('shortestPath');
+				            setMarker(key,e.latlng);
+	                        document.getElementById("destinationAdress").style.display = "block";
 	    	                computeAllRoutes();
              		        $.contextMenu('destroy', '#map');
                     };
             	    if (key=="c_start") {
+				            chooseRoutingMode('circular');
+                            document.getElementById("costTypeCircular").style.display = "block";
+                            document.getElementById("circularLengthPrompt").style.display = "block";
 				            setCircularMarkers(e.latlng);
              		        $.contextMenu('destroy', '#map');
                     };
@@ -223,7 +229,6 @@
         
         function circularLengthSet() {
             circularTime = $('#circularLengthField').val();
-            setMarker("c_start",markersList["start"]["marker"].getLatLng());
             setCircularMarkers(markersList["c_start"]["marker"].getLatLng());
         };
         
@@ -247,60 +252,88 @@
 	        } else {
 		        markersList["c_start"]["marker"].setLatLng(latlng);
 	        };
-	        markersList["c_start"]["lat"] = markersList["c_start"]["marker"].getLatLng().lat;
-	        markersList["c_start"]["lon"] = markersList["c_start"]["marker"].getLatLng().lng;
+	        var c_startLat = markersList["c_start"]["marker"].getLatLng().lat;
+	        var c_startLon = markersList["c_start"]["marker"].getLatLng().lng;
 	        
 	        // set the intermediate point:c_step2
-	        markersList["c_step2"]["lat"] = markersList["c_start"]["marker"].getLatLng().lat+distanceOpposite*Math.sin(direction)/degreeKm;
-	        markersList["c_step2"]["lon"] = markersList["c_start"]["marker"].getLatLng().lng+distanceOpposite*Math.cos(direction)/degreeKm;
+	        var c_step2Lat = markersList["c_start"]["marker"].getLatLng().lat+distanceOpposite*Math.sin(direction)/degreeKm;
+	        var c_step2Lon = markersList["c_start"]["marker"].getLatLng().lng+distanceOpposite*Math.cos(direction)/degreeKm;
 	        
 	        // set the intermediate point:c_step1
-	        markersList["c_step1"]["lat"] = markersList["c_start"]["marker"].getLatLng().lat+(distanceOpposite/Math.sqrt(2))*Math.sin(direction-Math.PI/4)/degreeKm;
-	        markersList["c_step1"]["lon"] = markersList["c_start"]["marker"].getLatLng().lng+(distanceOpposite/Math.sqrt(2))*Math.cos(direction-Math.PI/4)/degreeKm;
+	        var c_step1Lat = markersList["c_start"]["marker"].getLatLng().lat+(distanceOpposite/Math.sqrt(2))*Math.sin(direction-Math.PI/4)/degreeKm;
+	        var c_step1Lon = markersList["c_start"]["marker"].getLatLng().lng+(distanceOpposite/Math.sqrt(2))*Math.cos(direction-Math.PI/4)/degreeKm;
 	        
 	        // set the intermediate point:c_step3
-	        markersList["c_step3"]["lat"] = markersList["c_start"]["marker"].getLatLng().lat+(distanceOpposite/Math.sqrt(2))*Math.sin(direction+Math.PI/4)/degreeKm;
-	        markersList["c_step3"]["lon"] = markersList["c_start"]["marker"].getLatLng().lng+(distanceOpposite/Math.sqrt(2))*Math.cos(direction+Math.PI/4)/degreeKm;
+	        var c_step3Lat = markersList["c_start"]["marker"].getLatLng().lat+(distanceOpposite/Math.sqrt(2))*Math.sin(direction+Math.PI/4)/degreeKm;
+	        var c_step3Lon = markersList["c_start"]["marker"].getLatLng().lng+(distanceOpposite/Math.sqrt(2))*Math.cos(direction+Math.PI/4)/degreeKm;
+	        
 	        // Compute the circular route
-	        computeCircularRoute("cost_nature",markersList["c_start"]["lat"],markersList["c_start"]["lon"],markersList["c_step1"]["lat"],markersList["c_step1"]["lon"],markersList["c_step2"]["lat"],markersList["c_step2"]["lon"],markersList["c_step3"]["lat"],markersList["c_step3"]["lon"]);
+            map.removeLayer(routeLayers["length"]);
+            map.removeLayer(routeLayers["cost_activity"]);
+            map.removeLayer(routeLayers["cost_nature"]);
+            map.removeLayer(routeLayers["cost_culture"]);
+	        computeCircularRoute(circularProfile,c_startLat,c_startLon,c_step1Lat,c_step1Lon,c_step2Lat,c_step2Lon,c_step3Lat,c_step3Lon);
         };
         
         // get all the routes
 		function computeAllRoutes() {
 		    if ((markersList["start"]["marker"] != null) && (markersList["stop"]["marker"] != null)) {
-		        computeRoute("length",markersList["start"]["lat"],markersList["start"]["lon"],markersList["stop"]["lat"],markersList["stop"]["lon"]);
-	            computeRoute("cost_activity",markersList["start"]["lat"],markersList["start"]["lon"],markersList["stop"]["lat"],markersList["stop"]["lon"]);
-	            computeRoute("cost_nature",markersList["start"]["lat"],markersList["start"]["lon"],markersList["stop"]["lat"],markersList["stop"]["lon"]);
-	            computeRoute("cost_culture",markersList["start"]["lat"],markersList["start"]["lon"],markersList["stop"]["lat"],markersList["stop"]["lon"]);
-		        if (firstRoute) {
-		            document.getElementById("costType").style.display = "block";
-               		firstRoute = false;
-           		};
+		        computeRoute("length",markersList["start"]["marker"].getLatLng().lat,markersList["start"]["marker"].getLatLng().lng,markersList["stop"]["marker"].getLatLng().lat,markersList["stop"]["marker"].getLatLng().lng);
+	            computeRoute("cost_activity",markersList["start"]["marker"].getLatLng().lat,markersList["start"]["marker"].getLatLng().lng,markersList["stop"]["marker"].getLatLng().lat,markersList["stop"]["marker"].getLatLng().lng);
+	            computeRoute("cost_nature",markersList["start"]["marker"].getLatLng().lat,markersList["start"]["marker"].getLatLng().lng,markersList["stop"]["marker"].getLatLng().lat,markersList["stop"]["marker"].getLatLng().lng);
+	            computeRoute("cost_culture",markersList["start"]["marker"].getLatLng().lat,markersList["start"]["marker"].getLatLng().lng,markersList["stop"]["marker"].getLatLng().lat,markersList["stop"]["marker"].getLatLng().lng);
+	            document.getElementById("costType").style.display = "block";
            		if (! firstRouteInfo) {
-		            var div = document.getElementById("routeLength");
-                    div.parentNode.removeChild(div);
+           		    document.getElementById("routeLength").style.display = "none";
                     firstRouteInfo = true;
            		};
        		};
         };
         
         
+
+            
         function chooseRoutingMode(profile) {
             console.log(profile);
             switch(profile) {
                 case "shortestPath":
-                    document.getElementById("destinationAdress").style.display = "block";
+                    document.getElementById("startAdress").style.display = "block";
+                    document.getElementById("destinationAdress").style.display = "none";
+                    document.getElementById("routeLength").style.display = "none";
+                    document.getElementById("startAdressCircular").style.display = "none";
                     document.getElementById("circularLengthPrompt").style.display = "none";
+                    document.getElementById("costTypeCircular").style.display = "none";
                     document.getElementById("costType").style.display = "none";
-                    
+                    removeMarkerIfExists("c_start");
+                    map.removeLayer(routeLayers["length"]);
+                    map.removeLayer(routeLayers["cost_activity"]);
+                    map.removeLayer(routeLayers["cost_nature"]);
+                    map.removeLayer(routeLayers["cost_culture"]);
+                    $("#btnShortestPath").button('toggle');
                 break;
                 case "circular":
-                    document.getElementById("circularLengthPrompt").style.display = "block";
+                    document.getElementById("startAdressCircular").style.display = "block";
+                    document.getElementById("startAdress").style.display = "none";
                     document.getElementById("destinationAdress").style.display = "none";
                     document.getElementById("costType").style.display = "none";
                     document.getElementById("routeLength").style.display = "none";
+                    removeMarkerIfExists("start");
+                    removeMarkerIfExists("stop");
+                    map.removeLayer(routeLayers["length"]);
+                    map.removeLayer(routeLayers["cost_activity"]);
+                    map.removeLayer(routeLayers["cost_nature"]);
+                    map.removeLayer(routeLayers["cost_culture"]);
+                    document.getElementById("btnCircular").checked = true;
+                    $("#btnCircular").button('toggle');
                 break;
             }
+        };
+        
+        function removeMarkerIfExists(marker) {
+            if(markersList[marker]["marker"] != null) {
+                map.removeLayer(markersList[marker]["marker"]);
+                markersList[marker]["marker"] = null;
+            };
         };
         
         // keep only one route
@@ -409,8 +442,21 @@
                 $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + document.getElementById('startField').value, function(data) {
                     $.each(data, function(key, val) {
                         setMarker("start",new L.LatLng(val['lat'], val['lon']));
-                        document.getElementById("routingMode").style.display = "block";
+                        document.getElementById("destinationAdress").style.display = "block";
             	        computeAllRoutes();
+                    });
+                }); 
+            }
+        });
+        
+        $("#startFieldCircular").keyup(function (e) {
+            if (e.keyCode == 13) {
+                $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + document.getElementById('startFieldCircular').value, function(data) {
+                    $.each(data, function(key, val) {
+                        setMarker("c_start",new L.LatLng(val['lat'], val['lon']));
+                        document.getElementById("circularLengthPrompt").style.display = "block";
+                        document.getElementById("costTypeCircular").style.display = "block";
+                        setCircularMarkers(markersList["c_start"]["marker"].getLatLng());
                     });
                 }); 
             }

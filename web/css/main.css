@@ -14,7 +14,11 @@
     margin-bottom: 0;
     }
     
-#routingMode {
+#startAdress {
+    display:none;
+    }
+    
+#startAdressCircular {
     display:none;
     }
     
@@ -31,5 +35,9 @@
     }
     
 #circularLengthPrompt {
+    display:none;
+    }
+    
+#costTypeCircular {
     display:none;
     }
