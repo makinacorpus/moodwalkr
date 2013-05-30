@@ -61,7 +61,7 @@ BEGIN
 				        ST_MakeLine(
 				             ST_MakePoint(' || lon1 || ', ' || lat1 || '),
 				             ST_MakePoint(' || lon2 || ', ' || lat2 || ')
-				        ),4326),0.05)) as ways_foot
+				        ),4326),0.01)) as ways_foot
 	                UNION (SELECT -11 as gid,' ||  line_start.source || ' as source, -1 as target, (' || position_start || ' * ' || line_start.length || ') as length)
 	                UNION (SELECT -12 as gid, -1 as source,' ||  line_start.target || ' as target, ((1-' || position_start || ') * ' || line_start.length || ') as length)
 	                UNION (SELECT -21 as gid,' ||  line_target.source || ' as source, -2 as target, (' || position_target || ' * ' || line_target.length || ') as length)

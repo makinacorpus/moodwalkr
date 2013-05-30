@@ -64,8 +64,8 @@
 	            <form class="form-inline">
                     <fieldset>
                         <div class="input-append">
-                            <input type="number" class="span10" min="0" max="100" id="circularLengthField" placeholder="Duration">
-                            <span class="add-on">h</span>
+                            <input type="number" class="span9" min="0" step="10" max="1000" id="circularLengthField" placeholder="Duration">
+                            <span class="add-on">min</span>
                         </div>
 	                    <button type="button" class="btn" onclick="circularLengthSet()">Compute</button>
                     </fieldset>
@@ -228,7 +228,7 @@
         });
         
         function circularLengthSet() {
-            circularTime = $('#circularLengthField').val();
+            circularTime = $('#circularLengthField').val()/60; //Convert minutes to hours
             setCircularMarkers(markersList["c_start"]["marker"].getLatLng());
         };
         
@@ -373,7 +373,7 @@
                 document.getElementById("routeLength").style.display = "block";
                 firstRouteInfo = false;
             };
-       		$("#routeLengthContent").html("Longueur : " + routeLengths[profile] + " m <br \> Temps de parcours : " + Math.round(routeLengths[profile]*3.6/walkingSpeed) + " s");
+       		$("#routeLengthContent").html("Length: " + lengthFormating(routeLengths[profile]) + " <br \> Duration: " + timeFormating(routeLengths[profile]*3.6/walkingSpeed));
         };
 		
 		// get the route according to the profile passed as argument
@@ -472,6 +472,22 @@
                 }); 
             }
         });
+        
+        function timeFormating(seconds) {
+            var hours = Math.floor(seconds / 3600);
+            var minutes = Math.floor((seconds - (hours * 3600)) / 60);
+            
+            if (hours>0) {hours = hours +' h ';} else {hours = ''};
+            return (hours + minutes + ' min');
+        };
+        
+        function lengthFormating(meters) {
+            var km = Math.floor(meters / 1000);
+            var m = Math.floor((meters - (km * 1000))/10)*10;
+            
+            if (km>0) {km = km +' km ';} else {km = ''};
+            return (km + m + ' m');
+        };
 	</script>
 </body>
 </html>

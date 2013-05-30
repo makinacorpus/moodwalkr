@@ -32,7 +32,7 @@ OK: optimiser requetes -> recherche dans bbox
 * carte walkability Toulouse multi-critères
 * marqueurs début et arrivée différents
 * reconstruire carte bruit/trafic avec données OSM
-* formats : temps en h/min, espace entre les milliers de mètres
+OK: formats : temps en h/min, espace entre les milliers de mètres
 * aide (info-bulles) formulaire
 * griser zone non routable
 * nom produit
