@@ -24,7 +24,7 @@ OK: costgrid : la générer sur l'emprise de la bounding box, pas que Toulouse
 OK: costgrid culture
 OK: utiliser tag "heritage"
 * Supprimer les lignes inutiles pour le routing sur les surfaces (simplification topologique ?)
-* Mode itinéraire circulaire
+OK: Mode itinéraire circulaire
 * Interface utilisateur
 * Afficher POI autour de l'itinéraire
 OK: optimiser requetes -> recherche dans bbox
@@ -32,3 +32,8 @@ OK: optimiser requetes -> recherche dans bbox
 * carte walkability Toulouse multi-critères
 * marqueurs début et arrivée différents
 * reconstruire carte bruit/trafic avec données OSM
+* formats : temps en h/min, espace entre les milliers de mètres
+* aide (info-bulles) formulaire
+* griser zone non routable
+* nom produit
+* fiche produit

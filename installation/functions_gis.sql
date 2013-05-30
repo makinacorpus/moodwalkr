@@ -16,19 +16,18 @@ $$
 LANGUAGE plpgsql;
 
 
-CREATE OR REPLACE FUNCTION AllSegmentsFromPoints(polygon geometry,osm_id bigint)
+CREATE OR REPLACE FUNCTION AllSegmentsFromPoints(polygon geometry)
 RETURNS SETOF geometry AS
 $$
 BEGIN
 RETURN QUERY
 	EXECUTE
-	'WITH poly_geom AS (SELECT way FROM planet_osm_polygon WHERE osm_id=$1),
-		points1 AS (SELECT (ST_DumpPoints(poly_geom.way)).* FROM poly_geom),
-		points2 AS (SELECT (ST_DumpPoints(poly_geom.way)).* FROM poly_geom)
+	'WITH points1 AS (SELECT (ST_DumpPoints($1)).* ),
+		points2 AS (SELECT (ST_DumpPoints($1)).* )
 	SELECT DISTINCT ST_MakeLine(points1.geom, points2.geom)
 	FROM points1,points2
 	WHERE points1.path <> points2.path;'
-	USING osm_id;
+	USING polygon;
 END;
 $$
 LANGUAGE plpgsql;
@@ -46,7 +45,7 @@ BEGIN
     -- n rings for the polygon, n-1 interior rings
     ninteriorrings := ST_NRINGS(polygon)-1;
     -- analyse each line
-    FOR line IN SELECT * FROM AllSegmentsFromPoints(polygon,osm_id) LOOP
+    FOR line IN SELECT * FROM AllSegmentsFromPoints(polygon) LOOP
 	-- we assume the line is valid, i.e does not crosses the polygon, and is not included inside an inner ring
 	validsegment := TRUE;
 	-- check : no line outside the outer ring
