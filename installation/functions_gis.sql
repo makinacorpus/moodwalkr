@@ -19,10 +19,10 @@ CREATE OR REPLACE FUNCTION SimplifyPolygon(polygon geometry)
 RETURNS geometry AS
 $$
 DECLARE
-	polygontmp geometry;
+    linetmp geometry;
 BEGIN
-	SELECT ST_Astext(ST_Makepolygon(ST_AddPoint(St_Makeline(geom),ST_PointN(St_Makeline(geom),1))))
-	INTO polygontmp
+	SELECT ST_AddPoint(St_Makeline(geom),ST_PointN(St_Makeline(geom),1))
+	INTO linetmp
 	FROM (
 		SELECT geom
 		FROM (
@@ -38,7 +38,10 @@ BEGIN
 			    ) AS sj
 		      )
 	     ) k;
-	RETURN ST_SetSRID(polygontmp,900913);
+	IF (SELECT count(*) FROM ST_Dumppoints(linetmp) AS countpoints)>3
+	    THEN RETURN ST_SetSRID(ST_Makepolygon(linetmp),900913);
+	    ELSE RETURN polygon;
+	END IF;
 END;
 $$
 LANGUAGE plpgsql;
