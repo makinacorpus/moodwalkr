@@ -6,7 +6,7 @@ DECLARE
     polygontmp geometry;
 	result record;
 BEGIN
-    polygontmp := polygon ;
+    polygontmp := SimplifyPolygon(polygon) ;
     FOR obstacle IN SELECT way FROM planet_osm_line WHERE barrier='fence' AND ST_Contains(polygon,way) LOOP
 	SELECT * INTO polygontmp FROM ST_Difference(polygontmp,ST_Buffer(obstacle, 0.75, 'endcap=square join=mitre mitre_limit=1.0')) ;
     END LOOP;
@@ -15,6 +15,33 @@ END;
 $$
 LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION SimplifyPolygon(polygon geometry)
+RETURNS geometry AS
+$$
+DECLARE
+	polygontmp geometry;
+BEGIN
+	SELECT ST_Astext(ST_Makepolygon(ST_AddPoint(St_Makeline(geom),ST_PointN(St_Makeline(geom),1))))
+	INTO polygontmp
+	FROM (
+		SELECT geom
+		FROM (
+		  SELECT (ST_DumpPoints(polygon)).*
+		  ) AS j
+		WHERE ST_Contains((SELECT ST_ConvexHull(polygon)::geometry),geom)
+		   OR (SELECT count(*) >0
+		       FROM (SELECT way,highway,area 
+			     FROM planet_osm_line
+			     WHERE (highway LIKE '%')
+			       AND (area IS NULL)
+			       AND (ST_DWithin(way,geom,0.00001))
+			    ) AS sj
+		      )
+	     ) k;
+	RETURN ST_SetSRID(polygontmp,900913);
+END;
+$$
+LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION AllSegmentsFromPoints(polygon geometry)
 RETURNS SETOF geometry AS
