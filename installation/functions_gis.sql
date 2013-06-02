@@ -21,27 +21,31 @@ $$
 DECLARE
     linetmp geometry;
 BEGIN
-	SELECT ST_AddPoint(St_Makeline(geom),ST_PointN(St_Makeline(geom),1))
-	INTO linetmp
-	FROM (
-		SELECT geom
+	IF ST_NRINGS(polygon)=1 THEN
+		SELECT ST_AddPoint(St_Makeline(geom),ST_PointN(St_Makeline(geom),1))
+		INTO linetmp
 		FROM (
-		  SELECT (ST_DumpPoints(polygon)).*
-		  ) AS j
-		WHERE ST_Contains((SELECT ST_ConvexHull(polygon)::geometry),geom)
-		   OR (SELECT count(*) >0
-		       FROM (SELECT way,highway,area 
-			     FROM planet_osm_line
-			     WHERE (highway LIKE '%')
-			       AND (area IS NULL)
-			       AND (ST_DWithin(way,geom,0.00001))
-			    ) AS sj
-		      )
-	     ) k;
-	IF (SELECT count(*) FROM ST_Dumppoints(linetmp) AS countpoints)>3
-	    THEN RETURN ST_SetSRID(ST_Makepolygon(linetmp),900913);
-	    ELSE RETURN polygon;
+			SELECT geom
+			FROM (
+			  SELECT (ST_DumpPoints(polygon)).*
+			  ) AS j
+			WHERE ST_Contains((SELECT ST_ConvexHull(polygon)::geometry),geom)
+			   OR (SELECT count(*) >0
+			       FROM (SELECT way,highway,area 
+				     FROM planet_osm_line
+				     WHERE (highway LIKE '%')
+				       AND (area IS NULL)
+				       AND (ST_DWithin(way,geom,0.00001))
+				    ) AS sj
+			      )
+		     ) k;
+		IF (SELECT count(*) FROM ST_Dumppoints(linetmp) AS countpoints)>3 
+		    THEN RETURN ST_SetSRID(ST_Makepolygon(linetmp),900913);
+		    ELSE RETURN polygon;
+		END IF;
+	ELSE RETURN polygon;
 	END IF;
+
 END;
 $$
 LANGUAGE plpgsql;
