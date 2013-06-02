@@ -28,14 +28,17 @@
 		            <button type="button" id="btnCircular" class="btn" onclick="chooseRoutingMode('circular')"><i class="icon-repeat"></i> Loop route</button>
 		        </div>
             </div>
-	        <div id="startAdress">
-                <input type="text" class="actionDiv" id="startField" placeholder="Start">
+	        <div id="startAdress" class="input-append">
+                <input type="text" class="actionDiv" id="startField" placeholder="Start" rel="popover" data-content="Type the adress of your starting point, e.g. '14 Rue des Arts Toulouse'">
+                <button type="button" class="btn" onclick="setStart()"><i class="icon-search"></i></button>
             </div>
-	        <div id="startAdressCircular">
-                <input type="text" class="actionDiv" id="startFieldCircular" placeholder="Loop around this adress">
+	        <div id="startAdressCircular" class="input-append">
+                <input type="text" class="actionDiv" id="startFieldCircular" placeholder="Loop around this adress" rel="popover" data-content="Type the adress that will be your start and destination, e.g. '14 Rue des Arts Toulouse'">
+                <button type="button" class="btn" onclick="setStartCircular()"><i class="icon-search"></i></button>
             </div>
-	        <div id="destinationAdress">
-                <input type="text" class="actionDiv" id="destinationField" placeholder="Destination">
+	        <div id="destinationAdress" class="input-append">
+                <input type="text" class="actionDiv" id="destinationField" placeholder="Destination" rel="popover" data-content="Type the adress of your destinationField, e.g. '9 Rue Réclusane Toulouse'">
+                <button type="button" class="btn" onclick="setDestination()"><i class="icon-search"></i></button>
             </div>
             <div id="costType">
 	            <div class="btn-group" data-toggle="buttons-radio">
@@ -436,40 +439,52 @@
 	        })
 		};
 		
+		function setStart() {
+             $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + document.getElementById('startField').value, function(data) {
+                $.each(data, function(key, val) {
+                    setMarker("start",new L.LatLng(val['lat'], val['lon']));
+                    document.getElementById("destinationAdress").style.display = "block";
+        	        computeAllRoutes();
+                });
+            }); 
+		};
+		
+		function setStartCircular() {
+            $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + document.getElementById('startFieldCircular').value, function(data) {
+                $.each(data, function(key, val) {
+                    setMarker("c_start",new L.LatLng(val['lat'], val['lon']));
+                    document.getElementById("circularLengthPrompt").style.display = "block";
+                    document.getElementById("costTypeCircular").style.display = "block";
+                    setCircularMarkers(markersList["c_start"]["marker"].getLatLng());
+                });
+            }); 		
+		};
+		
+		function setDestination() {
+            $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + document.getElementById('destinationField').value, function(data) {
+                $.each(data, function(key, val) {
+                    setMarker("stop",new L.LatLng(val['lat'], val['lon']));
+        	        computeAllRoutes();
+                });
+            }); 
+		};
+		
 		// Call Nominatim to set the start or end points when using the search bar
 		$("#startField").keyup(function (e) {
             if (e.keyCode == 13) {
-                $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + document.getElementById('startField').value, function(data) {
-                    $.each(data, function(key, val) {
-                        setMarker("start",new L.LatLng(val['lat'], val['lon']));
-                        document.getElementById("destinationAdress").style.display = "block";
-            	        computeAllRoutes();
-                    });
-                }); 
+                setStart();
             }
         });
         
         $("#startFieldCircular").keyup(function (e) {
             if (e.keyCode == 13) {
-                $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + document.getElementById('startFieldCircular').value, function(data) {
-                    $.each(data, function(key, val) {
-                        setMarker("c_start",new L.LatLng(val['lat'], val['lon']));
-                        document.getElementById("circularLengthPrompt").style.display = "block";
-                        document.getElementById("costTypeCircular").style.display = "block";
-                        setCircularMarkers(markersList["c_start"]["marker"].getLatLng());
-                    });
-                }); 
+                setStartCircular();
             }
         });
         
 		$("#destinationField").keyup(function (e) {
             if (e.keyCode == 13) {
-                $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + document.getElementById('destinationField').value, function(data) {
-                    $.each(data, function(key, val) {
-                        setMarker("stop",new L.LatLng(val['lat'], val['lon']));
-            	        computeAllRoutes();
-                    });
-                }); 
+                setDestination();
             }
         });
         
@@ -488,6 +503,11 @@
             if (km>0) {km = km +' km ';} else {km = ''};
             return (km + m + ' m');
         };
+        
+        // Popovers
+        $('#startField').popover({placement:'bottom'})
+        $('#startFieldCircular').popover({placement:'bottom'})
+        
 	</script>
 </body>
 </html>
