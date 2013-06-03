@@ -23,9 +23,9 @@ OK: Pas de routing sur access=no et access=private
 OK: costgrid : la générer sur l'emprise de la bounding box, pas que Toulouse
 OK: costgrid culture
 OK: utiliser tag "heritage"
-* Supprimer les lignes inutiles pour le routing sur les surfaces (simplification topologique ?)
+OK: Supprimer les lignes inutiles pour le routing sur les surfaces
 OK: Mode itinéraire circulaire
-* Interface utilisateur
+OK: Interface utilisateur basique
 * Afficher POI autour de l'itinéraire
 OK: optimiser requetes -> recherche dans bbox
 * Données bruit et trafic
