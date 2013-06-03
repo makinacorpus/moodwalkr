@@ -34,7 +34,7 @@ OK: marqueurs début et arrivée différents
 * reconstruire carte bruit/trafic avec données OSM
 OK: formats : temps en h/min, espace entre les milliers de mètres
 OK: aide (info-bulles) formulaire
-* griser zone non routable
-* spin en attendant le chargement
+* griser zone non routable (à générer dynamiquement en fonction de la zone choisie ?
+OK: spin en attendant le chargement
 * nom produit
 * fiche produit

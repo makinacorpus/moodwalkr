@@ -17,6 +17,7 @@
 	<script src="http://medialize.github.com/jQuery-contextMenu/src/jquery.contextMenu.js"></script>
 	<script src="js/bootstrap.min.js"></script>
 	<script src="js/leaflet.awesome-markers.js"></script>
+	<script src="js/spin.js"></script>
 </head>
 
 <body>
@@ -401,6 +402,7 @@
 		
 		// get the route according to the profile passed as argument
 		function computeRoute(profile,vlat1,vlon1,vlat2,vlon2) {
+	        var spinner = new Spinner(opts).spin(target);
 		    var ajaxTime= new Date().getTime();
 		    $.ajax({
 			    dataType: "json",
@@ -422,6 +424,7 @@
 			            routeLengths[route.properties.profile] = Math.round(route.properties.length);
 		      }
 		    }).done(function () {
+		        spinner.stop();
        		    var totalTime = new Date().getTime()-ajaxTime;
        		    $("#responseTime").html("Temps de réponse : " + totalTime+ " ms");
 	        })
@@ -429,6 +432,7 @@
 		
 		// get the circular route according to the profile passed as argument
 		function computeCircularRoute(profile,vlat1,vlon1,vlat2,vlon2,vlat3,vlon3,vlat4,vlon4) {
+	        var spinner = new Spinner(opts).spin(target);
 		    var ajaxTime= new Date().getTime();
 		    $.ajax({
 			    dataType: "json",
@@ -454,6 +458,7 @@
 			            routeLengths[route.properties.profile] = Math.round(route.properties.length);
 		      }
 		    }).done(function () {
+		        spinner.stop();
        		    var totalTime = new Date().getTime()-ajaxTime;
        		    $("#responseTime").html("Temps de réponse : " + totalTime+ " ms");
 	        })
@@ -538,6 +543,27 @@
         $('#btnActivityC').tooltip();
         $('#btnNatureC').tooltip();
         $('#btnCultureC').tooltip();
+        
+        // Spin
+        var opts = {
+          lines: 13, // The number of lines to draw
+          length: 20, // The length of each line
+          width: 10, // The line thickness
+          radius: 30, // The radius of the inner circle
+          corners: 1, // Corner roundness (0..1)
+          rotate: 0, // The rotation offset
+          direction: 1, // 1: clockwise, -1: counterclockwise
+          color: '#000', // #rgb or #rrggbb
+          speed: 1, // Rounds per second
+          trail: 60, // Afterglow percentage
+          shadow: false, // Whether to render a shadow
+          hwaccel: false, // Whether to use hardware acceleration
+          className: 'spinner', // The CSS class to assign to the spinner
+          zIndex: 2e9, // The z-index (defaults to 2000000000)
+          top: 'auto', // Top position relative to parent in px
+          left: 'auto' // Left position relative to parent in px
+        };
+        var target = document.getElementById('map');
         
 	</script>
 </body>
