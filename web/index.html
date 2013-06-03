@@ -41,11 +41,11 @@
                 <button type="button" class="btn" onclick="setDestination()"><i class="icon-search"></i></button>
             </div>
             <div id="costType">
-	            <div class="btn-group" data-toggle="buttons-radio">
-	                <button type="button" class="btn btn-danger" onclick="chooseRoute('length')"><i class="icon-arrow-right"></i></button>
-		            <button type="button" class="btn btn-primary" onclick="chooseRoute('cost_activity')"><i class="icon-shopping-cart"></i></button>
-		            <button type="button" class="btn btn-success" onclick="chooseRoute('cost_nature')"><i class="icon-leaf"></i></button>
-		            <button type="button" class="btn btn-warning" onclick="chooseRoute('cost_culture')"><i class="icon-book"></i></button>
+	            <div class="btn-group" data-toggle="buttons-radio" id="btnGroupCostType">
+	                <button type="button" id="btnLength" class="btn btn-danger" onclick="chooseRoute('length')" rel="tooltip" data-title="Shortest path"><i class="icon-arrow-right"></i></button>
+		            <button type="button" id="btnActivity" class="btn btn-primary" onclick="chooseRoute('cost_activity')" rel="tooltip" data-title="Shopping and activities"><i class="icon-shopping-cart"></i></button>
+		            <button type="button" id="btnNature" class="btn btn-success" onclick="chooseRoute('cost_nature')" rel="tooltip" data-title="Nature"><i class="icon-leaf"></i></button>
+		            <button type="button" id="btnCulture" class="btn btn-warning" onclick="chooseRoute('cost_culture')" rel="tooltip" data-title="Culture"><i class="icon-book"></i></button>
 	            </div>
             </div>
             <div id="routeLength">
@@ -57,10 +57,10 @@
             </div>
             <div id="costTypeCircular">
 	            <div class="btn-group" data-toggle="buttons-radio">
-	                <button type="button" class="btn btn-danger" onclick="circularProfile='length';"><i class="icon-arrow-right"></i></button>
-		            <button type="button" class="btn btn-primary" onclick="circularProfile='cost_activity';"><i class="icon-shopping-cart"></i></button>
-		            <button type="button" class="btn btn-success" onclick="circularProfile='cost_nature';"><i class="icon-leaf"></i></button>
-		            <button type="button" class="btn btn-warning" onclick="circularProfile='cost_culture';"><i class="icon-book"></i></button>
+	                <button type="button" id="btnLengthC" class="btn btn-danger" onclick="circularProfile='length';" rel="tooltip" data-title="Shortest path"><i class="icon-arrow-right"></i></button>
+		            <button type="button" id="btnActivityC" class="btn btn-primary" onclick="circularProfile='cost_activity';" rel="tooltip" data-title="Shopping and activities"><i class="icon-shopping-cart"></i></button>
+		            <button type="button" id="btnNatureC" class="btn btn-success" onclick="circularProfile='cost_nature';" rel="tooltip" data-title="Nature"><i class="icon-leaf"></i></button>
+		            <button type="button" id="btnCultureC" class="btn btn-warning" onclick="circularProfile='cost_culture';" rel="tooltip" data-title="Culture"><i class="icon-book"></i></button>
 	            </div>
             </div>
 	        <div id="circularLengthPrompt">
@@ -505,9 +505,19 @@
         };
         
         // Popovers
-        $('#startField').popover({placement:'bottom'})
-        $('#startFieldCircular').popover({placement:'bottom',html:true})
-        $('#destinationField').popover({placement:'bottom'})
+        $('#startField').popover({placement:'bottom'});
+        $('#startFieldCircular').popover({placement:'bottom',html:true});
+        $('#destinationField').popover({placement:'bottom'});
+        
+        // Tooltips
+        $('#btnLength').tooltip();
+        $('#btnActivity').tooltip();
+        $('#btnNature').tooltip();
+        $('#btnCulture').tooltip();
+        $('#btnLengthC').tooltip();
+        $('#btnActivityC').tooltip();
+        $('#btnNatureC').tooltip();
+        $('#btnCultureC').tooltip();
         
 	</script>
 </body>
