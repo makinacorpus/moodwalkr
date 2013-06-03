@@ -30,10 +30,11 @@ OK: Mode itinéraire circulaire
 OK: optimiser requetes -> recherche dans bbox
 * Données bruit et trafic
 * carte walkability Toulouse multi-critères
-* marqueurs début et arrivée différents
+OK: marqueurs début et arrivée différents
 * reconstruire carte bruit/trafic avec données OSM
 OK: formats : temps en h/min, espace entre les milliers de mètres
-* aide (info-bulles) formulaire
+OK: aide (info-bulles) formulaire
 * griser zone non routable
+* spin en attendant le chargement
 * nom produit
 * fiche produit

@@ -14,8 +14,13 @@
     margin-bottom: 0;
     }
     
+#routingMode {
+    margin-bottom:10px;
+    }
+    
 #startAdress {
     display:none;
+    margin-left:0;
     }
     
 #startAdressCircular {

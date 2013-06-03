@@ -6,6 +6,7 @@
 	 <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.css" />
 	 <link rel="stylesheet" href="http://medialize.github.com/jQuery-contextMenu/src/jquery.contextMenu.css" />
 	 <link rel="stylesheet" href="css/bootstrap.css">
+	 <link rel="stylesheet" href="css/leaflet.awesome-markers.css">
 	 <link rel="stylesheet" href="css/main.css">
 	<!--[if lte IE 8]>
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.5/leaflet.ie.css" />
@@ -15,6 +16,7 @@
 	<script src="http://medialize.github.com/jQuery-contextMenu/src/jquery.ui.position.js"></script>
 	<script src="http://medialize.github.com/jQuery-contextMenu/src/jquery.contextMenu.js"></script>
 	<script src="js/bootstrap.min.js"></script>
+	<script src="js/leaflet.awesome-markers.js"></script>
 </head>
 
 <body>
@@ -29,15 +31,15 @@
 		        </div>
             </div>
 	        <div id="startAdress" class="input-append">
-                <input type="text" class="actionDiv" id="startField" placeholder="Start" rel="popover" data-content="Type the adress of your starting point, e.g. '14 Rue des Arts Toulouse'.">
+                <input type="text" class="actionDiv span10" id="startField" placeholder="Start" rel="popover" data-content="Type the adress of your starting point, e.g. '14 Rue des Arts Toulouse'.">
                 <button type="button" class="btn" onclick="setStart()"><i class="icon-search"></i></button>
             </div>
 	        <div id="startAdressCircular" class="input-append">
-                <input type="text" class="actionDiv" id="startFieldCircular" placeholder="Loop around this adress" rel="popover" data-content="Type the adress that will be your start and destination, e.g. '14 Rue des Arts Toulouse'.<br />By default, a 1-hour loop will be displayed.">
+                <input type="text" class="actionDiv span10" id="startFieldCircular" placeholder="Loop around this adress" rel="popover" data-content="Type the adress that will be your start and destination, e.g. '14 Rue des Arts Toulouse'.<br />By default, a 1-hour loop will be displayed.">
                 <button type="button" class="btn" onclick="setStartCircular()"><i class="icon-search"></i></button>
             </div>
 	        <div id="destinationAdress" class="input-append">
-                <input type="text" class="actionDiv" id="destinationField" placeholder="Destination" rel="popover" data-content="Type the adress of your destinationField, e.g. '9 Rue Réclusane Toulouse'.">
+                <input type="text" class="actionDiv span10" id="destinationField" placeholder="Destination" rel="popover" data-content="Type the adress of your destinationField, e.g. '9 Rue Réclusane Toulouse'.">
                 <button type="button" class="btn" onclick="setDestination()"><i class="icon-search"></i></button>
             </div>
             <div id="costType">
@@ -143,16 +145,34 @@
         };
         		
 
-        // Markers
+        // Markers        
+        var startMarker = L.AwesomeMarkers.icon({
+            icon: 'icon-arrow-up', 
+            color: 'cadetblue'
+        });
+        
+        var stopMarker = L.AwesomeMarkers.icon({
+            icon: 'icon-arrow-down', 
+            color: 'cadetblue'
+        });
+        
+        var c_startMarker = L.AwesomeMarkers.icon({
+            icon: 'icon-repeat', 
+            color: 'cadetblue'
+        });
+        
         var markersList = {
             "start": {
-                "marker": null
+                "marker": null,
+                "markerIcon": startMarker
             },
             "stop": {
-                "marker": null
+                "marker": null,
+                "markerIcon": stopMarker
             },
             "c_start": {
-                "marker": null
+                "marker": null,
+                "markerIcon": c_startMarker
             }
         };
         
@@ -175,7 +195,7 @@
 		// Set start and stop markers
 	    function setMarker(marker,latlng) {
 		    if (markersList[marker]["marker"] == null) {
-		        markersList[marker]["marker"] = L.marker(latlng, {draggable:true});
+		        markersList[marker]["marker"] = L.marker(latlng, {draggable:true, icon:markersList[marker]["markerIcon"]});
 		        markersList[marker]["marker"].addTo(map);
                 (markersList[marker]["marker"]).on('dragend', function(event) {
                     var markerEvent = event.target;
@@ -245,7 +265,7 @@
             var degreeKm = degreeKmEquator * Math.cos(latlng.lat);
             // set c_start, the start and end point of the circular route
             if (markersList["c_start"]["marker"] == null) {
-		        markersList["c_start"]["marker"] = L.marker(latlng);
+		        markersList["c_start"]["marker"] = L.marker(latlng, {icon:markersList["c_start"]["markerIcon"]});
 		        markersList["c_start"]["marker"].addTo(map);
                 (markersList["c_start"]["marker"]).on('dragend', function(event) {
                     var markerEvent = event.target;
