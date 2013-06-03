@@ -29,15 +29,15 @@
 		        </div>
             </div>
 	        <div id="startAdress" class="input-append">
-                <input type="text" class="actionDiv" id="startField" placeholder="Start" rel="popover" data-content="Type the adress of your starting point, e.g. '14 Rue des Arts Toulouse'">
+                <input type="text" class="actionDiv" id="startField" placeholder="Start" rel="popover" data-content="Type the adress of your starting point, e.g. '14 Rue des Arts Toulouse'.">
                 <button type="button" class="btn" onclick="setStart()"><i class="icon-search"></i></button>
             </div>
 	        <div id="startAdressCircular" class="input-append">
-                <input type="text" class="actionDiv" id="startFieldCircular" placeholder="Loop around this adress" rel="popover" data-content="Type the adress that will be your start and destination, e.g. '14 Rue des Arts Toulouse'">
+                <input type="text" class="actionDiv" id="startFieldCircular" placeholder="Loop around this adress" rel="popover" data-content="Type the adress that will be your start and destination, e.g. '14 Rue des Arts Toulouse'.<br />By default, a 1-hour loop will be displayed.">
                 <button type="button" class="btn" onclick="setStartCircular()"><i class="icon-search"></i></button>
             </div>
 	        <div id="destinationAdress" class="input-append">
-                <input type="text" class="actionDiv" id="destinationField" placeholder="Destination" rel="popover" data-content="Type the adress of your destinationField, e.g. '9 Rue Réclusane Toulouse'">
+                <input type="text" class="actionDiv" id="destinationField" placeholder="Destination" rel="popover" data-content="Type the adress of your destinationField, e.g. '9 Rue Réclusane Toulouse'.">
                 <button type="button" class="btn" onclick="setDestination()"><i class="icon-search"></i></button>
             </div>
             <div id="costType">
@@ -506,7 +506,8 @@
         
         // Popovers
         $('#startField').popover({placement:'bottom'})
-        $('#startFieldCircular').popover({placement:'bottom'})
+        $('#startFieldCircular').popover({placement:'bottom',html:true})
+        $('#destinationField').popover({placement:'bottom'})
         
 	</script>
 </body>
