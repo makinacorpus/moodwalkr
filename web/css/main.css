@@ -1,9 +1,11 @@
 #action {
+    width: 213px;
     position: absolute;
     top: 20px;
     left: 20px;
     margin-left:0;
     background: #E6E6E6;
+    box-shadow: 1px 1px 12px #555;
     -webkit-transition:width 1000ms ease-in-out, height 1000ms ease-in-out;
     -moz-transition:width 1000ms ease-in-out, height 1000ms ease-in-out;
     -o-transition:width 1000ms ease-in-out, height 1000ms ease-in-out;
@@ -18,6 +20,22 @@
     margin-bottom:10px;
     }
     
+#btnGroupCostTypeCircular {
+    margin-bottom:10px;
+    }
+    
+#startFieldCircular {
+    width: 159px;
+    }
+    
+#startField {
+    width: 159px;
+    }
+    
+#destinationField {
+    width: 159px;
+    }
+
 #startAdress {
     display:none;
     margin-left:0;

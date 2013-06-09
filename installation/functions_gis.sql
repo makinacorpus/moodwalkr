@@ -76,29 +76,31 @@ DECLARE
     i integer ;
     validsegment boolean;
 BEGIN
-    -- n rings for the polygon, n-1 interior rings
-    ninteriorrings := ST_NRINGS(polygon)-1;
-    -- analyse each line
-    FOR line IN SELECT * FROM AllSegmentsFromPoints(polygon) LOOP
-	-- we assume the line is valid, i.e does not crosses the polygon, and is not included inside an inner ring
-	validsegment := TRUE;
-	-- check : no line outside the outer ring
-	validsegment := validsegment AND ST_covers(ST_BuildArea(ST_ExteriorRing(polygon)),line);
-	-- check : no line crosses any ring
-	validsegment := validsegment AND NOT (ST_CROSSES(polygon,line));
-	-- if there is one or more inner ring, check if the line is inside this ring
-	IF ninteriorrings > 0 THEN
-	    FOR i IN 1..ninteriorrings LOOP
-	         validsegment := validsegment AND NOT ST_within(line,ST_BuildArea(ST_InteriorRingN(polygon,i)));
+    IF ST_IsValid(polygon) THEN
+        -- n rings for the polygon, n-1 interior rings
+        ninteriorrings := ST_NRINGS(polygon)-1;
+        -- analyse each line
+        FOR line IN SELECT * FROM AllSegmentsFromPoints(polygon) LOOP
+	    -- we assume the line is valid, i.e does not crosses the polygon, and is not included inside an inner ring
+	    validsegment := TRUE;
+	    -- check : no line outside the outer ring
+	    validsegment := validsegment AND ST_covers(ST_BuildArea(ST_ExteriorRing(polygon)),line);
+	    -- check : no line crosses any ring
+	    validsegment := validsegment AND NOT (ST_CROSSES(polygon,line));
+	    -- if there is one or more inner ring, check if the line is inside this ring
+	    IF ninteriorrings > 0 THEN
+	        FOR i IN 1..ninteriorrings LOOP
+	             validsegment := validsegment AND NOT ST_within(line,ST_BuildArea(ST_InteriorRingN(polygon,i)));
+	        END LOOP;
+	    END IF;
+	    -- if the line is valid, return it
+	    IF validsegment
+	    THEN
+	        --RETURN NEXT line;
+	        INSERT INTO lines_from_polygon (geom,name,osm_id) VALUES (line,line_name,osm_id);
+	    END IF;
 	    END LOOP;
-	END IF;
-	-- if the line is valid, return it
-	IF validsegment
-	THEN
-	    --RETURN NEXT line;
-	    INSERT INTO lines_from_polygon (geom,name,osm_id) VALUES (line,line_name,osm_id);
-	END IF;
-	END LOOP;
+    END IF;
 END;
 $$
 LANGUAGE plpgsql;

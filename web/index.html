@@ -24,7 +24,7 @@
 	<!-- Add Leaflet library -->
 	<div class="row-fluid">
 	    <div class="span12" id="map" style="height:650px;" ></div>
-	    <div class="span2" id="action">
+	    <div id="action">
 	        <div id="routingMode">
 	            <div class="btn-group" data-toggle="buttons-radio">
 		            <button type="button" id="btnShortestPath" class="btn" onclick="chooseRoutingMode('shortestPath')"><i class="icon-share-alt"></i> Itinerary</button>
@@ -32,23 +32,23 @@
 		        </div>
             </div>
 	        <div id="startAdress" class="input-append">
-                <input type="text" class="actionDiv span10" id="startField" placeholder="Start" rel="popover" data-content="Type the adress of your starting point, e.g. '14 Rue des Arts Toulouse'.">
+                <input type="text" class="actionDiv" id="startField" placeholder="Start" rel="popover" data-content="Type the adress of your starting point, e.g. '14 Rue des Arts Toulouse'.">
                 <button type="button" class="btn" onclick="setStart()"><i class="icon-search"></i></button>
             </div>
 	        <div id="startAdressCircular" class="input-append">
-                <input type="text" class="actionDiv span10" id="startFieldCircular" placeholder="Loop around this adress" rel="popover" data-content="Type the adress that will be your start and destination, e.g. '14 Rue des Arts Toulouse'.<br />By default, a 1-hour loop will be displayed.">
+                <input type="text" class="actionDiv" id="startFieldCircular" placeholder="Loop around this adress" rel="popover" data-content="Type the adress that will be your start and destination, e.g. '14 Rue des Arts Toulouse'.<br />By default, a 1-hour loop will be displayed.">
                 <button type="button" class="btn" onclick="setStartCircular()"><i class="icon-search"></i></button>
             </div>
 	        <div id="destinationAdress" class="input-append">
-                <input type="text" class="actionDiv span10" id="destinationField" placeholder="Destination" rel="popover" data-content="Type the adress of your destinationField, e.g. '9 Rue Réclusane Toulouse'.">
+                <input type="text" class="actionDiv" id="destinationField" placeholder="Destination" rel="popover" data-content="Type the adress of your destinationField, e.g. '9 Rue Réclusane Toulouse'.">
                 <button type="button" class="btn" onclick="setDestination()"><i class="icon-search"></i></button>
             </div>
             <div id="costType">
 	            <div class="btn-group" data-toggle="buttons-radio" id="btnGroupCostType">
-	                <button type="button" id="btnLength" class="btn btn-danger" onclick="chooseRoute('length')" rel="tooltip" data-title="Shortest path"><i class="icon-arrow-right"></i></button>
-		            <button type="button" id="btnActivity" class="btn btn-primary" onclick="chooseRoute('cost_activity')" rel="tooltip" data-title="Shopping and activities"><i class="icon-shopping-cart"></i></button>
-		            <button type="button" id="btnNature" class="btn btn-success" onclick="chooseRoute('cost_nature')" rel="tooltip" data-title="Nature"><i class="icon-leaf"></i></button>
-		            <button type="button" id="btnCulture" class="btn btn-warning" onclick="chooseRoute('cost_culture')" rel="tooltip" data-title="Culture"><i class="icon-book"></i></button>
+	                <button type="button" id="btnLength" class="btn btn-large btn-danger" onclick="chooseRoute('length')" rel="tooltip" data-title="Shortest path"><i class="icon-arrow-right"></i></button>
+		            <button type="button" id="btnActivity" class="btn btn-large btn-primary" onclick="chooseRoute('cost_activity')" rel="tooltip" data-title="Shopping and activities"><i class="icon-shopping-cart"></i></button>
+		            <button type="button" id="btnNature" class="btn btn-large btn-success" onclick="chooseRoute('cost_nature')" rel="tooltip" data-title="Nature"><i class="icon-leaf"></i></button>
+		            <button type="button" id="btnCulture" class="btn btn-large btn-warning" onclick="chooseRoute('cost_culture')" rel="tooltip" data-title="Culture"><i class="icon-book"></i></button>
 	            </div>
             </div>
             <div id="routeLength">
@@ -59,18 +59,18 @@
                 </div>
             </div>
             <div id="costTypeCircular">
-	            <div class="btn-group" data-toggle="buttons-radio">
-	                <button type="button" id="btnLengthC" class="btn btn-danger" onclick="circularProfile='length';" rel="tooltip" data-title="Shortest path"><i class="icon-arrow-right"></i></button>
-		            <button type="button" id="btnActivityC" class="btn btn-primary" onclick="circularProfile='cost_activity';" rel="tooltip" data-title="Shopping and activities"><i class="icon-shopping-cart"></i></button>
-		            <button type="button" id="btnNatureC" class="btn btn-success" onclick="circularProfile='cost_nature';" rel="tooltip" data-title="Nature"><i class="icon-leaf"></i></button>
-		            <button type="button" id="btnCultureC" class="btn btn-warning" onclick="circularProfile='cost_culture';" rel="tooltip" data-title="Culture"><i class="icon-book"></i></button>
+	            <div class="btn-group" data-toggle="buttons-radio" id="btnGroupCostTypeCircular">
+	                <button type="button" id="btnLengthC" class="btn btn-large btn-danger" onclick="circularProfile='length';" rel="tooltip" data-title="Shortest path"><i class="icon-arrow-right"></i></button>
+		            <button type="button" id="btnActivityC" class="btn btn-large btn-primary" onclick="circularProfile='cost_activity';" rel="tooltip" data-title="Shopping and activities"><i class="icon-shopping-cart"></i></button>
+		            <button type="button" id="btnNatureC" class="btn btn-large btn-success" onclick="circularProfile='cost_nature';" rel="tooltip" data-title="Nature"><i class="icon-leaf"></i></button>
+		            <button type="button" id="btnCultureC" class="btn btn-large btn-warning" onclick="circularProfile='cost_culture';" rel="tooltip" data-title="Culture"><i class="icon-book"></i></button>
 	            </div>
             </div>
 	        <div id="circularLengthPrompt">
 	            <form class="form-inline">
                     <fieldset>
                         <div class="input-append">
-                            <input type="number" class="span9" min="0" step="10" max="1000" id="circularLengthField" placeholder="Duration">
+                            <input type="number" class="span9" min="0" step="10" max="1000" id="circularLengthField" value="60">
                             <span class="add-on">min</span>
                         </div>
 	                    <button type="button" class="btn" onclick="circularLengthSet()">Compute</button>
