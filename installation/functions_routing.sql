@@ -103,11 +103,20 @@ RETURNS text AS
 $$
 DECLARE
 	geojson text;
+	point record;
 BEGIN
 	geojson:='{"type":"FeatureCollection","features":[';
 	geojson:=geojson || '{"type":"Feature","geometry":';
 	geojson:=geojson || ST_AsGeoJSON(route);
 	geojson:=geojson || ', "properties":{"id":1}},';
+	FOR point IN SELECT way,pname FROM ProfileMarkers(route,profile,length) AS (way geometry,pname text) LOOP
+		geojson:=geojson || '{"type":"Feature","geometry":';
+		geojson:=geojson || ST_AsGeoJSON(point.way);
+		geojson:=geojson || ',"properties": { "popupContent":"';
+		-- concatenate an empty string is pname is null, otherwise the whole geojson string will be null
+		geojson:=geojson || coalesce(point.pname, '');
+		geojson:=geojson || '"}},';
+	END LOOP;
 	geojson:=substring(geojson from 1 for char_length(geojson)-1);	
 	geojson:=geojson || '],"properties": {"length":' || length || ',"profile":"' || profile ||  '"}';
 	geojson:=geojson || '}';
@@ -116,6 +125,25 @@ END;
 $$
 LANGUAGE plpgsql;
 
+
+CREATE OR REPLACE FUNCTION ProfileMarkers(route geometry, profile text, length double precision)
+RETURNS SETOF RECORD AS
+$$
+DECLARE
+    markersCount integer;
+    buffer geometry;
+BEGIN
+    markersCount:=((length::integer-mod(length::integer,500))/500)::integer;
+    RETURN QUERY
+        EXECUTE 'SELECT ST_Transform(way,4326),name
+                 FROM planet_osm_point
+                 WHERE shop LIKE ''%''
+                   AND ST_DWithin(ST_Transform(way,4326),$1,0.0005)
+                 LIMIT $2'
+        USING route,markersCount;
+END;
+$$
+LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION ShortestPath(lat1 text, lon1 text, lat2 text, lon2 text, profile text)

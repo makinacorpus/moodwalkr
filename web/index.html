@@ -137,12 +137,25 @@
             }
         };
 		
+		var markerRouteStyles = {
+		    "length": L.AwesomeMarkers.icon({icon: 'icon-arrow-right', color: 'red'}),
+            "cost_activity" : L.AwesomeMarkers.icon({icon: 'icon-shopping-cart', color: 'blue'}),
+            "cost_nature": L.AwesomeMarkers.icon({icon: 'icon-leaf', color: 'green'}),
+            "cost_culture": L.AwesomeMarkers.icon({icon: 'icon-book', color: 'orange'})
+        };
+		
 		// Layers
 		var routeLayers = {
 		    "length": "routeShortestLayer",
             "cost_activity": "routeActivityLayer",
             "cost_nature": "routeNatureLayer",
             "cost_culture": "routeCultureLayer"
+        };
+		var markerRouteLayers = {
+		    "length": "markerRouteShortestLayer",
+            "cost_activity": "markerRouteActivityLayer",
+            "cost_nature": "markerRouteNatureLayer",
+            "cost_culture": "markerRouteCultureLayer"
         };
         		
 
@@ -160,7 +173,8 @@
         var c_startMarker = L.AwesomeMarkers.icon({
             icon: 'icon-repeat', 
             color: 'cadetblue'
-        });
+        });       
+        
         
         var markersList = {
             "start": {
@@ -192,6 +206,10 @@
 		routeActivityLayer = undefined;
 		routeNatureLayer = undefined;
 		routeCultureLayer = undefined;
+		markerRouteShortestLayer = undefined;
+		markerRouteActivityLayer = undefined;
+		markerRouteNatureLayer = undefined;
+		markerRouteCultureLayer = undefined;
 
 		// Set start and stop markers
 	    function setMarker(marker,latlng) {
@@ -315,6 +333,10 @@
         };
         
         
+        function onEachFeature(feature, layer) {
+			var popupContent =  feature.properties.popupContent;
+			layer.bindPopup(popupContent);
+		};
 
             
         function chooseRoutingMode(profile) {
@@ -333,6 +355,10 @@
                     map.removeLayer(routeLayers["cost_activity"]);
                     map.removeLayer(routeLayers["cost_nature"]);
                     map.removeLayer(routeLayers["cost_culture"]);
+		            map.removeLayer(markerRouteLayers["length"]);
+		            map.removeLayer(markerRouteLayers["cost_activity"]);
+		            map.removeLayer(markerRouteLayers["cost_nature"]);
+		            map.removeLayer(markerRouteLayers["cost_culture"]);
                     $("#btnShortestPath").button('toggle');
                 break;
                 case "circular":
@@ -347,6 +373,10 @@
                     map.removeLayer(routeLayers["cost_activity"]);
                     map.removeLayer(routeLayers["cost_nature"]);
                     map.removeLayer(routeLayers["cost_culture"]);
+		            map.removeLayer(markerRouteLayers["length"]);
+		            map.removeLayer(markerRouteLayers["cost_activity"]);
+		            map.removeLayer(markerRouteLayers["cost_nature"]);
+		            map.removeLayer(markerRouteLayers["cost_culture"]);
                     document.getElementById("btnCircular").checked = true;
                     $("#btnCircular").button('toggle');
                 break;
@@ -365,27 +395,44 @@
             switch(profile) {
                 case "length":
 		            routeLayers["length"].addTo(map);
+		            markerRouteLayers["length"].addTo(map);
 		            map.removeLayer(routeLayers["cost_activity"]);
 		            map.removeLayer(routeLayers["cost_nature"]);
 		            map.removeLayer(routeLayers["cost_culture"]);
+		            map.removeLayer(markerRouteLayers["cost_activity"]);
+		            map.removeLayer(markerRouteLayers["cost_nature"]);
+		            map.removeLayer(markerRouteLayers["cost_culture"]);
+		            
                 break;
                 case "cost_activity":
 		            routeLayers["cost_activity"].addTo(map);
+		            markerRouteLayers["cost_activity"].addTo(map);
 		            map.removeLayer(routeLayers["length"]);
 		            map.removeLayer(routeLayers["cost_nature"]);
 		            map.removeLayer(routeLayers["cost_culture"]);
+		            map.removeLayer(markerRouteLayers["length"]);
+		            map.removeLayer(markerRouteLayers["cost_nature"]);
+		            map.removeLayer(markerRouteLayers["cost_culture"]);
                 break;
                 case "cost_nature":
                     routeLayers["cost_nature"].addTo(map);
+                    markerRouteLayers["cost_nature"].addTo(map);
 		            map.removeLayer(routeLayers["cost_activity"]);
 		            map.removeLayer(routeLayers["length"]);
 		            map.removeLayer(routeLayers["cost_culture"]);
+		            map.removeLayer(markerRouteLayers["cost_activity"]);
+		            map.removeLayer(markerRouteLayers["length"]);
+		            map.removeLayer(markerRouteLayers["cost_culture"]);
                 break;
                 case "cost_culture":
                     routeLayers["cost_culture"].addTo(map);
+                    markerRouteLayers["cost_culture"].addTo(map);
 		            map.removeLayer(routeLayers["cost_activity"]);
 		            map.removeLayer(routeLayers["length"]);
 		            map.removeLayer(routeLayers["cost_nature"]);
+		            map.removeLayer(markerRouteLayers["cost_activity"]);
+		            map.removeLayer(markerRouteLayers["length"]);
+		            map.removeLayer(markerRouteLayers["cost_nature"]);
                 break;
             }
             infoRoute(profile);
@@ -419,7 +466,21 @@
 		                if (routeLayers[route.properties.profile] != undefined) {
 		                    map.removeLayer(routeLayers[route.properties.profile]);
 		                }
-		                routeLayers[route.properties.profile] = L.geoJson(route, {style: routeStyles[route.properties.profile]});
+		                routeLayers[route.properties.profile] = L.geoJson(route,
+		                                                                  {style: routeStyles[route.properties.profile],
+		                                                                  filter: function(feature, layer) {
+		                                                                          return feature.geometry.type == "MultiLineString";
+		                                                                          }
+                        });
+		                markerRouteLayers[route.properties.profile] = L.geoJson(route, {
+		                                                                        pointToLayer: function (feature, latlng) {
+										                                            return L.marker(latlng, {icon: markerRouteStyles[route.properties.profile]});
+									                                            },
+									                                            onEachFeature: onEachFeature,
+		                                                                        filter: function(feature, layer) {
+	                                                                                return feature.geometry.type == "Point";
+		                                                                        }
+                        });
 		                routeLayers[route.properties.profile].addTo(map);
 			            routeLengths[route.properties.profile] = Math.round(route.properties.length);
 		      }
