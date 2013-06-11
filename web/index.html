@@ -314,6 +314,10 @@
             map.removeLayer(routeLayers["cost_activity"]);
             map.removeLayer(routeLayers["cost_nature"]);
             map.removeLayer(routeLayers["cost_culture"]);
+            map.removeLayer(markerRouteLayers["length"]);
+            map.removeLayer(markerRouteLayers["cost_activity"]);
+            map.removeLayer(markerRouteLayers["cost_nature"]);
+            map.removeLayer(markerRouteLayers["cost_culture"]);
 	        computeCircularRoute(circularProfile,c_startLat,c_startLon,c_step1Lat,c_step1Lon,c_step2Lat,c_step2Lon,c_step3Lat,c_step3Lon);
         };
         
@@ -465,6 +469,7 @@
 				    console.log(route.properties.profile);
 		                if (routeLayers[route.properties.profile] != undefined) {
 		                    map.removeLayer(routeLayers[route.properties.profile]);
+        		            map.removeLayer(markerRouteLayers[route.properties.profile]);
 		                }
 		                routeLayers[route.properties.profile] = L.geoJson(route,
 		                                                                  {style: routeStyles[route.properties.profile],
@@ -513,9 +518,25 @@
 				    console.log(route.properties.profile);
 		                if (routeLayers[route.properties.profile] != undefined) {
 		                    map.removeLayer(routeLayers[route.properties.profile]);
+		                    map.removeLayer(markerRouteLayers[route.properties.profile]);
 		                }
-		                routeLayers[route.properties.profile] = L.geoJson(route, {style: routeStyles[route.properties.profile]});
+		                routeLayers[route.properties.profile] = L.geoJson(route,
+		                                                                  {style: routeStyles[route.properties.profile],
+		                                                                  filter: function(feature, layer) {
+		                                                                          return feature.geometry.type == "MultiLineString";
+		                                                                          }
+                        });
+		                markerRouteLayers[route.properties.profile] = L.geoJson(route, {
+		                                                                        pointToLayer: function (feature, latlng) {
+										                                            return L.marker(latlng, {icon: markerRouteStyles[route.properties.profile]});
+									                                            },
+									                                            onEachFeature: onEachFeature,
+		                                                                        filter: function(feature, layer) {
+	                                                                                return feature.geometry.type == "Point";
+		                                                                        }
+                        });
 		                routeLayers[route.properties.profile].addTo(map);
+		                markerRouteLayers[route.properties.profile].addTo(map);
 			            routeLengths[route.properties.profile] = Math.round(route.properties.length);
 		      }
 		    }).done(function () {

@@ -132,15 +132,89 @@ $$
 DECLARE
     markersCount integer;
     buffer geometry;
+    tolerance double precision;
 BEGIN
     markersCount:=((length::integer-mod(length::integer,500))/500)::integer;
-    RETURN QUERY
-        EXECUTE 'SELECT ST_Transform(way,4326),name
-                 FROM planet_osm_point
-                 WHERE shop LIKE ''%''
-                   AND ST_DWithin(ST_Transform(way,4326),$1,0.0005)
-                 LIMIT $2'
-        USING route,markersCount;
+    tolerance:=0.0003;
+    CASE profile
+	WHEN 'cost_activity' THEN
+		RETURN QUERY
+		    EXECUTE 'SELECT way,name
+			     FROM (SELECT ST_Transform(way,4326) AS way,name
+				   FROM planet_osm_point
+			           WHERE shop LIKE ''%''
+					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
+					AND name IS NOT NULL) AS activitypoi
+			     UNION (SELECT ST_Transform(way,4326) AS way,name
+				   FROM planet_osm_point
+			           WHERE amenity=''bar''
+					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
+					AND name IS NOT NULL)
+			     UNION (SELECT ST_Transform(way,4326) AS way,name
+				   FROM planet_osm_point
+			           WHERE amenity=''cafe''
+					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
+					AND name IS NOT NULL)
+			     UNION (SELECT ST_Transform(way,4326) AS way,name
+				   FROM planet_osm_point
+			           WHERE amenity=''pub''
+					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
+					AND name IS NOT NULL)
+			     UNION (SELECT ST_Transform(way,4326) AS way,name
+				   FROM planet_osm_point
+			           WHERE amenity=''restaurant''
+					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
+					AND name IS NOT NULL)
+			     LIMIT $2'
+		    USING route,markersCount,tolerance;
+	WHEN 'cost_nature' THEN
+		RETURN QUERY
+		    EXECUTE 'SELECT way,name
+			     FROM (SELECT ST_Transform(ST_PointOnSurface(way),4326) AS way,name
+				   FROM planet_osm_polygon
+			           WHERE leisure LIKE ''park''
+					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
+					AND name IS NOT NULL) AS naturepoi
+			     UNION (SELECT ST_Transform(ST_PointOnSurface(way),4326) AS way,name
+				   FROM planet_osm_line
+			           WHERE waterway=''riverbank''
+					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
+					AND name IS NOT NULL)
+			     UNION (SELECT ST_Transform(ST_PointOnSurface(way),4326) AS way,name
+				   FROM planet_osm_polygon
+			           WHERE waterway=''riverbank''
+					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
+					AND name IS NOT NULL)
+			     LIMIT $2'
+		    USING route,markersCount,tolerance;
+	WHEN 'cost_culture' THEN
+		RETURN QUERY
+		    EXECUTE 'SELECT way,name
+			     FROM (SELECT ST_Transform(way,4326) AS way,name
+				   FROM planet_osm_point
+			           WHERE tourism LIKE ''%''
+					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
+					AND name IS NOT NULL) AS culturepoi
+			     UNION (SELECT ST_Transform(ST_PointOnSurface(way),4326) AS way,name
+				   FROM planet_osm_polygon
+			           WHERE tourism LIKE ''%''
+					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
+					AND name IS NOT NULL)
+			     UNION (SELECT ST_Transform(ST_PointOnSurface(way),4326) AS way,name
+				   FROM planet_osm_polygon
+			           WHERE amenity=''place_of_worship''
+					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
+					AND name IS NOT NULL)
+			     UNION (SELECT ST_Transform(ST_PointOnSurface(way),4326) AS way,name
+				   FROM planet_osm_polygon
+			           WHERE heritage LIKE ''%''
+					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
+					AND name IS NOT NULL)
+			     LIMIT $2'
+		    USING route,markersCount,tolerance;
+	ELSE
+		NULL;
+    END CASE;
 END;
 $$
 LANGUAGE plpgsql;
