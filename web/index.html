@@ -18,6 +18,7 @@
 	<script src="js/bootstrap.min.js"></script>
 	<script src="js/leaflet.awesome-markers.js"></script>
 	<script src="js/spin.js"></script>
+	<script src="js/leaflet.spin.js"></script>
 </head>
 
 <body>
@@ -453,7 +454,7 @@
 		
 		// get the route according to the profile passed as argument
 		function computeRoute(profile,vlat1,vlon1,vlat2,vlon2) {
-	        var spinner = new Spinner(opts).spin(target);
+	        map.spin(true,opts);
 		    var ajaxTime= new Date().getTime();
 		    $.ajax({
 			    dataType: "json",
@@ -490,15 +491,17 @@
 			            routeLengths[route.properties.profile] = Math.round(route.properties.length);
 		      }
 		    }).done(function () {
-		        spinner.stop();
+		        map.spin(false);
        		    var totalTime = new Date().getTime()-ajaxTime;
        		    $("#responseTime").html("Temps de réponse : " + totalTime+ " ms");
-	        })
+	        }).error(function () {
+                map.spin(false);
+            });
 		};
 		
 		// get the circular route according to the profile passed as argument
 		function computeCircularRoute(profile,vlat1,vlon1,vlat2,vlon2,vlat3,vlon3,vlat4,vlon4) {
-	        var spinner = new Spinner(opts).spin(target);
+	        map.spin(true,opts);
 		    var ajaxTime= new Date().getTime();
 		    $.ajax({
 			    dataType: "json",
@@ -540,10 +543,12 @@
 			            routeLengths[route.properties.profile] = Math.round(route.properties.length);
 		      }
 		    }).done(function () {
-		        spinner.stop();
+                map.spin(false);
        		    var totalTime = new Date().getTime()-ajaxTime;
        		    $("#responseTime").html("Temps de réponse : " + totalTime+ " ms");
-	        })
+	        }).error(function () {
+                map.spin(false);
+            });
 		};
 		
 		function setStart() {
