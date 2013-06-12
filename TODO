@@ -26,7 +26,7 @@ OK: utiliser tag "heritage"
 OK: Supprimer les lignes inutiles pour le routing sur les surfaces
 OK: Mode itinéraire circulaire
 OK: Interface utilisateur basique
-* Afficher POI autour de l'itinéraire
+OK: Afficher POI autour de l'itinéraire
 OK: optimiser requetes -> recherche dans bbox
 * Données bruit et trafic
 * carte walkability Toulouse multi-critères
@@ -38,3 +38,4 @@ OK: aide (info-bulles) formulaire
 OK: spin en attendant le chargement
 * nom produit
 * fiche produit
+OK: reverse geocoding points arrivée/départ

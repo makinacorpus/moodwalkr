@@ -219,7 +219,21 @@
 		        markersList[marker]["marker"].addTo(map);
                 (markersList[marker]["marker"]).on('dragend', function(event) {
                     var markerEvent = event.target;
-                    setMarker(marker,markerEvent.getLatLng())
+                    setMarker(marker,markerEvent.getLatLng());
+                    if (marker=="start") {
+                        $.getJSON("http://nominatim.openstreetmap.org/reverse?format=json&zoom=18&lat=" + markerEvent.getLatLng().lat + "&lon=" + markerEvent.getLatLng().lng, function(data) {
+                            var address = reverseGeocode(data)
+                            console.log(address);
+                            document.getElementById("startField").value = address;
+                        }); 
+                        };
+                    if (marker=="stop") {
+                        $.getJSON("http://nominatim.openstreetmap.org/reverse?format=json&zoom=18&lat=" + markerEvent.getLatLng().lat + "&lon=" + markerEvent.getLatLng().lng, function(data) {
+                            var address = reverseGeocode(data)
+                            console.log(address);
+                            document.getElementById("destinationField").value = address;
+                        }); 
+                        };
                     computeAllRoutes();
                 });
 	        } else {
@@ -234,8 +248,12 @@
             	callback: function(key, options) {
             	    if (key=="start") {
 	                        chooseRoutingMode('shortestPath');
-				            setMarker(key,e.latlng);
 	                        document.getElementById("startAdress").style.display = "block";
+	                        $.getJSON("http://nominatim.openstreetmap.org/reverse?format=json&zoom=18&lat=" + e.latlng.lat + "&lon=" + e.latlng.lng, function(data) {
+	                            var address = reverseGeocode(data)
+                                document.getElementById("startField").value = address;
+                            }); 	
+				            setMarker(key,e.latlng);
 	    	                computeAllRoutes();
              		        $.contextMenu('destroy', '#map');
                     };                    
@@ -243,10 +261,18 @@
 	                        chooseRoutingMode('shortestPath');
 				            setMarker(key,e.latlng);
 	                        document.getElementById("destinationAdress").style.display = "block";
+	                        $.getJSON("http://nominatim.openstreetmap.org/reverse?format=json&zoom=18&lat=" + e.latlng.lat + "&lon=" + e.latlng.lng, function(data) {
+	                            var address = reverseGeocode(data)
+                                document.getElementById("destinationField").value = address;
+                            }); 
 	    	                computeAllRoutes();
              		        $.contextMenu('destroy', '#map');
                     };
             	    if (key=="c_start") {
+	                        $.getJSON("http://nominatim.openstreetmap.org/reverse?format=json&zoom=18&lat=" + e.latlng.lat + "&lon=" + e.latlng.lng, function(data) {
+	                            var address = reverseGeocode(data)
+                                document.getElementById("startFieldCircular").value = address;
+                            }); 
 				            chooseRoutingMode('circular');
                             document.getElementById("costTypeCircular").style.display = "block";
                             document.getElementById("circularLengthPrompt").style.display = "block";
@@ -580,6 +606,21 @@
                 });
             }); 
 		};
+		
+		// Reverse geocoding
+		function reverseGeocode(data) {
+            var address = ""
+            if (data.address.house_number != undefined) {
+                address = address + data.address.house_number + " ";
+                };
+            if (data.address.road != undefined) {
+                address = address + data.address.road+ ", ";
+                };
+            if (data.address.city != undefined) {
+                address = address + data.address.city;
+                };
+            return address;
+        }
 		
 		// Call Nominatim to set the start or end points when using the search bar
 		$("#startField").keyup(function (e) {

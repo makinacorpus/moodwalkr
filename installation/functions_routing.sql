@@ -89,7 +89,7 @@ BEGIN
 			WHERE ways_foot.gid=pvid;
 			routearray=array_append(routearray,linegeom);
 		END LOOP;
-		route := ST_Union(routearray);
+		route := ST_LineMerge(ST_SnapToGrid(ST_Union(routearray),0.00002));
 	END IF;
 	result:=(route,length_tot);
 	RETURN result;
