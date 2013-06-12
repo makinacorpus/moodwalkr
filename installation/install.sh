@@ -66,7 +66,7 @@ fi
 if test ! -d pgrouting; then
     git clone git@github.com:pgRouting/pgrouting.git
     pushd pgrouting
-    git checkout 3be3aef5
+    git checkout 818e73089abc98cbdaccd8225e1cb0bad6a44d4e
     cmake -DWITH_DD=ON .
     make
     sudo make install

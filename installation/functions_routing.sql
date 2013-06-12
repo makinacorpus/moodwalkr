@@ -50,8 +50,8 @@ BEGIN
 		route:=ST_Line_Substring(line_start.the_geom,LEAST(position_start,position_target),GREATEST(position_start,position_target));
 		length_tot:=line_start.length * abs(position_target - position_start);
 	ELSE
-		-- Loop across edges. Last edge_id is -1, and is not taken into account. (n vertices, n-1 edges)
-		FOR point IN (SELECT * FROM shortest_path('
+		-- Loop across edges. Last edge/id2 is -1, and is not taken into account. (n vertices, n-1 edges)
+		FOR point IN (SELECT id2 AS edge FROM pgr_dijkstra('
                 SELECT gid as id,
 	                source::integer,
 	                target::integer,
@@ -66,8 +66,8 @@ BEGIN
 	                UNION (SELECT -12 as gid, -1 as source,' ||  line_start.target || ' as target, ((1-' || position_start || ') * ' || line_start.length || ') as length)
 	                UNION (SELECT -21 as gid,' ||  line_target.source || ' as source, -2 as target, (' || position_target || ' * ' || line_target.length || ') as length)
 	                UNION (SELECT -22 as gid, -2 as source,' ||  line_target.target || ' as target, ((1-' || position_target || ') * ' || line_target.length || ') as length)
-	                ', -1, -2, false, false) WHERE edge_id != -1) LOOP
-			pvid:=point.edge_id;
+	                ', -1, -2, false, false) WHERE id2 != -1) LOOP
+			pvid:=point.edge;
 			
 			SELECT length 
 			INTO point_length 
