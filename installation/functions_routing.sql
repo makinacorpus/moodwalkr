@@ -109,7 +109,7 @@ BEGIN
 	geojson:=geojson || '{"type":"Feature","geometry":';
 	geojson:=geojson || ST_AsGeoJSON(route);
 	geojson:=geojson || ', "properties":{"id":1}},';
-	FOR point IN SELECT way,pname FROM ProfileMarkers(route,profile,length) AS (way geometry,pname text) LOOP
+	FOR point IN SELECT way,pname FROM ProfileMarkers(route,profile,length) AS (way geometry,pname text,rand double precision) LOOP
 		geojson:=geojson || '{"type":"Feature","geometry":';
 		geojson:=geojson || ST_AsGeoJSON(point.way);
 		geojson:=geojson || ',"properties": { "popupContent":"';
@@ -139,77 +139,80 @@ BEGIN
     CASE profile
 	WHEN 'cost_activity' THEN
 		RETURN QUERY
-		    EXECUTE 'SELECT way,name
-			     FROM (SELECT ST_Transform(way,4326) AS way,name
+		    EXECUTE 'SELECT way,name,rand
+			     FROM (SELECT ST_Transform(way,4326) AS way,name,random() AS rand
 				   FROM planet_osm_point
 			           WHERE shop LIKE ''%''
 					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
 					AND name IS NOT NULL) AS activitypoi
-			     UNION (SELECT ST_Transform(way,4326) AS way,name
+			     UNION (SELECT ST_Transform(way,4326) AS way,name,random() AS rand
 				   FROM planet_osm_point
 			           WHERE amenity=''bar''
 					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
 					AND name IS NOT NULL)
-			     UNION (SELECT ST_Transform(way,4326) AS way,name
+			     UNION (SELECT ST_Transform(way,4326) AS way,name,random() AS rand
 				   FROM planet_osm_point
 			           WHERE amenity=''cafe''
 					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
 					AND name IS NOT NULL)
-			     UNION (SELECT ST_Transform(way,4326) AS way,name
+			     UNION (SELECT ST_Transform(way,4326) AS way,name,random() AS rand
 				   FROM planet_osm_point
 			           WHERE amenity=''pub''
 					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
 					AND name IS NOT NULL)
-			     UNION (SELECT ST_Transform(way,4326) AS way,name
+			     UNION (SELECT ST_Transform(way,4326) AS way,name,random() AS rand
 				   FROM planet_osm_point
 			           WHERE amenity=''restaurant''
 					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
 					AND name IS NOT NULL)
+			     ORDER by rand
 			     LIMIT $2'
 		    USING route,markersCount,tolerance;
 	WHEN 'cost_nature' THEN
 		RETURN QUERY
-		    EXECUTE 'SELECT way,name
-			     FROM (SELECT ST_Transform(ST_PointOnSurface(way),4326) AS way,name
+		    EXECUTE 'SELECT way,name,rand
+			     FROM (SELECT ST_Transform(ST_PointOnSurface(way),4326) AS way,name,random() AS rand
 				   FROM planet_osm_polygon
 			           WHERE leisure LIKE ''park''
 					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
 					AND name IS NOT NULL) AS naturepoi
-			     UNION (SELECT ST_Transform(ST_PointOnSurface(way),4326) AS way,name
+			     UNION (SELECT ST_Transform(ST_PointOnSurface(way),4326) AS way,name,random() AS rand
 				   FROM planet_osm_line
 			           WHERE waterway=''riverbank''
 					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
 					AND name IS NOT NULL)
-			     UNION (SELECT ST_Transform(ST_PointOnSurface(way),4326) AS way,name
+			     UNION (SELECT ST_Transform(ST_PointOnSurface(way),4326) AS way,name,random() AS rand
 				   FROM planet_osm_polygon
 			           WHERE waterway=''riverbank''
 					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
 					AND name IS NOT NULL)
+			     ORDER by rand
 			     LIMIT $2'
 		    USING route,markersCount,tolerance;
 	WHEN 'cost_culture' THEN
 		RETURN QUERY
-		    EXECUTE 'SELECT way,name
-			     FROM (SELECT ST_Transform(way,4326) AS way,name
+		    EXECUTE 'SELECT way,name,rand
+			     FROM (SELECT ST_Transform(way,4326) AS way,name,random() AS rand
 				   FROM planet_osm_point
 			           WHERE tourism LIKE ''%''
 					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
 					AND name IS NOT NULL) AS culturepoi
-			     UNION (SELECT ST_Transform(ST_PointOnSurface(way),4326) AS way,name
+			     UNION (SELECT ST_Transform(ST_PointOnSurface(way),4326) AS way,name,random() AS rand
 				   FROM planet_osm_polygon
 			           WHERE tourism LIKE ''%''
 					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
 					AND name IS NOT NULL)
-			     UNION (SELECT ST_Transform(ST_PointOnSurface(way),4326) AS way,name
+			     UNION (SELECT ST_Transform(ST_PointOnSurface(way),4326) AS way,name,random() AS rand
 				   FROM planet_osm_polygon
 			           WHERE amenity=''place_of_worship''
 					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
 					AND name IS NOT NULL)
-			     UNION (SELECT ST_Transform(ST_PointOnSurface(way),4326) AS way,name
+			     UNION (SELECT ST_Transform(ST_PointOnSurface(way),4326) AS way,name,random() AS rand
 				   FROM planet_osm_polygon
 			           WHERE heritage LIKE ''%''
 					AND ST_DWithin(ST_Transform(way,4326),$1,$3)
 					AND name IS NOT NULL)
+			     ORDER by rand
 			     LIMIT $2'
 		    USING route,markersCount,tolerance;
 	ELSE

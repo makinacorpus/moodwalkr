@@ -246,7 +246,7 @@ UPDATE cost_grid
 SET test_culture=(test_culture/(SELECT max FROM max_test_culture));
 
 UPDATE cost_grid
-   SET test_activite=t_highway+t_heavy_transport+a_shops+a_leisure+c_tourism+c_pow+a_food;
+   SET test_activite=t_highway+t_heavy_transport+3*a_shops+2*a_leisure+2*a_food;
 
 WITH max_test_activite AS (SELECT GREATEST(max(test_activite), 1) as max FROM cost_grid)
 UPDATE cost_grid

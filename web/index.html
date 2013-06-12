@@ -475,7 +475,7 @@
 		                routeLayers[route.properties.profile] = L.geoJson(route,
 		                                                                  {style: routeStyles[route.properties.profile],
 		                                                                  filter: function(feature, layer) {
-		                                                                          return feature.geometry.type == "MultiLineString";
+		                                                                          return feature.geometry.type == "LineString";
 		                                                                          }
                         });
 		                markerRouteLayers[route.properties.profile] = L.geoJson(route, {
@@ -526,7 +526,7 @@
 		                routeLayers[route.properties.profile] = L.geoJson(route,
 		                                                                  {style: routeStyles[route.properties.profile],
 		                                                                  filter: function(feature, layer) {
-		                                                                          return feature.geometry.type == "MultiLineString";
+		                                                                          return feature.geometry.type == "LineString";
 		                                                                          }
                         });
 		                markerRouteLayers[route.properties.profile] = L.geoJson(route, {

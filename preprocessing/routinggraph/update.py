@@ -98,7 +98,7 @@ cur.execute("INSERT INTO ways(the_geom,name,class_id,gid,osm_id,foot,frompolygon
 print "***** Assign vertex id"
 cur.execute("SELECT assign_vertex_id('ways', 0.00001, 'the_geom', 'gid');")
 
-print "***** Update legnth"
+print "***** Update length"
 cur.execute("UPDATE ways SET length = ST_Length_Spheroid(ways.the_geom,'SPHEROID[\"WGS 84\",6378137,298.257223563]');")
 
 print "***** Update foot attribute"
