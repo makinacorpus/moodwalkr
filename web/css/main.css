@@ -36,16 +36,16 @@
     width: 159px;
     }
 
-#startAdress {
+#startAddress {
     display:none;
     margin-left:0;
     }
     
-#startAdressCircular {
+#startAddressCircular {
     display:none;
     }
     
-#destinationAdress {
+#destinationAddress {
     display:none;
     }
     
