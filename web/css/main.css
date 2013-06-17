@@ -11,6 +11,10 @@
     -o-transition:width 1000ms ease-in-out, height 1000ms ease-in-out;
     transition:width 1000ms ease-in-out, height 1000ms ease-in-out;
     }
+    
+#languageSelector {
+    width: 100%;
+    }
 
 .actionDiv {
     margin-bottom: 0;
