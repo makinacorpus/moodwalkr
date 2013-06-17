@@ -583,7 +583,7 @@ var t_lang = '<select id="languageSelector">'
            + '    <option value="i18nTableFr">Français</option>'
            + '</select>';
                   
-var t_routingMode = '<div class="btn-group" data-toggle="buttons-radio" data-step="1" data-position="right" data-intro="first">'
+var t_routingMode = '<div class="btn-group" data-toggle="buttons-radio" data-step="1" data-position="right" data-intro="{{tour_step1}}">'
                   + '   <button type="button" id="btnShortestPath" class="btn"><i class="icon-share-alt"></i>{{itinerary}}</button>'
                   + '   <button type="button" id="btnCircular" class="btn"><i class="icon-repeat"></i>{{loop}}</button>'
                   + '</div>';
@@ -678,10 +678,6 @@ $("#languageSelector").on("change",function() {
     $('#costType').html( o_costType );
     $('#costTypeCircular').html( o_costTypeCircular );
     $('#circularLengthPrompt').html( o_circularLengthPrompt );
-});
-
-$(document).ready(function() {
-    introJs().start();
 });
 
 // Call Nominatim to set the start or end points when using the search bar
