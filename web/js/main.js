@@ -134,7 +134,7 @@ markerRouteNatureLayer = undefined;
 markerRouteCultureLayer = undefined;
 
 
-// Spin
+// Spin options
 var opts = {
   lines: 13, // The number of lines to draw
   length: 20, // The length of each line
@@ -576,40 +576,13 @@ function setDestination() {
 }
 var target = document.getElementById('map');
 
-// i18n tables
-var i18nTableEn = { 
-   "itinerary" : " Itinerary",
-   "loop" : " Loop route",
-   "shortest" : "Shortest path",
-   "activity" : "Shopping and activities",
-   "nature" : "Nature",
-   "culture" : "Culture",
-   "start" : "Start",
-   "startContent" : "Type the address of your starting point, e.g. '14 Rue des Arts Toulouse'.",
-   "startCircular" : "Loop around this address",
-   "startCircularContent" : "Type the address that will be your start and destination, e.g. '14 Rue des Arts Toulouse'.<br>By default, a 1-hour loop will be displayed.",
-   "destination" : "Destination",
-   "destinationContent" : "Type the address of your destination, e.g. '9 Rue Réclusane Toulouse'.",
-   "compute" : "Compute"
-};
-
-var i18nTableFr = { 
-   "itinerary" : " Itinéraire",
-   "loop" : " Boucle",
-   "shortest" : "Au plus court",
-   "activity" : "Courses et lieux d'activité",
-   "nature" : "Nature",
-   "culture" : "Culture"   ,
-   "start" : "Point de départ",
-   "startContent" : "Tapez l'adresse de votre point de départ, par exemple '14 Rue des Arts Toulouse'.",
-   "startCircular" : "Boucle autour de cette adresse",
-   "startCircularContent" : "Tapez l'adresse qui sera votre départ et votre arrivée, par exemple '14 Rue des Arts Toulouse'.<br>Par défaut, une boucle d'une heure sera affichée.",
-   "destination" : "Destination",
-   "destinationContent" : "Tapez l'adresse de votre point d'arrivée, par exemple '9 Rue Réclusane Toulouse'.",
-   "compute" : "Calculer"
-};
 
 // Contents
+var t_lang = '<select id="languageSelector">'
+           + '    <option value="i18nTableEn" selected="1">English</option>'
+           + '    <option value="i18nTableFr">Français</option>'
+           + '</select>';
+                  
 var t_routingMode = '<div class="btn-group" data-toggle="buttons-radio">'
                   + '   <button type="button" id="btnShortestPath" class="btn"><i class="icon-share-alt"></i>{{itinerary}}</button>'
                   + '   <button type="button" id="btnCircular" class="btn"><i class="icon-repeat"></i>{{loop}}</button>'
@@ -658,8 +631,9 @@ var t_circularLengthPrompt = '<form class="form-inline">'
                            + '</form>';      
 
 // Rendering
-var lang = i18nTableFr;
+var lang = i18nTableEn;
 
+var o_lang = Mustache.render(t_lang, lang);
 var o_routingMode = Mustache.render(t_routingMode, lang);
 var o_startAddress = Mustache.render(t_startAddress, lang);
 var o_startAddressCircular = Mustache.render(t_startAddressCircular, lang);
@@ -669,6 +643,7 @@ var o_costType = Mustache.render(t_costType, lang);
 var o_costTypeCircular = Mustache.render(t_costTypeCircular, lang);
 var o_circularLengthPrompt = Mustache.render(t_circularLengthPrompt, lang);
 
+$('#lang').html( o_lang );
 $('#routingMode').html( o_routingMode );
 $('#startAddress').html( o_startAddress );
 $('#startAddressCircular').html( o_startAddressCircular );
@@ -683,68 +658,86 @@ $('#circularLengthPrompt').html( o_circularLengthPrompt );
 $("[rel='tooltip']").tooltip();
 $("[rel='popover']").popover({placement:'bottom',html:true});
 
+$("#languageSelector").on("change",function() {
+    lang = window[$("#languageSelector").val()];
+    console.log(lang);
+    var o_routingMode = Mustache.render(t_routingMode, lang);
+    var o_startAddress = Mustache.render(t_startAddress, lang);
+    var o_startAddressCircular = Mustache.render(t_startAddressCircular, lang);
+    var o_destinationAddress = Mustache.render(t_destinationAddress, lang);
+    var o_routeLength = Mustache.render(t_routeLength, lang);
+    var o_costType = Mustache.render(t_costType, lang);
+    var o_costTypeCircular = Mustache.render(t_costTypeCircular, lang);
+    var o_circularLengthPrompt = Mustache.render(t_circularLengthPrompt, lang);
+
+    $('#routingMode').html( o_routingMode );
+    $('#startAddress').html( o_startAddress );
+    $('#startAddressCircular').html( o_startAddressCircular );
+    $('#destinationAddress').html( o_destinationAddress );
+    $('#routeLength').html( o_routeLength );
+    $('#costType').html( o_costType );
+    $('#costTypeCircular').html( o_costTypeCircular );
+    $('#circularLengthPrompt').html( o_circularLengthPrompt );
+});
+
 // Call Nominatim to set the start or end points when using the search bar
-$("#startField").keyup(function (e) {
+$("body").on("keyup", "#startField", function(e){
     if (e.keyCode === 13) {
         setStart();
     }
 });
-
-$("#startFieldCircular").keyup(function (e) {
+$("body").on("keyup", "#startFieldCircular", function(e){
     if (e.keyCode === 13) {
         setStartCircular();
     }
 });
-
-$("#destinationField").keyup(function (e) {
+$("body").on("keyup", "#destinationField", function(e){
     if (e.keyCode === 13) {
         setDestination();
     }
 });
 
-
-
 // Buttons click
 
-$("#btnShortestPath").click(function() {
+$("body").on("click", "#btnShortestPath", function(){
     chooseRoutingMode('shortestPath');
 });
-$("#btnCircular").click(function() {
+$("body").on("click", "#btnCircular", function(){
     chooseRoutingMode('circular');
 });
-$("#btnStartAddress").click(function() {
+$("body").on("click", "#btnStartAddress", function(){
     setStart();
 });
-$("#btnStartAddressCircular").click(function() {
+$("body").on("click", "#btnStartAddressCircular", function(){
     setStartCircular();
 });
-$("#btnDestinationAddress").click(function() {
+$("body").on("click", "#btnDestinationAddress", function(){
     setDestination();
 });
-$("#btnLength").click(function() {
+$("body").on("click", "#btnLength", function(){
     chooseRoute('length');
 });
-$("#btnActivity").click(function() {
+$("body").on("click", "#btnActivity", function(){
     chooseRoute('cost_activity');
 });
-$("#btnNature").click(function() {
+$("body").on("click", "#btnNature", function(){
     chooseRoute('cost_nature');
 });
-$("#btnCulture").click(function() {
+$("body").on("click", "#btnCulture", function(){
     chooseRoute('cost_culture');
 });
-$("#btnLengthC").click(function() {
+$("body").on("click", "#btnLengthC", function(){
     circularProfile='length';
 });
-$("#btnActivityC").click(function() {
+$("body").on("click", "#btnActivityC", function(){
     circularProfile='cost_activity';
 });
-$("#btnNatureC").click(function() {
+$("body").on("click", "#btnNatureC", function(){
     circularProfile='cost_nature';
 });
-$("#btnCultureC").click(function() {
+$("body").on("click", "#btnCultureC", function(){
     circularProfile='cost_culture';
 });
-$("#btnCircularLengthSet").click(function() {
+$("body").on("click", "#btnCircularLengthSet", function(){
     circularLengthSet();
 });
