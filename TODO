@@ -38,7 +38,8 @@ OK: aide (info-bulles) formulaire
 OK: spin en attendant le chargement
 OK: nom produit
 * fiche produit
-* i18n
+OK: i18n
 OK: sortir js du html (onclick button)
 * séparer code js par fonctionnalité (init)
 OK: reverse geocoding points arrivée/départ
+* Visite guidée

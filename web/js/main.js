@@ -583,7 +583,7 @@ var t_lang = '<select id="languageSelector">'
            + '    <option value="i18nTableFr">Français</option>'
            + '</select>';
                   
-var t_routingMode = '<div class="btn-group" data-toggle="buttons-radio">'
+var t_routingMode = '<div class="btn-group" data-toggle="buttons-radio" data-step="1" data-position="right" data-intro="first">'
                   + '   <button type="button" id="btnShortestPath" class="btn"><i class="icon-share-alt"></i>{{itinerary}}</button>'
                   + '   <button type="button" id="btnCircular" class="btn"><i class="icon-repeat"></i>{{loop}}</button>'
                   + '</div>';
@@ -680,6 +680,10 @@ $("#languageSelector").on("change",function() {
     $('#circularLengthPrompt').html( o_circularLengthPrompt );
 });
 
+$(document).ready(function() {
+    introJs().start();
+});
+
 // Call Nominatim to set the start or end points when using the search bar
 $("body").on("keyup", "#startField", function(e){
     if (e.keyCode === 13) {
@@ -694,6 +698,11 @@ $("body").on("keyup", "#startFieldCircular", function(e){
 $("body").on("keyup", "#destinationField", function(e){
     if (e.keyCode === 13) {
         setDestination();
+    }
+});
+$("body").on("keyup", "#circularLengthField", function(e){
+    if (e.keyCode === 13) {
+        circularLengthSet();
     }
 });
 
