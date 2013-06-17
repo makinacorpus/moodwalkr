@@ -548,8 +548,8 @@ function chooseRoute(profile) {
 function setStart() {
      $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + document.getElementById('startField').value, function(data) {
         $.each(data, function(key, val) {
-            setMarker("start",new L.LatLng(val.lat, val.lon));
             document.getElementById("destinationAddress").style.display = "block";
+            setMarker("start",new L.LatLng(val.lat, val.lon));
 	        computeAllRoutes();
         });
     }); 
@@ -558,9 +558,9 @@ function setStart() {
 function setStartCircular() {
     $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&q=" + document.getElementById('startFieldCircular').value, function(data) {
         $.each(data, function(key, val) {
-            setMarker("c_start",new L.LatLng(val.lat, val.lon));
             document.getElementById("circularLengthPrompt").style.display = "block";
             document.getElementById("costTypeCircular").style.display = "block";
+            setMarker("c_start",new L.LatLng(val.lat, val.lon));
             setCircularMarkers(markersList.c_start.marker.getLatLng());
         });
     });	
@@ -578,25 +578,29 @@ var target = document.getElementById('map');
 
 
 // Contents
-var t_lang = '<select id="languageSelector">'
+var t_lang = '<select id="languageSelector" data-step="1" data-position="right" data-intro="{{tour_step1}}">'
            + '    <option value="i18nTableEn" selected="1">English</option>'
            + '    <option value="i18nTableFr">Français</option>'
            + '</select>';
                   
-var t_routingMode = '<div class="btn-group" data-toggle="buttons-radio" data-step="1" data-position="right" data-intro="{{tour_step1}}">'
+var t_routingMode = '<div class="btn-group" data-toggle="buttons-radio" id="step2" data-step="2" data-position="right" data-intro="{{tour_step2}}">'
                   + '   <button type="button" id="btnShortestPath" class="btn"><i class="icon-share-alt"></i>{{itinerary}}</button>'
                   + '   <button type="button" id="btnCircular" class="btn"><i class="icon-repeat"></i>{{loop}}</button>'
                   + '</div>';
                  
                  
-var t_startAddress = '<input type="text" class="actionDiv" id="startField" placeholder="{{start}}" rel="popover" data-content="{{startContent}}">'
-                   + '<button type="button" class="btn" id="btnStartAddress"><i class="icon-search"></i></button>';
+var t_startAddress = '<div id="step3" data-step="3" data-position="right" data-intro="{{tour_step3}}">'
+                   + '   <input type="text" class="actionDiv" id="startField" placeholder="{{start}}" rel="popover" data-content="{{startContent}}">'
+                   + '   <button type="button" class="btn" id="btnStartAddress"><i class="icon-search"></i></button>'
+                   + '</div>';
                   
 var t_startAddressCircular = '<input type="text" class="actionDiv" id="startFieldCircular" placeholder="{{startCircular}}" rel="popover" data-content="{{startCircularContent}}">'
                            + '<button type="button" class="btn" id="btnStartAddressCircular"><i class="icon-search"></i></button>';            
         
-var t_destinationAddress = '<input type="text" class="actionDiv" id="destinationField" placeholder="{{destination}}" rel="popover" data-content="{{destinationContent}}">'
-                         + '<button type="button" class="btn" id="btnDestinationAddress"><i class="icon-search"></i></button>';
+var t_destinationAddress = '<div id="step4" data-step="4" data-position="right" data-intro="{{tour_step4}}">'
+                         + '    <input type="text" class="actionDiv" id="destinationField" placeholder="{{destination}}" rel="popover" data-content="{{destinationContent}}">'
+                         + '    <button type="button" class="btn" id="btnDestinationAddress"><i class="icon-search"></i></button>'
+                         + '</div>';
         
 var t_routeLength = '<ul class="nav nav-list">'
                   + '   <li class="divider"></li>'
@@ -604,7 +608,7 @@ var t_routeLength = '<ul class="nav nav-list">'
                   + '<div id="routeLengthContent">'
                   + '</div>';
         
-var t_costType = '<div class="btn-group" data-toggle="buttons-radio" id="btnGroupCostType">'
+var t_costType = '<div class="btn-group" data-toggle="buttons-radio" id="btnGroupCostType" data-step="5" data-position="right" data-intro="{{tour_step5}}">'
                + '  <button type="button" id="btnLength" class="btn btn-large btn-danger" rel="tooltip" data-title="{{shortest}}"><i class="icon-arrow-right"></i></button>'
                + '  <button type="button" id="btnActivity" class="btn btn-large btn-primary" rel="tooltip" data-title="{{activity}}"><i class="icon-shopping-cart"></i></button>'
                + '  <button type="button" id="btnNature" class="btn btn-large btn-success" rel="tooltip" data-title="{{nature}}"><i class="icon-leaf"></i></button>'
