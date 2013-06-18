@@ -15,11 +15,30 @@ $(document).ready(function() {
                 document.getElementById('destinationField').value="1 Rue des Cuves Saint-Sernin, Toulouse";
                 document.getElementById("costType").style.display = "block";
                 setDestination();
-                map.setView(new L.LatLng(43.602, 1.445),15); //43.60153&lon=1.44483&zoom=15&layers=M
+                map.setView(new L.LatLng(43.602, 1.445),15);
             break; 
             case "routeLengthContent": 
                 chooseRoute('cost_culture');
             break; 
+            case "step8": 
+                chooseRoutingMode('circular');
+            break; 
+            case "btnGroupCostTypeCircular": 
+                document.getElementById('startFieldCircular').value="36 Rue Saint-Rémésy, Toulouse";
+                document.getElementById("costTypeCircular").style.display = "block";
+                document.getElementById("circularLengthPrompt").style.display = "block";
+                setStartCircular();
+                map.setView(new L.LatLng(43.597, 1.443),14);
+            break; 
+            case "step10": 
+                circularProfile='cost_nature';
+            break; 
+            case "step11": 
+                document.getElementById('circularLengthField').value="90";
+                circularLengthSet();
+            break; 
+            
+            
             }
     }).start();
 });

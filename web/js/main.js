@@ -583,9 +583,9 @@ var t_lang = '<select id="languageSelector" data-step="1" data-position="right" 
            + '    <option value="i18nTableFr">Français</option>'
            + '</select>';
                   
-var t_routingMode = '<div class="btn-group" data-toggle="buttons-radio" id="step2" data-step="2" data-position="right" data-intro="{{tour_step2}}">'
-                  + '   <button type="button" id="btnShortestPath" class="btn"><i class="icon-share-alt"></i>{{itinerary}}</button>'
-                  + '   <button type="button" id="btnCircular" class="btn"><i class="icon-repeat"></i>{{loop}}</button>'
+var t_routingMode = '<div class="btn-group" data-toggle="buttons-radio" id="step11"  data-step="11" data-position="right" data-intro="{{tour_step11}}">'
+                  + '   <button type="button" id="btnShortestPath" class="btn" data-step="2" data-position="right" data-intro="{{tour_step2}}"><i class="icon-share-alt"></i>{{itinerary}}</button>'
+                  + '   <button type="button" id="btnCircular" class="btn" data-step="7" data-position="right" data-intro="{{tour_step7}}"><i class="icon-repeat"></i>{{loop}}</button>'
                   + '</div>';
                  
                  
@@ -594,8 +594,10 @@ var t_startAddress = '<div id="step3" data-step="3" data-position="right" data-i
                    + '   <button type="button" class="btn" id="btnStartAddress"><i class="icon-search"></i></button>'
                    + '</div>';
                   
-var t_startAddressCircular = '<input type="text" class="actionDiv" id="startFieldCircular" placeholder="{{startCircular}}" rel="popover" data-content="{{startCircularContent}}">'
-                           + '<button type="button" class="btn" id="btnStartAddressCircular"><i class="icon-search"></i></button>';            
+var t_startAddressCircular = '<div id="step8" data-step="8" data-position="right" data-intro="{{tour_step8}}">'
+                           + '  <input type="text" class="actionDiv" id="startFieldCircular" placeholder="{{startCircular}}" rel="popover" data-content="{{startCircularContent}}">'
+                           + '  <button type="button" class="btn" id="btnStartAddressCircular"><i class="icon-search"></i></button>'
+                           + '</div>';            
         
 var t_destinationAddress = '<div id="step4" data-step="4" data-position="right" data-intro="{{tour_step4}}">'
                          + '    <input type="text" class="actionDiv" id="destinationField" placeholder="{{destination}}" rel="popover" data-content="{{destinationContent}}">'
@@ -616,7 +618,7 @@ var t_costType = '<div class="btn-group" data-toggle="buttons-radio" id="btnGrou
                + '</div>';
                
                
-var t_costTypeCircular = '<div class="btn-group" data-toggle="buttons-radio" id="btnGroupCostTypeCircular">'
+var t_costTypeCircular = '<div class="btn-group" data-toggle="buttons-radio" id="btnGroupCostTypeCircular" data-step="9" data-position="right" data-intro="{{tour_step9}}">'
                        + '  <button type="button" id="btnLengthC" class="btn btn-large btn-danger" rel="tooltip" data-title="{{shortest}}"><i class="icon-arrow-right"></i></button>'
                        + '  <button type="button" id="btnActivityC" class="btn btn-large btn-primary" rel="tooltip" data-title="{{activity}}"><i class="icon-shopping-cart"></i></button>'
                        + '  <button type="button" id="btnNatureC" class="btn btn-large btn-success" rel="tooltip" data-title="{{nature}}"><i class="icon-leaf"></i></button>'
@@ -624,7 +626,7 @@ var t_costTypeCircular = '<div class="btn-group" data-toggle="buttons-radio" id=
                        + '</div>';
     
 
-var t_circularLengthPrompt = '<form class="form-inline">'
+var t_circularLengthPrompt = '<form class="form-inline" id="step10"  data-step="10" data-position="right" data-intro="{{tour_step10}}">'
                            + '  <fieldset>'
                            + '      <div class="input-append">'
                            + '          <input type="number" class="span9" min="0" step="10" max="1000" id="circularLengthField" value="60">'
