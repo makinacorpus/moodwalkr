@@ -605,7 +605,7 @@ var t_destinationAddress = '<div id="step4" data-step="4" data-position="right" 
 var t_routeLength = '<ul class="nav nav-list">'
                   + '   <li class="divider"></li>'
                   + '</ul>'
-                  + '<div id="routeLengthContent">'
+                  + '<div id="routeLengthContent" data-step="6" data-position="right" data-intro="{{tour_step6}}">'
                   + '</div>';
         
 var t_costType = '<div class="btn-group" data-toggle="buttons-radio" id="btnGroupCostType" data-step="5" data-position="right" data-intro="{{tour_step5}}">'

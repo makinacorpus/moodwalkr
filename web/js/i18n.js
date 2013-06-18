@@ -17,7 +17,8 @@ var i18nTableEn = {
    "tour_step2" : "You can choose whether you want to walk between two locations, or walk a loop around a given place.<br />We will begin with an itinerary.",
    "tour_step3" : "You can type the address of your starting point, e.g. '8 Grande Rue Nazareth, Toulouse'. Then, click on the search button on the right, or press the 'Enter' key",
    "tour_step4" : "Type the address of your destination. You will also be able to set the starting and destination points by <b>right-clicking</b> on the map.",
-   "tour_step5" : "The computed walking routes are now displayed on the map for 4 different profiles. We will choose the culture profile."
+   "tour_step5" : "The computed walking routes are now displayed on the map for 4 different profiles. We will choose the culture profile by clicking on the yellow button.",
+   "tour_step6" : "Only the chosen route is now displayed. Markers appear along: they indicate interesting places related to the profile you have chosen. You can click on them to get more information."
 };
 
 var i18nTableFr = { 
