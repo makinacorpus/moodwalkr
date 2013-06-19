@@ -9,6 +9,7 @@ import tempfile
 
 # options parsing
 costgrid_update = '-c' in sys.argv
+use_extract = '-e' in sys.argv
 base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # "gis" database connection
@@ -19,15 +20,18 @@ cur = conn.cursor()
 # Drop existing tables
 cur.execute("DROP TABLE IF EXISTS lines_from_polygon")
 
-print "***** download OSM data"
-r = requests.get("http://www.overpass-api.de/api/xapi?map?bbox=%s,%s,%s,%s" % (lon_inf, lat_inf,lon_sup, lat_sup), stream=True)
-f = tempfile.NamedTemporaryFile(delete=False)
-for data in r.iter_content(chunk_size=1024):
-    f.write(data)
-f.flush()
-
+# Download data or use a local file defined in config.py
 print "***** osm2pgsql"
-command = "osm2pgsql -s -H localhost -U %s -d %s -S %s/preprocessing/osm2pgsql/default.style %s" % (db_user, db_name, base_path, f.name)
+if use_extract:
+	command = "osm2pgsql -s -H localhost -U %s -d %s -S %s/preprocessing/osm2pgsql/default.style %s" % (db_user, db_name, base_path, osm_extract)
+else:
+	print "***** download OSM data"
+	r = requests.get("http://www.overpass-api.de/api/xapi?map?bbox=%s,%s,%s,%s" % (lon_inf, lat_inf,lon_sup, lat_sup), stream=True)
+	f = tempfile.NamedTemporaryFile(delete=False)
+	for data in r.iter_content(chunk_size=1024):
+	    f.write(data)
+	f.flush()	
+	command = "osm2pgsql -s -H localhost -U %s -d %s -S %s/preprocessing/osm2pgsql/default.style %s" % (db_user, db_name, base_path, f.name)
 print command
 os.system(command)
 
@@ -71,7 +75,10 @@ for zone in pedestrianAreasHighway:
 cur.execute("DROP TABLE IF EXISTS ways_openspace")
 
 print "***** osm2pgrouting"
-command = "%s/installation/osm2pgrouting/osm2pgrouting -file %s -conf %s/preprocessing/osm2pgrouting/mapconfig.xml -host localhost -dbname %s -user %s -clean" % (base_path, f.name, base_path, db_name, db_user)
+if use_extract:
+	command = "%s/installation/osm2pgrouting/osm2pgrouting -file %s -conf %s/preprocessing/osm2pgrouting/mapconfig.xml -host localhost -dbname %s -user %s -clean" % (base_path, osm_extract, base_path, db_name, db_user)
+else:
+	command = "%s/installation/osm2pgrouting/osm2pgrouting -file %s -conf %s/preprocessing/osm2pgrouting/mapconfig.xml -host localhost -dbname %s -user %s -clean" % (base_path, f.name, base_path, db_name, db_user)
 print command
 os.system(command)
 
@@ -95,8 +102,8 @@ cur.execute("INSERT INTO ways(the_geom,name,class_id,gid,osm_id,foot,frompolygon
 			"SELECT st_transform(geom,4326),name,116,nextval('ways_openspace_id'),osm_id,TRUE,TRUE " +
 			"FROM lines_from_polygon;")
 
-print "***** Assign vertex id"
-cur.execute("SELECT assign_vertex_id('ways', 0.00001, 'the_geom', 'gid');")
+print "***** pgr_createTopology"
+cur.execute("SELECT pgr_createTopology('ways', 0.00001, 'the_geom', 'gid');")
 
 print "***** Update length"
 cur.execute("UPDATE ways SET length = ST_Length_Spheroid(ways.the_geom,'SPHEROID[\"WGS 84\",6378137,298.257223563]');")
@@ -161,5 +168,6 @@ cur.execute("UPDATE ways " +
 conn.commit()
 cur.close()
 conn.close()
-f.close()
+if not use_extract:
+	f.close()
 
