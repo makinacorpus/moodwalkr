@@ -43,4 +43,4 @@ OK: sortir js du html (onclick button)
 * séparer code js par fonctionnalité (init)
 OK: reverse geocoding points arrivée/départ
 OK: Visite guidée
-* Pouvoir télécharger données osm sur un dépot comme Geofabrik
+OK: Pouvoir télécharger données osm sur un dépot comme Geofabrik

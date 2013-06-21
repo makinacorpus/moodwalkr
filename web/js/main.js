@@ -314,10 +314,10 @@ function setMarker(marker,latlng) {
 function setCircularMarkers(latlng) {
     // Variables and parameters
     var circularLength = circularTime * walkingSpeed;
-    var direction = Math.random()*360;
+    var direction = Math.random() * 2 * Math.PI;
     var distanceOpposite = circularLength/Math.PI; // geographic distance to the point opposite to the starting point
     var degreeKmEquator = 111.2; // Multiply by cos(lat) for the value at the current lat
-    var degreeKm = degreeKmEquator * Math.cos(latlng.lat);
+    var degreeKm = degreeKmEquator * Math.cos(latlng.lat * Math.PI /180);
     // set c_start, the start and end point of the circular route
     if (markersList.c_start.marker === null) {
         markersList.c_start.marker = L.marker(latlng, {icon:markersList.c_start.markerIcon});

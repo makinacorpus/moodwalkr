@@ -3,26 +3,30 @@
 UPDATE cost_grid
 SET e_water=1
 FROM (SELECT way,waterway FROM planet_osm_polygon WHERE waterway='riverbank') as riverbank
-WHERE ST_Intersects(cost_grid.geom,riverbank.way);
+WHERE ST_Intersects(cost_grid.geom,riverbank.way)
+AND ST_IsValid(riverbank.way);
 
 UPDATE cost_grid
 SET e_water=1
 FROM (SELECT way,waterway FROM planet_osm_line WHERE waterway='riverbank') as riverbank
-WHERE ST_Intersects(cost_grid.geom,riverbank.way);
+WHERE ST_Intersects(cost_grid.geom,riverbank.way)
+AND ST_IsValid(riverbank.way);
 
 -- Environment : parks
 
 UPDATE cost_grid
 SET e_park=1
 FROM (SELECT way,leisure FROM planet_osm_polygon WHERE leisure='park') as park
-WHERE ST_Intersects(cost_grid.geom,park.way);
+WHERE ST_Intersects(cost_grid.geom,park.way)
+AND ST_IsValid(park.way);
 
 -- Environment - natural features
 
 UPDATE cost_grid
 SET e_natural=1
 FROM (SELECT way,"natural" FROM planet_osm_polygon WHERE "natural" LIKE '%') as naturalf
-WHERE ST_Intersects(cost_grid.geom,naturalf.way);
+WHERE ST_Intersects(cost_grid.geom,naturalf.way)
+AND ST_IsValid(naturalf.way);
 
 -- Transport - bus stops
 
@@ -63,37 +67,38 @@ SET t_heavy_transport=(t_heavy_transport/(SELECT max FROM max_t_heavy_transport)
 
 UPDATE cost_grid
 SET t_highway=(SELECT avg(rating)
-	     FROM (SELECT way,highway,
-			  CASE WHEN highway='motorway' THEN 0
-			       WHEN highway='motorway_link' THEN 0
-			       WHEN highway='motorway_junction' THEN 0
-			       WHEN highway='trunk' THEN 0
-			       WHEN highway='trunk_link' THEN 0
-			       WHEN highway='primary' THEN 0.1
-			       WHEN highway='primary_link' THEN 0.1
-			       WHEN highway='secondary' THEN 0.2
-			       WHEN highway='secondary_link' THEN 0.2
-			       WHEN highway='tertiary' THEN 0.4
-			       WHEN highway='tertiary_link' THEN 0.4
-			       WHEN highway='unclassified' THEN 0.6
-			       WHEN highway='residential' THEN 0.7
-			       WHEN highway='bus_guideway' THEN 0.8
-			       WHEN highway='service' THEN 0.8
-			       WHEN highway='living_street' THEN 0.8
-			       WHEN highway='track' THEN 0.9
-			       WHEN highway='path' THEN 0.9
-			       WHEN highway='steps' THEN 0.9
-			       WHEN highway='cycleway' THEN 0.9
-			       WHEN highway='bridleway' THEN 1
-			       WHEN highway='byway' THEN 1
-			       WHEN highway='footway' THEN 1
-			       WHEN highway='path' THEN 1
-			       WHEN highway='pedestrian' THEN 1
-			       ELSE 0
-			  END AS rating
-	           FROM planet_osm_line WHERE highway LIKE '%') as road
-	     WHERE ST_Intersects(cost_grid.geom,road.way)
-	    )
+	    	   FROM (SELECT way,highway,
+					 CASE WHEN highway='motorway' THEN 0
+					      WHEN highway='motorway_link' THEN 0
+					      WHEN highway='motorway_junction' THEN 0
+					      WHEN highway='trunk' THEN 0
+					      WHEN highway='trunk_link' THEN 0
+					      WHEN highway='primary' THEN 0.1
+					      WHEN highway='primary_link' THEN 0.1
+					      WHEN highway='secondary' THEN 0.2
+					      WHEN highway='secondary_link' THEN 0.2
+					      WHEN highway='tertiary' THEN 0.4
+					      WHEN highway='tertiary_link' THEN 0.4
+					      WHEN highway='unclassified' THEN 0.6
+					      WHEN highway='residential' THEN 0.7
+					      WHEN highway='bus_guideway' THEN 0.8
+					      WHEN highway='service' THEN 0.8
+					      WHEN highway='living_street' THEN 0.8
+					      WHEN highway='track' THEN 0.9
+					      WHEN highway='path' THEN 0.9
+					      WHEN highway='steps' THEN 0.9
+					      WHEN highway='cycleway' THEN 0.9
+					      WHEN highway='bridleway' THEN 1
+					      WHEN highway='byway' THEN 1
+					      WHEN highway='footway' THEN 1
+					      WHEN highway='path' THEN 1
+					      WHEN highway='pedestrian' THEN 1
+					      ELSE 0
+					 END AS rating
+	           		 FROM planet_osm_line WHERE highway LIKE '%') as road
+	     	   WHERE ST_Intersects(cost_grid.geom,road.way)
+		       AND ST_IsValid(road.way)
+	    	  )
 ;
 
 UPDATE cost_grid
@@ -113,6 +118,7 @@ UPDATE cost_grid
 SET a_shops=a_shops+(SELECT count(*)
 	     FROM (SELECT way,shop FROM planet_osm_polygon WHERE shop LIKE '%') as shops
 	     WHERE ST_Intersects(cost_grid.geom,shops.way)
+		 AND ST_IsValid(shops.way)
 	    )
 ;
 
@@ -133,6 +139,7 @@ UPDATE cost_grid
 SET a_leisure=a_leisure+(SELECT count(*)
 	     FROM (SELECT way,leisure FROM planet_osm_polygon WHERE leisure LIKE '%' AND leisure != 'park') as leisure
 	     WHERE ST_Intersects(cost_grid.geom,leisure.way)
+		 AND ST_IsValid(leisure.way)
 	    )
 ;
 
@@ -153,6 +160,7 @@ UPDATE cost_grid
 SET a_public_building=a_public_building+(SELECT count(*)
 	     FROM (SELECT way,amenity FROM planet_osm_polygon WHERE amenity='townhall' OR amenity='police' OR amenity='hospital' OR amenity='school' OR amenity='university' OR amenity='college') as public_building
 	     WHERE ST_Intersects(cost_grid.geom,public_building.way)
+		 AND ST_IsValid(public_building.way)
 	    )
 ;
 
@@ -173,6 +181,7 @@ UPDATE cost_grid
 SET a_food=a_food+(SELECT count(*)
 	     FROM (SELECT way,amenity FROM planet_osm_polygon WHERE amenity='bar' OR amenity='bbq' OR amenity='biergarten' OR amenity='cafe' OR amenity='fast_food' OR amenity='ice_cream' OR amenity='pub' OR amenity='restaurant') as food
 	     WHERE ST_Intersects(cost_grid.geom,food.way)
+		 AND ST_IsValid(food.way)
 	    )
 ;
 
@@ -193,6 +202,7 @@ UPDATE cost_grid
 SET c_tourism=c_tourism+(SELECT count(*)
 	     FROM (SELECT way,tourism FROM planet_osm_polygon WHERE tourism LIKE '%') as tourism
 	     WHERE ST_Intersects(cost_grid.geom,tourism.way)
+		 AND ST_IsValid(tourism.way)
 	    )
 ;
 
@@ -213,6 +223,7 @@ UPDATE cost_grid
 SET c_pow=c_pow+(SELECT count(*)
 	     FROM (SELECT way,amenity FROM planet_osm_polygon WHERE amenity='place_of_worship') as pow
 	     WHERE ST_Intersects(cost_grid.geom,pow.way)
+		 AND ST_IsValid(pow.way)
 	    )
 ;
 
@@ -226,6 +237,7 @@ UPDATE cost_grid
 SET c_heritage=(SELECT sum(1/heritage::double precision)
         FROM (SELECT way,heritage FROM planet_osm_polygon WHERE "heritage" LIKE '%') as heritage
         WHERE ST_Intersects(cost_grid.geom,heritage.way)
+		AND ST_IsValid(heritage.way)
         )
 ;
 
