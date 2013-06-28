@@ -45,3 +45,5 @@ OK: reverse geocoding points arrivée/départ
 OK: Visite guidée
 OK: Pouvoir télécharger données osm sur un dépot comme Geofabrik
 * Design du site
+* Test SSD vs HD
+* Test charge

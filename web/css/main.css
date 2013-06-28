@@ -1,3 +1,81 @@
+body {
+    padding: 0;
+    margin: 0;
+}
+
+html, body {
+    height: 100%;
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+}
+
+#left {
+    width: 300px;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    margin: 0;
+    background-color: white;
+}
+
+#logo {
+    height: 200px;
+    top: 0;
+    margin: 0;
+    background-color: #5bdce4;
+    box-shadow: 0 4px 2px -2px #555;
+}
+
+#footer {
+    width: 100%;
+    height: 75px;
+    bottom: 0;
+    position: absolute;
+    margin: 0;
+    background-color: #4b4a4a;
+}
+
+.icons ul {
+    margin: 0 0 0 0;
+}
+
+.icons li {
+    display: inline-block;
+}
+
+.icons a {
+    display: block;
+    position: relative;
+    width: 75px;
+    height: 75px;
+    background: red;
+}
+
+.icons i {
+    background-image: url("/img/sprite_icons.png");
+    background-repeat: no-repeat;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -15px;
+    margin-top: -15px;
+}
+ 
+.icon-mail { background-position: left top; }
+.icon-help { background-position: 33% top; }
+.icon-info { background-position: 67% top; }
+.icon-twitter { background-position: right top; } 
+
+a:hover .icon-mail { background-position: left bottom; }
+a:hover .icon-help { background-position: 33% bottom; }
+a:hover .icon-info { background-position: 67% bottom; }
+a:hover .icon-twitter { background-position: right bottom; }
+
 #action {
     width: 213px;
     position: absolute;
