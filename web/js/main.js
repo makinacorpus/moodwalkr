@@ -28,36 +28,29 @@ map.setView(new L.LatLng(43.6, 1.4),12);
 // Route styles for display
 var routeStyles = {
     "length":  {
-        "color": "red",
+        "color": "#f70952",
         "weight": 5,
         "opacity": 0.5,
         "clickable": false
     },
     "cost_activity" : {
-        "color": "blue",
+        "color": "#f3891e",
         "weight": 5,
         "opacity": 0.5,
         "clickable": false
     },
     "cost_nature": {
-        "color": "green",
+        "color": "#0bd05a",
         "weight": 5,
         "opacity": 0.5,
         "clickable": false
     },
     "cost_culture": {
-        "color": "orange",
+        "color": "#7516ea",
         "weight": 5,
         "opacity": 0.5,
         "clickable": false
     }
-};
-
-var markerRouteStyles = {
-    "length": L.AwesomeMarkers.icon({icon: 'icon-arrow-right', color: 'red'}),
-    "cost_activity" : L.AwesomeMarkers.icon({icon: 'icon-shopping-cart', color: 'blue'}),
-    "cost_nature": L.AwesomeMarkers.icon({icon: 'icon-leaf', color: 'green'}),
-    "cost_culture": L.AwesomeMarkers.icon({icon: 'icon-book', color: 'orange'})
 };
 
 // Layers
@@ -73,37 +66,86 @@ var markerRouteLayers = {
     "cost_nature": "markerRouteNatureLayer",
     "cost_culture": "markerRouteCultureLayer"
 };
-		
 
-// Markers        
-var startMarker = L.AwesomeMarkers.icon({
-    icon: 'icon-arrow-up', 
-    color: 'cadetblue'
+
+var startIcon = L.icon({
+    iconUrl: '/img/marker-start.png',
+    shadowUrl: '/img/marker-shadow.png',
+    iconSize: [35, 45], 
+    iconAnchor:   [17, 42],
+    popupAnchor: [1, -32],
+    shadowAnchor: [10, 12],
+    shadowSize: [36, 16]
 });
 
-var stopMarker = L.AwesomeMarkers.icon({
-    icon: 'icon-arrow-down', 
-    color: 'cadetblue'
+var stopIcon = L.icon({
+    iconUrl: '/img/marker-stop.png',
+    shadowUrl: '/img/marker-shadow.png',
+    iconSize: [35, 45], 
+    iconAnchor:   [17, 42],
+    popupAnchor: [1, -32],
+    shadowAnchor: [10, 12],
+    shadowSize: [36, 16]
 });
 
-var c_startMarker = L.AwesomeMarkers.icon({
-    icon: 'icon-repeat', 
-    color: 'cadetblue'
-});       
+var circularIcon = L.icon({
+    iconUrl: '/img/marker-circular.png',
+    shadowUrl: '/img/marker-shadow.png',
+    iconSize: [35, 45], 
+    iconAnchor:   [17, 42],
+    popupAnchor: [1, -32],
+    shadowAnchor: [10, 12],
+    shadowSize: [36, 16]
+});
 
+var activityIcon = L.icon({
+    iconUrl: '/img/marker-activity.png',
+    shadowUrl: '/img/marker-shadow.png',
+    iconSize: [35, 45], 
+    iconAnchor:   [17, 42],
+    popupAnchor: [1, -32],
+    shadowAnchor: [10, 12],
+    shadowSize: [36, 16]
+});
+
+var natureIcon = L.icon({
+    iconUrl: '/img/marker-nature.png',
+    shadowUrl: '/img/marker-shadow.png',
+    iconSize: [35, 45], 
+    iconAnchor:   [17, 42],
+    popupAnchor: [1, -32],
+    shadowAnchor: [10, 12],
+    shadowSize: [36, 16]
+});
+
+var cultureIcon = L.icon({
+    iconUrl: '/img/marker-culture.png',
+    shadowUrl: '/img/marker-shadow.png',
+    iconSize: [35, 45], 
+    iconAnchor:   [17, 42],
+    popupAnchor: [1, -32],
+    shadowAnchor: [10, 12],
+    shadowSize: [36, 16]
+});
+
+var markerRouteStyles = {
+    "cost_activity" : activityIcon,
+    "cost_nature": natureIcon,
+    "cost_culture": cultureIcon
+};
 
 var markersList = {
     "start": {
         "marker": null,
-        "markerIcon": startMarker
+        "markerIcon": startIcon
     },
     "stop": {
         "marker": null,
-        "markerIcon": stopMarker
+        "markerIcon": stopIcon
     },
     "c_start": {
         "marker": null,
-        "markerIcon": c_startMarker
+        "markerIcon": circularIcon
     }
 };
 
@@ -387,7 +429,8 @@ function chooseRoutingMode(profile) {
             map.removeLayer(markerRouteLayers.cost_activity);
             map.removeLayer(markerRouteLayers.cost_nature);
             map.removeLayer(markerRouteLayers.cost_culture);
-            $("#btnShortestPath").button('toggle');
+            $("#btnShortestPath").addClass('button-toggle');
+            $("#btnCircular").removeClass('button-toggle');
         break;
         case "circular":
             document.getElementById("startAddressCircular").style.display = "block";
@@ -406,7 +449,8 @@ function chooseRoutingMode(profile) {
             map.removeLayer(markerRouteLayers.cost_nature);
             map.removeLayer(markerRouteLayers.cost_culture);
             document.getElementById("btnCircular").checked = true;
-            $("#btnCircular").button('toggle');
+            $("#btnCircular").addClass('button-toggle');
+            $("#btnShortestPath").removeClass('button-toggle');
         break;
     }
 }
@@ -583,40 +627,58 @@ var t_lang = '<select id="languageSelector" data-step="1" data-position="right" 
            + '    <option value="i18nTableFr">Français</option>'
            + '</select>';
                   
-var t_routingMode = '<div class="btn-group" data-toggle="buttons-radio" id="step11"  data-step="11" data-position="right" data-intro="{{tour_step11}}">'
-                  + '   <button type="button" id="btnShortestPath" class="btn" data-step="2" data-position="right" data-intro="{{tour_step2}}"><i class="icon-share-alt"></i>{{itinerary}}</button>'
-                  + '   <button type="button" id="btnCircular" class="btn" data-step="7" data-position="right" data-intro="{{tour_step7}}"><i class="icon-repeat"></i>{{loop}}</button>'
-                  + '</div>';
+var t_routingMode = '<input type="button" class="button" id="btnShortestPath" value="ITINERARY"/>'
+                  + '<button class="button" id="btnCircular">LOOP ROUTE</button>';
                  
                  
 var t_startAddress = '<div id="step3" data-step="3" data-position="right" data-intro="{{tour_step3}}">'
-                   + '   <input type="text" class="actionDiv" id="startField" placeholder="{{start}}" rel="popover" data-content="{{startContent}}">'
+                   + '   <input type="text" class="text-field" id="startField" placeholder="{{start}}" rel="popover" data-content="{{startContent}}">'
                    + '   <button type="button" class="btn" id="btnStartAddress"><i class="icon-search"></i></button>'
                    + '</div>';
                   
 var t_startAddressCircular = '<div id="step8" data-step="8" data-position="right" data-intro="{{tour_step8}}">'
-                           + '  <input type="text" class="actionDiv" id="startFieldCircular" placeholder="{{startCircular}}" rel="popover" data-content="{{startCircularContent}}">'
+                           + '  <input type="text" class="text-field" id="startFieldCircular" placeholder="{{startCircular}}" rel="popover" data-content="{{startCircularContent}}">'
                            + '  <button type="button" class="btn" id="btnStartAddressCircular"><i class="icon-search"></i></button>'
                            + '</div>';            
         
 var t_destinationAddress = '<div id="step4" data-step="4" data-position="right" data-intro="{{tour_step4}}">'
-                         + '    <input type="text" class="actionDiv" id="destinationField" placeholder="{{destination}}" rel="popover" data-content="{{destinationContent}}">'
+                         + '    <input type="text" class="text-field" id="destinationField" placeholder="{{destination}}" rel="popover" data-content="{{destinationContent}}">'
                          + '    <button type="button" class="btn" id="btnDestinationAddress"><i class="icon-search"></i></button>'
                          + '</div>';
         
-var t_routeLength = '<ul class="nav nav-list">'
-                  + '   <li class="divider"></li>'
-                  + '</ul>'
-                  + '<div id="routeLengthContent" data-step="6" data-position="right" data-intro="{{tour_step6}}">'
+var t_routeLength = '<div id="routeLengthContent" data-step="6" data-position="right" data-intro="{{tour_step6}}">'
                   + '</div>';
         
-var t_costType = '<div class="btn-group" data-toggle="buttons-radio" id="btnGroupCostType" data-step="5" data-position="right" data-intro="{{tour_step5}}">'
+/*var t_costType = '<div class="btn-group" data-toggle="buttons-radio" id="btnGroupCostType" data-step="5" data-position="right" data-intro="{{tour_step5}}">'
                + '  <button type="button" id="btnLength" class="btn btn-large btn-danger" rel="tooltip" data-title="{{shortest}}"><i class="icon-arrow-right"></i></button>'
                + '  <button type="button" id="btnActivity" class="btn btn-large btn-primary" rel="tooltip" data-title="{{activity}}"><i class="icon-shopping-cart"></i></button>'
                + '  <button type="button" id="btnNature" class="btn btn-large btn-success" rel="tooltip" data-title="{{nature}}"><i class="icon-leaf"></i></button>'
                + '  <button type="button" id="btnCulture" class="btn btn-large btn-warning" rel="tooltip" data-title="{{culture}}"><i class="icon-book"></i></button>'
-               + '</div>';
+               + '</div>';*/
                
+
+var t_costType = '<ul class="iconsCt">'
+               + '  <li id="btnLength">'
+               + '      <a>'
+               + '          <i class="icon-shortest"></i>'
+               + '      </a>'
+               + '  </li>'
+               + '  <li id="btnActivity">'
+               + '      <a>'
+               + '          <i class="icon-activity"></i>'
+               + '      </a>'
+               + '  </li>'
+               + '  <li id="btnNature">'
+               + '      <a>'
+               + '          <i class="icon-nature"></i>'
+               + '      </a>'
+               + '  </li>'
+               + '  <li id="btnCulture">'
+               + '      <a>'
+               + '          <i class="icon-culture"></i>'
+               + '      </a>'
+               + '  </li>'
+               + '</ul>'
                
 var t_costTypeCircular = '<div class="btn-group" data-toggle="buttons-radio" id="btnGroupCostTypeCircular" data-step="9" data-position="right" data-intro="{{tour_step9}}">'
                        + '  <button type="button" id="btnLengthC" class="btn btn-large btn-danger" rel="tooltip" data-title="{{shortest}}"><i class="icon-arrow-right"></i></button>'
@@ -661,8 +723,8 @@ $('#circularLengthPrompt').html( o_circularLengthPrompt );
 
 
 // Jquery selectors
-$("[rel='tooltip']").tooltip();
-$("[rel='popover']").popover({placement:'bottom',html:true});
+//$("[rel='tooltip']").tooltip();
+//$("[rel='popover']").popover({placement:'bottom',html:true});
 
 $("#languageSelector").on("change",function() {
     lang = window[$("#languageSelector").val()];

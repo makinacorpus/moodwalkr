@@ -96,6 +96,7 @@ textarea {
 body {
     padding: 0;
     margin: 0;
+    font-family: 'Cabin', sans-serif;
 }
 
 html, body {
@@ -117,11 +118,78 @@ html, body {
 }
 
 #logo {
+    height: 60px;
+}
+
+#logo-img {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    margin-left: -102px;
+    margin-top: -19px;
+}
+
+#intro-text {
+    margin-left: 20px;
+    margin-right: 20px;
+    color:white;
+}
+
+#header {
     height: 200px;
     top: 0;
     margin: 0;
     background-color: #5bdce4;
     box-shadow: 0 4px 2px -2px #555;
+}
+
+#routingMode {
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#startAddress {
+    display:none;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+     
+#startAddressCircular {
+    display:none;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+     
+#destinationAddress {
+    display:none;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+     
+#costType {
+    display:none;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+     
+#routeLength {
+    display:none;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+     
+#circularLengthPrompt {
+    display:none;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+     
+#costTypeCircular {
+    display:none;
+    margin-left: 15px;
+    margin-right: 15px;
 }
 
 #footer {
@@ -138,8 +206,72 @@ ul.icons {
     margin-top: 0px;
     padding-left: 0px;
     font-size : 0;
-
 }
+
+.button {
+    background-color: #dadbdc; 
+    color: white;
+    border-width: 0px;
+    width: 130px;
+    height:40px;
+    margin-right: 5px;
+    margin-left: 5px;
+}
+
+.button-toggle {
+    background-color: #4b4a4a; 
+}
+
+ul.iconsCt {
+    margin-bottom: 0px;
+    margin-top: 0px;
+    padding-left: 0px;
+    font-size : 0;
+}
+
+.iconsCt li {
+    display: inline-block;
+    background-color: red;
+    margin-right: 10px;
+}
+
+.iconsCt a {
+    display: block;
+    position: relative;
+    width: 60px;
+    height: 60px;
+}
+
+.iconsCt i {
+    background-image: url("/img/sprite_icons_costtype.png");
+    background-repeat: no-repeat;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -15px;
+    margin-top: -15px;
+}
+ 
+#btnLength {
+    background-color: #f70952;
+}
+#btnActivity {
+    background-color: #f3891e;
+}
+#btnNature {
+    background-color: #0bd05a;
+}
+#btnCulture {
+    background-color: #7516ea;
+    margin-right: -10px;
+}
+
+.icon-shortest { background-position: left top; }
+.icon-activity { background-position: 33% top; }
+.icon-nature { background-position: 67% top; }
+.icon-culture { background-position: right top; }
 
 .icons li {
     display: inline-block;
@@ -173,6 +305,24 @@ a:hover .icon-mail { background-position: left bottom; }
 a:hover .icon-help { background-position: 33% bottom; }
 a:hover .icon-info { background-position: 67% bottom; }
 a:hover .icon-twitter { background-position: right bottom; }
+
+.text-field {
+    border-color: #dadbdc;
+    border-width: 1px;
+    border-style: solid;
+    padding-top: 8px;
+    padding-right: 5px;
+    padding-bottom: 8px;
+    padding-left: 5px;
+    height: 21px;
+    text-indent: 6px;
+}
+
+.leaflet-popup-content-wrapper {
+    -webkit-border-radius: 0px;
+    border-radius: 0px;
+    font-family: 'Cabin', sans-serif;
+}
 
 
 /* ==========================================================================
