@@ -157,6 +157,8 @@ var routeLengths = {
     "cost_culture": null
 };
 
+// Chosen profile
+var profileChosen = null;
 
 function onEachFeature(feature, layer) {
 	var popupContent =  feature.properties.popupContent;
@@ -525,11 +527,7 @@ function timeFormating(seconds) {
 }
 
 function lengthFormating(meters) {
-    var km = Math.floor(meters / 1000);
-    var m = Math.floor((meters - (km * 1000))/10)*10;
-    
-    if (km>0) {km = km +' km ';} else {km = '';}
-    return (km + m + ' m');
+    return ((Math.round(meters/100))/10).toFixed(1);
 }
 
 // Informations about the chosen route
@@ -538,6 +536,16 @@ function infoRoute(profile) {
         document.getElementById("routeLength").style.display = "block";
         firstRouteInfo = false;
     }
+
+    var t_routeLength = '<span style="font-size:25px;color:' + routeStyles[profile]["color"] + ';">{{' + profileChosen + '}}</span><br>'
+                      + '<div id="routeLengthDist">'
+                      + '   <span style="background:white;font-size:60px;color:' + routeStyles[profile]["color"] + ';">' + lengthFormating(routeLengths[profile]) + '</span> {{km}}<br>{{distance}}'
+                      + '</div>'
+                      + '<div id="routeLengthTime">'
+                      + '   <span style="background:white;font-size:60px;color:' + routeStyles[profile]["color"] + ';">' + Math.round(routeLengths[profile]*3.6/60/walkingSpeed) + '</span> {{min}}<br>{{time}}'
+                      + '</div>';
+    var o_routeLength = Mustache.render(t_routeLength, lang);
+    $('#routeLength').html( o_routeLength );
 	$("#routeLengthContent").html("Length: " + lengthFormating(routeLengths[profile]) + " <br> Duration: " + timeFormating(routeLengths[profile]*3.6/walkingSpeed));
 }
 
@@ -545,6 +553,10 @@ function infoRoute(profile) {
 function chooseRoute(profile) {
     switch(profile) {
         case "length":
+            profileChosen="shortest";
+            var o_costType = Mustache.render(t_costType, lang);
+            $('#costType').html( o_costType );
+            console.log(profileChosen);
             routeLayers.length.addTo(map);
             markerRouteLayers.length.addTo(map);
             map.removeLayer(routeLayers.cost_activity);
@@ -556,6 +568,7 @@ function chooseRoute(profile) {
             
         break;
         case "cost_activity":
+            profileChosen="activity";
             routeLayers.cost_activity.addTo(map);
             markerRouteLayers.cost_activity.addTo(map);
             map.removeLayer(routeLayers.length);
@@ -566,6 +579,7 @@ function chooseRoute(profile) {
             map.removeLayer(markerRouteLayers.cost_culture);
         break;
         case "cost_nature":
+            profileChosen="nature";
             routeLayers.cost_nature.addTo(map);
             markerRouteLayers.cost_nature.addTo(map);
             map.removeLayer(routeLayers.cost_activity);
@@ -576,6 +590,7 @@ function chooseRoute(profile) {
             map.removeLayer(markerRouteLayers.cost_culture);
         break;
         case "cost_culture":
+            profileChosen="culture";
             routeLayers.cost_culture.addTo(map);
             markerRouteLayers.cost_culture.addTo(map);
             map.removeLayer(routeLayers.cost_activity);
@@ -646,9 +661,6 @@ var t_destinationAddress = '<div id="step4" data-step="4" data-position="right" 
                          + '    <button type="button" class="btn" id="btnDestinationAddress"><i class="icon-search"></i></button>'
                          + '</div>';
         
-var t_routeLength = '<div id="routeLengthContent" data-step="6" data-position="right" data-intro="{{tour_step6}}">'
-                  + '</div>';
-        
 /*var t_costType = '<div class="btn-group" data-toggle="buttons-radio" id="btnGroupCostType" data-step="5" data-position="right" data-intro="{{tour_step5}}">'
                + '  <button type="button" id="btnLength" class="btn btn-large btn-danger" rel="tooltip" data-title="{{shortest}}"><i class="icon-arrow-right"></i></button>'
                + '  <button type="button" id="btnActivity" class="btn btn-large btn-primary" rel="tooltip" data-title="{{activity}}"><i class="icon-shopping-cart"></i></button>'
@@ -678,14 +690,31 @@ var t_costType = '<ul class="iconsCt">'
                + '          <i class="icon-culture"></i>'
                + '      </a>'
                + '  </li>'
-               + '</ul>'
+               + '</ul>';
                
-var t_costTypeCircular = '<div class="btn-group" data-toggle="buttons-radio" id="btnGroupCostTypeCircular" data-step="9" data-position="right" data-intro="{{tour_step9}}">'
-                       + '  <button type="button" id="btnLengthC" class="btn btn-large btn-danger" rel="tooltip" data-title="{{shortest}}"><i class="icon-arrow-right"></i></button>'
-                       + '  <button type="button" id="btnActivityC" class="btn btn-large btn-primary" rel="tooltip" data-title="{{activity}}"><i class="icon-shopping-cart"></i></button>'
-                       + '  <button type="button" id="btnNatureC" class="btn btn-large btn-success" rel="tooltip" data-title="{{nature}}"><i class="icon-leaf"></i></button>'
-                       + '  <button type="button" id="btnCultureC" class="btn btn-large btn-warning" rel="tooltip" data-title="{{culture}}"><i class="icon-book"></i></button>'
-                       + '</div>';
+
+var t_costTypeCircular = '<ul class="iconsCt">'
+                       + '  <li id="btnLengthC">'
+                       + '      <a>'
+                       + '          <i class="icon-shortest"></i>'
+                       + '      </a>'
+                       + '  </li>'
+                       + '  <li id="btnActivityC">'
+                       + '      <a>'
+                       + '          <i class="icon-activity"></i>'
+                       + '      </a>'
+                       + '  </li>'
+                       + '  <li id="btnNatureC">'
+                       + '      <a>'
+                       + '          <i class="icon-nature"></i>'
+                       + '      </a>'
+                       + '  </li>'
+                       + '  <li id="btnCultureC">'
+                       + '      <a>'
+                       + '          <i class="icon-culture"></i>'
+                       + '      </a>'
+                       + '  </li>'
+                       + '</ul>';
     
 
 var t_circularLengthPrompt = '<form class="form-inline" id="step10"  data-step="10" data-position="right" data-intro="{{tour_step10}}">'
@@ -706,7 +735,6 @@ var o_routingMode = Mustache.render(t_routingMode, lang);
 var o_startAddress = Mustache.render(t_startAddress, lang);
 var o_startAddressCircular = Mustache.render(t_startAddressCircular, lang);
 var o_destinationAddress = Mustache.render(t_destinationAddress, lang);
-var o_routeLength = Mustache.render(t_routeLength, lang);
 var o_costType = Mustache.render(t_costType, lang);
 var o_costTypeCircular = Mustache.render(t_costTypeCircular, lang);
 var o_circularLengthPrompt = Mustache.render(t_circularLengthPrompt, lang);
@@ -716,7 +744,6 @@ $('#routingMode').html( o_routingMode );
 $('#startAddress').html( o_startAddress );
 $('#startAddressCircular').html( o_startAddressCircular );
 $('#destinationAddress').html( o_destinationAddress );
-$('#routeLength').html( o_routeLength );
 $('#costType').html( o_costType );
 $('#costTypeCircular').html( o_costTypeCircular );
 $('#circularLengthPrompt').html( o_circularLengthPrompt );
@@ -733,7 +760,6 @@ $("#languageSelector").on("change",function() {
     var o_startAddress = Mustache.render(t_startAddress, lang);
     var o_startAddressCircular = Mustache.render(t_startAddressCircular, lang);
     var o_destinationAddress = Mustache.render(t_destinationAddress, lang);
-    var o_routeLength = Mustache.render(t_routeLength, lang);
     var o_costType = Mustache.render(t_costType, lang);
     var o_costTypeCircular = Mustache.render(t_costTypeCircular, lang);
     var o_circularLengthPrompt = Mustache.render(t_circularLengthPrompt, lang);
@@ -742,7 +768,6 @@ $("#languageSelector").on("change",function() {
     $('#startAddress').html( o_startAddress );
     $('#startAddressCircular').html( o_startAddressCircular );
     $('#destinationAddress').html( o_destinationAddress );
-    $('#routeLength').html( o_routeLength );
     $('#costType').html( o_costType );
     $('#costTypeCircular').html( o_costTypeCircular );
     $('#circularLengthPrompt').html( o_circularLengthPrompt );

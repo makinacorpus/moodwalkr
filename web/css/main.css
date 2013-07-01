@@ -147,37 +147,55 @@ html, body {
     margin-left: 10px;
     margin-right: 10px;
     margin-top: 20px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 #startAddress {
     display:none;
     margin-left: 15px;
     margin-right: 15px;
+    margin-bottom: 15px;
 }
      
 #startAddressCircular {
     display:none;
     margin-left: 15px;
     margin-right: 15px;
+    margin-bottom: 15px;
 }
      
 #destinationAddress {
     display:none;
     margin-left: 15px;
     margin-right: 15px;
+    margin-bottom: 15px;
 }
      
 #costType {
     display:none;
     margin-left: 15px;
     margin-right: 15px;
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
      
 #routeLength {
     display:none;
-    margin-left: 15px;
-    margin-right: 15px;
+    background-color: #eaeaea;
+    height: 1000px;
+    padding-top: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+#routeLengthDist {
+    width: 45%;
+    float: left;
+}
+
+#routeLengthTime {
+    width: 45%;
+    float: right;
 }
      
 #circularLengthPrompt {
@@ -231,7 +249,6 @@ ul.iconsCt {
 
 .iconsCt li {
     display: inline-block;
-    background-color: red;
     margin-right: 10px;
 }
 
@@ -267,11 +284,30 @@ ul.iconsCt {
     background-color: #7516ea;
     margin-right: -10px;
 }
+ 
+#btnLengthC {
+    background-color: #f70952;
+}
+#btnActivityC {
+    background-color: #f3891e;
+}
+#btnNatureC {
+    background-color: #0bd05a;
+}
+#btnCultureC {
+    background-color: #7516ea;
+    margin-right: -10px;
+}
 
 .icon-shortest { background-position: left top; }
 .icon-activity { background-position: 33% top; }
 .icon-nature { background-position: 67% top; }
 .icon-culture { background-position: right top; }
+
+a:hover .icon-shortest { background-position: left bottom; }
+a:hover .icon-activity { background-position: 33% bottom; }
+a:hover .icon-nature { background-position: 67% bottom; }
+a:hover .icon-culture { background-position: right bottom; }
 
 .icons li {
     display: inline-block;

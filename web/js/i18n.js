@@ -13,6 +13,10 @@ var i18nTableEn = {
    "destination" : "Destination",
    "destinationContent" : "Type the address of your destination, e.g. '1 Rue des Cuves Saint-Sernin, Toulouse'.",
    "compute" : "Compute",
+   "km" : "km",
+   "min" : "min",
+   "distance" : "distance",
+   "time" : "time",
    "tour_step1" : "Welcome !<br />You can follow this introduction to discover MoodWalkr.<br />During this guided tour, you don't have to write in the text fields or click on the map: simply click on Next each time.",
    "tour_step2" : "You can choose whether you want to walk between two locations, or walk a loop around a given place.<br />We will begin with an itinerary.",
    "tour_step3" : "You can type the address of your starting point, e.g. '8 Grande Rue Nazareth, Toulouse'. Then, click on the search button on the right, or press the 'Enter' key",
@@ -40,6 +44,10 @@ var i18nTableFr = {
    "destination" : "Destination",
    "destinationContent" : "Tapez l'adresse de votre point d'arrivée, par exemple '1 Rue des Cuves Saint-Sernin, Toulouse'.",
    "compute" : "Calculer",
+   "km" : "km",
+   "min" : "min",
+   "distance" : "distance",
+   "time" : "temps",
    "tour_step1" : "You can choose whether you want to walk between to locations, or walk a loop around a given place."
 };
 
