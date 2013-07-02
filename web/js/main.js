@@ -431,8 +431,8 @@ function chooseRoutingMode(profile) {
             map.removeLayer(markerRouteLayers.cost_activity);
             map.removeLayer(markerRouteLayers.cost_nature);
             map.removeLayer(markerRouteLayers.cost_culture);
-            $("#btnShortestPath").addClass('button-toggle');
-            $("#btnCircular").removeClass('button-toggle');
+            $("#btnShortestPath").css("background-color", "#4b4a4a");
+            $("#btnCircular").css("background-color", "#dadbdc");
         break;
         case "circular":
             document.getElementById("startAddressCircular").style.display = "block";
@@ -451,8 +451,8 @@ function chooseRoutingMode(profile) {
             map.removeLayer(markerRouteLayers.cost_nature);
             map.removeLayer(markerRouteLayers.cost_culture);
             document.getElementById("btnCircular").checked = true;
-            $("#btnCircular").addClass('button-toggle');
-            $("#btnShortestPath").removeClass('button-toggle');
+            $("#btnCircular").css("background-color", "#4b4a4a");
+            $("#btnShortestPath").css("background-color", "#dadbdc");
         break;
     }
 }
@@ -537,12 +537,12 @@ function infoRoute(profile) {
         firstRouteInfo = false;
     }
 
-    var t_routeLength = '<span style="font-size:25px;color:' + routeStyles[profile]["color"] + ';">{{' + profileChosen + '}}</span><br>'
+    var t_routeLength = '<span style="font-size:25px;color:' + routeStyles[profile]["color"] + ';">{{' + profileChosen + '}}</span><br><br>'
                       + '<div id="routeLengthDist">'
-                      + '   <span style="background:white;font-size:60px;color:' + routeStyles[profile]["color"] + ';">' + lengthFormating(routeLengths[profile]) + '</span> {{km}}<br>{{distance}}'
+                      + '   <span style="background:white;font-size:55px;color:' + routeStyles[profile]["color"] + ';">' + lengthFormating(routeLengths[profile]) + '</span> {{km}}<br>{{distance}}'
                       + '</div>'
                       + '<div id="routeLengthTime">'
-                      + '   <span style="background:white;font-size:60px;color:' + routeStyles[profile]["color"] + ';">' + Math.round(routeLengths[profile]*3.6/60/walkingSpeed) + '</span> {{min}}<br>{{time}}'
+                      + '   <span style="background:white;font-size:55px;color:' + routeStyles[profile]["color"] + ';">' + Math.round(routeLengths[profile]*3.6/60/walkingSpeed) + '</span> {{min}}<br>{{time}}'
                       + '</div>';
     var o_routeLength = Mustache.render(t_routeLength, lang);
     $('#routeLength').html( o_routeLength );
@@ -642,13 +642,16 @@ var t_lang = '<select id="languageSelector" data-step="1" data-position="right" 
            + '    <option value="i18nTableFr">Français</option>'
            + '</select>';
                   
-var t_routingMode = '<input type="button" class="button" id="btnShortestPath" value="ITINERARY"/>'
-                  + '<button class="button" id="btnCircular">LOOP ROUTE</button>';
+var t_routingMode = '<a href="#" class="button" id="btnShortestPath">'
+                  + '   <span class="itinerary"></span><span class="btn-text">ITINERARY</span>'
+                  + '</a>'
+                  + '<a href="#" class="button" id="btnCircular">'
+                  + '   <span class="loop"></span><span class="btn-text">LOOP</span>'
+                  + '</a>';                 
                  
-                 
-var t_startAddress = '<div id="step3" data-step="3" data-position="right" data-intro="{{tour_step3}}">'
-                   + '   <input type="text" class="text-field" id="startField" placeholder="{{start}}" rel="popover" data-content="{{startContent}}">'
-                   + '   <button type="button" class="btn" id="btnStartAddress"><i class="icon-search"></i></button>'
+var t_startAddress = '<div id="startAddressBlock" data-step="3" data-position="right" data-intro="{{tour_step3}}">'
+                   + '  <input type="text" class="text-field" id="startField" placeholder="{{start}}" rel="popover" data-content="{{startContent}}">'
+                   + '  <span id="btnStartAddress"></span>'
                    + '</div>';
                   
 var t_startAddressCircular = '<div id="step8" data-step="8" data-position="right" data-intro="{{tour_step8}}">'
@@ -656,9 +659,9 @@ var t_startAddressCircular = '<div id="step8" data-step="8" data-position="right
                            + '  <button type="button" class="btn" id="btnStartAddressCircular"><i class="icon-search"></i></button>'
                            + '</div>';            
         
-var t_destinationAddress = '<div id="step4" data-step="4" data-position="right" data-intro="{{tour_step4}}">'
-                         + '    <input type="text" class="text-field" id="destinationField" placeholder="{{destination}}" rel="popover" data-content="{{destinationContent}}">'
-                         + '    <button type="button" class="btn" id="btnDestinationAddress"><i class="icon-search"></i></button>'
+var t_destinationAddress = '<div id="destinationAddressBlock" data-step="4" data-position="right" data-intro="{{tour_step4}}">'
+                         + '  <input type="text" class="text-field" id="destinationField" placeholder="{{destination}}" rel="popover" data-content="{{destinationContent}}">'
+                         + '  <span id="btnDestinationAddress"></span>'
                          + '</div>';
         
 /*var t_costType = '<div class="btn-group" data-toggle="buttons-radio" id="btnGroupCostType" data-step="5" data-position="right" data-intro="{{tour_step5}}">'
