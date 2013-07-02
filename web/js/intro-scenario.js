@@ -3,7 +3,7 @@ $(document).ready(function() {
     console.log(targetElement.id); 
         switch (targetElement.id) 
             { 
-            case "step3": 
+            case "startAddressBlock": 
                 chooseRoutingMode('shortestPath');
             break; 
             case "step4": 

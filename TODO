@@ -40,11 +40,12 @@ OK: nom produit
 * fiche produit
 OK: i18n
 OK: sortir js du html (onclick button)
-* séparer code js par fonctionnalité (init)
+OK: séparer code js par fonctionnalité (init)
 OK: reverse geocoding points arrivée/départ
-OK: Visite guidée
+* Visite guidée
 OK: Pouvoir télécharger données osm sur un dépot comme Geofabrik
 * Design du site
 * Test SSD vs HD
 * Test charge
 * Piwik
+* Serveur Python

@@ -3,15 +3,17 @@
 
 
 import psycopg2
-import BaseHTTPServer
+from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import re
+from SocketServer import ThreadingMixIn
+import threading
 
 PORT = 8000
 db_name="routing"
 db_user="routing"
 db_pass="KadufZyn8Dr"
 
-class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+class MyHandler(BaseHTTPRequestHandler):
     def do_HEAD(self):
         self.send_response(200)
         self.send_header("Content-type", "application/json")
@@ -102,8 +104,11 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.wfile.write(result)
             self.wfile.close()
 
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    """Handle requests in a separate thread."""
+
 try:
-    server = BaseHTTPServer.HTTPServer(('', PORT), MyHandler)
+    server = ThreadedHTTPServer(('', PORT), MyHandler)
     print('Started http server')
     server.serve_forever()
 except KeyboardInterrupt:

@@ -198,6 +198,17 @@ var opts = {
   left: 'auto' // Left position relative to parent in px
 };
 
+
+// Detect browser language
+var language = window.navigator.userLanguage || window.navigator.language;
+switch(language.substring(0,2)) {
+    case "fr":
+        var lang=i18nTableFr;
+    break;
+    default:
+        var lang=i18nTableEn;
+}
+
 // get the route according to the profile passed as argument
 function computeRoute(profile,vlat1,vlon1,vlat2,vlon2) {
     map.spin(true,opts);
@@ -464,13 +475,14 @@ map.on('contextmenu', function(e) {
         callback: function(key, options) {
             if (key==="start") {
                     chooseRoutingMode('shortestPath');
+                    setMarker(key,e.latlng);
                     document.getElementById("startAddress").style.display = "block";
                     $.getJSON("http://nominatim.openstreetmap.org/reverse?format=json&zoom=18&lat=" + e.latlng.lat + "&lon=" + e.latlng.lng, function(data) {
                         var address = reverseGeocode(data);
                         document.getElementById("startField").value = address;
                     });
-		            setMarker(key,e.latlng);
 	                computeAllRoutes();
+                    document.getElementById("destinationAddress").style.display = "block";
                     $.contextMenu('destroy', '#map');
             }                    
             if (key==="stop") {
@@ -538,11 +550,11 @@ function infoRoute(profile) {
     }
 
     var t_routeLength = '<span style="font-size:25px;color:' + routeStyles[profile]["color"] + ';">{{' + profileChosen + '}}</span><br><br>'
-                      + '<div id="routeLengthDist">'
-                      + '   <span style="background:white;font-size:55px;color:' + routeStyles[profile]["color"] + ';">' + lengthFormating(routeLengths[profile]) + '</span> {{km}}<br>{{distance}}'
-                      + '</div>'
                       + '<div id="routeLengthTime">'
-                      + '   <span style="background:white;font-size:55px;color:' + routeStyles[profile]["color"] + ';">' + Math.round(routeLengths[profile]*3.6/60/walkingSpeed) + '</span> {{min}}<br>{{time}}'
+                      + '   <span style="background:white;font-size:50px;padding-left:5px;padding-right:5px;color:' + routeStyles[profile]["color"] + ';">' + Math.round(routeLengths[profile]*3.6/60/walkingSpeed) + '</span> {{min}}<br>{{time}}'
+                      + '</div>'
+                      + '<div id="routeLengthDist">'
+                      + '   <span style="background:white;font-size:50px;padding-left:5px;padding-right:5px;color:' + routeStyles[profile]["color"] + ';">' + lengthFormating(routeLengths[profile]) + '</span> {{km}}<br>{{distance}}'
                       + '</div>';
     var o_routeLength = Mustache.render(t_routeLength, lang);
     $('#routeLength').html( o_routeLength );
@@ -637,40 +649,35 @@ var target = document.getElementById('map');
 
 
 // Contents
-var t_lang = '<select id="languageSelector" data-step="1" data-position="right" data-intro="{{tour_step1}}">'
-           + '    <option value="i18nTableEn" selected="1">English</option>'
-           + '    <option value="i18nTableFr">Français</option>'
-           + '</select>';
-                  
-var t_routingMode = '<a href="#" class="button" id="btnShortestPath">'
-                  + '   <span class="itinerary"></span><span class="btn-text">ITINERARY</span>'
+
+var t_introText = '<div id="logo" data-step="1" data-position="right" data-intro="{{tour_step1}}">'
+                + '    <img id="logo-img" src="/img/logo-moodwalkr.png">'
+                + '</div>'
+                + '<div id="introText">'
+                + '    {{introduction}}'
+                + '</div>';
+
+var t_routingMode = '<a href="#" class="button" id="btnShortestPath" data-step="2" data-position="right" data-intro="{{tour_step2}}">'
+                  + '    <span class="itinerary"></span><span class="btn-text">{{itinerary}}</span>'
                   + '</a>'
                   + '<a href="#" class="button" id="btnCircular">'
-                  + '   <span class="loop"></span><span class="btn-text">LOOP</span>'
+                  + '    <span class="loop"></span><span class="btn-text">{{loop}}</span>'
                   + '</a>';                 
                  
 var t_startAddress = '<div id="startAddressBlock" data-step="3" data-position="right" data-intro="{{tour_step3}}">'
                    + '  <input type="text" class="text-field" id="startField" placeholder="{{start}}" rel="popover" data-content="{{startContent}}">'
                    + '  <span id="btnStartAddress"></span>'
-                   + '</div>';
-                  
-var t_startAddressCircular = '<div id="step8" data-step="8" data-position="right" data-intro="{{tour_step8}}">'
+                   + '</div>';            
+                 
+var t_startAddressCircular = '<div id="startCircularAddressBlock" data-step="3" data-position="right" data-intro="{{tour_step3}}">'
                            + '  <input type="text" class="text-field" id="startFieldCircular" placeholder="{{startCircular}}" rel="popover" data-content="{{startCircularContent}}">'
-                           + '  <button type="button" class="btn" id="btnStartAddressCircular"><i class="icon-search"></i></button>'
-                           + '</div>';            
+                           + '  <span id="btnStartAddressCircular"></span>'
+                           + '</div>';           
         
 var t_destinationAddress = '<div id="destinationAddressBlock" data-step="4" data-position="right" data-intro="{{tour_step4}}">'
                          + '  <input type="text" class="text-field" id="destinationField" placeholder="{{destination}}" rel="popover" data-content="{{destinationContent}}">'
                          + '  <span id="btnDestinationAddress"></span>'
-                         + '</div>';
-        
-/*var t_costType = '<div class="btn-group" data-toggle="buttons-radio" id="btnGroupCostType" data-step="5" data-position="right" data-intro="{{tour_step5}}">'
-               + '  <button type="button" id="btnLength" class="btn btn-large btn-danger" rel="tooltip" data-title="{{shortest}}"><i class="icon-arrow-right"></i></button>'
-               + '  <button type="button" id="btnActivity" class="btn btn-large btn-primary" rel="tooltip" data-title="{{activity}}"><i class="icon-shopping-cart"></i></button>'
-               + '  <button type="button" id="btnNature" class="btn btn-large btn-success" rel="tooltip" data-title="{{nature}}"><i class="icon-leaf"></i></button>'
-               + '  <button type="button" id="btnCulture" class="btn btn-large btn-warning" rel="tooltip" data-title="{{culture}}"><i class="icon-book"></i></button>'
-               + '</div>';*/
-               
+                         + '</div>';               
 
 var t_costType = '<ul class="iconsCt">'
                + '  <li id="btnLength">'
@@ -731,9 +738,9 @@ var t_circularLengthPrompt = '<form class="form-inline" id="step10"  data-step="
                            + '</form>';      
 
 // Rendering
-var lang = i18nTableEn;
 
-var o_lang = Mustache.render(t_lang, lang);
+
+var o_introText = Mustache.render(t_introText, lang);
 var o_routingMode = Mustache.render(t_routingMode, lang);
 var o_startAddress = Mustache.render(t_startAddress, lang);
 var o_startAddressCircular = Mustache.render(t_startAddressCircular, lang);
@@ -742,7 +749,7 @@ var o_costType = Mustache.render(t_costType, lang);
 var o_costTypeCircular = Mustache.render(t_costTypeCircular, lang);
 var o_circularLengthPrompt = Mustache.render(t_circularLengthPrompt, lang);
 
-$('#lang').html( o_lang );
+$('#header').html( o_introText );
 $('#routingMode').html( o_routingMode );
 $('#startAddress').html( o_startAddress );
 $('#startAddressCircular').html( o_startAddressCircular );
@@ -755,26 +762,6 @@ $('#circularLengthPrompt').html( o_circularLengthPrompt );
 // Jquery selectors
 //$("[rel='tooltip']").tooltip();
 //$("[rel='popover']").popover({placement:'bottom',html:true});
-
-$("#languageSelector").on("change",function() {
-    lang = window[$("#languageSelector").val()];
-    console.log(lang);
-    var o_routingMode = Mustache.render(t_routingMode, lang);
-    var o_startAddress = Mustache.render(t_startAddress, lang);
-    var o_startAddressCircular = Mustache.render(t_startAddressCircular, lang);
-    var o_destinationAddress = Mustache.render(t_destinationAddress, lang);
-    var o_costType = Mustache.render(t_costType, lang);
-    var o_costTypeCircular = Mustache.render(t_costTypeCircular, lang);
-    var o_circularLengthPrompt = Mustache.render(t_circularLengthPrompt, lang);
-
-    $('#routingMode').html( o_routingMode );
-    $('#startAddress').html( o_startAddress );
-    $('#startAddressCircular').html( o_startAddressCircular );
-    $('#destinationAddress').html( o_destinationAddress );
-    $('#costType').html( o_costType );
-    $('#costTypeCircular').html( o_costTypeCircular );
-    $('#circularLengthPrompt').html( o_circularLengthPrompt );
-});
 
 // Call Nominatim to set the start or end points when using the search bar
 $("body").on("keyup", "#startField", function(e){
