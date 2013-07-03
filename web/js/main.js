@@ -729,11 +729,9 @@ var t_costTypeCircular = '<ul class="iconsCt">'
 
 var t_circularLengthPrompt = '<form class="form-inline" id="step10"  data-step="10" data-position="right" data-intro="{{tour_step10}}">'
                            + '  <fieldset>'
-                           + '      <div class="input-append">'
-                           + '          <input type="number" class="span9" min="0" step="10" max="1000" id="circularLengthField" value="60">'
-                           + '          <span class="add-on">min</span>'
-                           + '      </div>'
-                           + '      <button type="button" class="btn" id="btnCircularLengthSet">{{compute}}</button>'
+                           + '      <input type="number" class="text-field" min="0" step="10" max="1000" id="circularLengthField" value="60">'
+                           + '      <span class="add-on">min</span>'
+                           + '      <button class="button" id="btnCircularLengthSet">{{compute}}</button>'
                            + '  </fieldset>'
                            + '</form>';      
 

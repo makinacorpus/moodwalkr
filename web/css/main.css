@@ -138,6 +138,7 @@ html, body {
 .whiteDiv{
     background-color: white;
     height: 250px;
+    padding-top: 20px;
 }
 
 #header {
@@ -151,7 +152,6 @@ html, body {
 #routingMode {
     margin-left: 10px;
     margin-right: 10px;
-    margin-top: 20px;
     margin-bottom: 15px;
 }
 
