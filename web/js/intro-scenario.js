@@ -1,6 +1,5 @@
-$(document).ready(function() {
+function launchScenario() {
     introJs().onchange(function(targetElement) {  
-    console.log(targetElement.id); 
         switch (targetElement.id) 
             { 
             case "startAddressBlock": 
@@ -40,7 +39,16 @@ $(document).ready(function() {
             
             
             }
-    }).start();
-});
+    })
+    .start()
+    .onexit(function() {
+    $.cookie('showIntro', 'false', {expire : 365});
+    });
+}
 
 
+if ($.cookie('showIntro') != 'false') {
+    $(document).ready(function() {
+        launchScenario();
+    });
+};

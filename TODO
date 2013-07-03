@@ -43,8 +43,9 @@ OK: sortir js du html (onclick button)
 OK: séparer code js par fonctionnalité (init)
 OK: reverse geocoding points arrivée/départ
 * Visite guidée
+OK: cookie sur introjs
 OK: Pouvoir télécharger données osm sur un dépot comme Geofabrik
-* Design du site
+OK: Design du site
 * Test SSD vs HD
 * Test charge
 * Piwik

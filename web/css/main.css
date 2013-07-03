@@ -219,10 +219,44 @@ html, body {
     float: left;
 }
      
+#routeLengthCircular {
+    display:none;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+     
+#routeTypeCircular {
+    display:none;
+    padding-top: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+#routeLengthDistCircular {
+    width: 45%;
+    float: right;
+}
+
+#routeLengthTimeCircular {
+    width: 45%;
+    float: left;
+}
+     
 #circularLengthPrompt {
     display:none;
     margin-left: 15px;
     margin-right: 15px;
+}
+     
+#btnCircularLengthSet {
+    background-color: #4b4a4a; 
+    color: white;
+    border-width: 0px;
+    width: 130px;
+    height:40px;
+    float: right;
+    text-align: center;
+    font-family: 'Cabin Condensed', sans-serif;
 }
      
 #costTypeCircular {
@@ -258,7 +292,6 @@ a.button {
     height:40px;
     margin-right: 5px;
     margin-left: 5px;
-
 }
 
 .btn-text {

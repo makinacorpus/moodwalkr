@@ -249,8 +249,6 @@ function computeRoute(profile,vlat1,vlon1,vlat2,vlon2) {
       }
     }).done(function () {
         map.spin(false);
-	    var totalTime = new Date().getTime()-ajaxTime;
-	    $("#responseTime").html("Temps de réponse : " + totalTime+ " ms");
     }).error(function () {
         map.spin(false);
     });
@@ -274,7 +272,6 @@ function computeAllRoutes() {
 // get the circular route according to the profile passed as argument
 function computeCircularRoute(profile,vlat1,vlon1,vlat2,vlon2,vlat3,vlon3,vlat4,vlon4) {
     map.spin(true,opts);
-    var ajaxTime= new Date().getTime();
     $.ajax({
 	    dataType: "json",
 	    data: {
@@ -313,11 +310,11 @@ function computeCircularRoute(profile,vlat1,vlon1,vlat2,vlon2,vlat3,vlon3,vlat4,
                 routeLayers[route.properties.profile].addTo(map);
                 markerRouteLayers[route.properties.profile].addTo(map);
 	            routeLengths[route.properties.profile] = Math.round(route.properties.length);
-      }
+        }
     }).done(function () {
         map.spin(false);
-	    var totalTime = new Date().getTime()-ajaxTime;
-	    $("#responseTime").html("Temps de réponse : " + totalTime+ " ms");
+        document.getElementById("routeLengthCircular").style.display = "block";
+        infoRouteCircular(circularProfile);
     }).error(function () {
         map.spin(false);
     });
@@ -433,6 +430,8 @@ function chooseRoutingMode(profile) {
             document.getElementById("circularLengthPrompt").style.display = "none";
             document.getElementById("costTypeCircular").style.display = "none";
             document.getElementById("costType").style.display = "none";
+            document.getElementById("routeLengthCircular").style.display = "none";
+            document.getElementById("routeTypeCircular").style.display = "none";
             removeMarkerIfExists("c_start");
             map.removeLayer(routeLayers.length);
             map.removeLayer(routeLayers.cost_activity);
@@ -451,6 +450,7 @@ function chooseRoutingMode(profile) {
             document.getElementById("destinationAddress").style.display = "none";
             document.getElementById("costType").style.display = "none";
             document.getElementById("routeLength").style.display = "none";
+            document.getElementById("routeLengthCircular").style.display = "none";
             removeMarkerIfExists("start");
             removeMarkerIfExists("stop");
             map.removeLayer(routeLayers.length);
@@ -548,7 +548,6 @@ function infoRoute(profile) {
         document.getElementById("routeLength").style.display = "block";
         firstRouteInfo = false;
     }
-
     var t_routeLength = '<span style="font-size:25px;color:' + routeStyles[profile]["color"] + ';">{{' + profileChosen + '}}</span><br><br>'
                       + '<div id="routeLengthTime">'
                       + '   <span style="background:white;font-size:50px;padding-left:5px;padding-right:5px;color:' + routeStyles[profile]["color"] + ';">' + Math.round(routeLengths[profile]*3.6/60/walkingSpeed) + '</span> {{min}}<br>{{time}}'
@@ -558,14 +557,32 @@ function infoRoute(profile) {
                       + '</div>';
     var o_routeLength = Mustache.render(t_routeLength, lang);
     $('#routeLength').html( o_routeLength );
-	$("#routeLengthContent").html("Length: " + lengthFormating(routeLengths[profile]) + " <br> Duration: " + timeFormating(routeLengths[profile]*3.6/walkingSpeed));
+}
+
+function chooseRouteCircular(profile) {
+    circularProfile = profile;
+    document.getElementById("routeTypeCircular").style.display = "block";
+    var t_routeTypeCircular = '<span style="font-size:25px;color:' + routeStyles[profile]["color"] + ';">{{' + profile + '}}</span><br><br>';
+    var o_routeTypeCircular = Mustache.render(t_routeTypeCircular, lang);
+    $('#routeTypeCircular').html( o_routeTypeCircular );
+}
+
+function infoRouteCircular(profile) {
+    var t_routeLengthCircular = '<div id="routeLengthTimeCircular">'
+                              + '   <span style="background:white;font-size:50px;padding-left:5px;padding-right:5px;color:' + routeStyles[profile]["color"] + ';">' + Math.round(routeLengths[profile]*3.6/60/walkingSpeed) + '</span> {{min}}<br>{{time}}'
+                              + '</div>'
+                              + '<div id="routeLengthDistCircular">'
+                              + '   <span style="background:white;font-size:50px;padding-left:5px;padding-right:5px;color:' + routeStyles[profile]["color"] + ';">' + lengthFormating(routeLengths[profile]) + '</span> {{km}}<br>{{distance}}'
+                              + '</div>';
+    var o_routeLengthCircular = Mustache.render(t_routeLengthCircular, lang);
+    $('#routeLengthCircular').html( o_routeLengthCircular );
 }
 
 // keep only one route
 function chooseRoute(profile) {
+    profileChosen=profile;
     switch(profile) {
         case "length":
-            profileChosen="shortest";
             var o_costType = Mustache.render(t_costType, lang);
             $('#costType').html( o_costType );
             console.log(profileChosen);
@@ -580,7 +597,6 @@ function chooseRoute(profile) {
             
         break;
         case "cost_activity":
-            profileChosen="activity";
             routeLayers.cost_activity.addTo(map);
             markerRouteLayers.cost_activity.addTo(map);
             map.removeLayer(routeLayers.length);
@@ -591,7 +607,6 @@ function chooseRoute(profile) {
             map.removeLayer(markerRouteLayers.cost_culture);
         break;
         case "cost_nature":
-            profileChosen="nature";
             routeLayers.cost_nature.addTo(map);
             markerRouteLayers.cost_nature.addTo(map);
             map.removeLayer(routeLayers.cost_activity);
@@ -602,7 +617,6 @@ function chooseRoute(profile) {
             map.removeLayer(markerRouteLayers.cost_culture);
         break;
         case "cost_culture":
-            profileChosen="culture";
             routeLayers.cost_culture.addTo(map);
             markerRouteLayers.cost_culture.addTo(map);
             map.removeLayer(routeLayers.cost_activity);
@@ -731,7 +745,9 @@ var t_circularLengthPrompt = '<form class="form-inline" id="step10"  data-step="
                            + '  <fieldset>'
                            + '      <input type="number" class="text-field" min="0" step="10" max="1000" id="circularLengthField" value="60">'
                            + '      <span class="add-on">min</span>'
-                           + '      <button class="button" id="btnCircularLengthSet">{{compute}}</button>'
+                           + '      <a href="#" id="btnCircularLengthSet">'
+                           + '          <span class="btn-text">{{compute}}</span>'
+                           + '      </a>';
                            + '  </fieldset>'
                            + '</form>';      
 
@@ -813,17 +829,22 @@ $("body").on("click", "#btnCulture", function(){
     chooseRoute('cost_culture');
 });
 $("body").on("click", "#btnLengthC", function(){
-    circularProfile='length';
+    chooseRouteCircular('length');
 });
 $("body").on("click", "#btnActivityC", function(){
-    circularProfile='cost_activity';
+    chooseRouteCircular('cost_activity');
 });
 $("body").on("click", "#btnNatureC", function(){
-    circularProfile='cost_nature';
+    chooseRouteCircular('cost_nature');
 });
 $("body").on("click", "#btnCultureC", function(){
-    circularProfile='cost_culture';
+    chooseRouteCircular('cost_culture');
 });
 $("body").on("click", "#btnCircularLengthSet", function(){
     circularLengthSet();
+});
+$("body").on("click", "#help", function(){
+    $.cookie('showIntro', 'true', {expire : 365});
+    launchScenario();
+    console.log("bbb");
 });
