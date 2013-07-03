@@ -365,9 +365,10 @@ function setMarker(marker,latlng) {
 // set the markers for circular routing
 function setCircularMarkers(latlng) {
     // Variables and parameters
+    var reduction = 0.75; // Street network is not an open space so the distances need to be reduced
     var circularLength = circularTime * walkingSpeed;
     var direction = Math.random() * 2 * Math.PI;
-    var distanceOpposite = circularLength/Math.PI; // geographic distance to the point opposite to the starting point
+    var distanceOpposite = circularLength/Math.PI*reduction; // geographic distance to the point opposite to the starting point
     var degreeKmEquator = 111.2; // Multiply by cos(lat) for the value at the current lat
     var degreeKm = degreeKmEquator * Math.cos(latlng.lat * Math.PI /180);
     // set c_start, the start and end point of the circular route
@@ -556,7 +557,7 @@ function infoRoute(profile) {
                       + '   <span style="background:white;font-size:50px;padding-left:5px;padding-right:5px;color:' + routeStyles[profile]["color"] + ';">' + lengthFormating(routeLengths[profile]) + '</span> {{km}}<br>{{distance}}'
                       + '</div>';
     var o_routeLength = Mustache.render(t_routeLength, lang);
-    $('#routeLength').html( o_routeLength );
+    $('#routeLengthBlock').html( o_routeLength );
 }
 
 function chooseRouteCircular(profile) {
@@ -667,14 +668,14 @@ var target = document.getElementById('map');
 var t_introText = '<div id="logo" data-step="1" data-position="right" data-intro="{{tour_step1}}">'
                 + '    <img id="logo-img" src="/img/logo-moodwalkr.png">'
                 + '</div>'
-                + '<div id="introText">'
+                + '<div id="introText" data-step="11" data-position="right" data-intro="{{tour_step11}}">'
                 + '    {{introduction}}'
                 + '</div>';
 
 var t_routingMode = '<a href="#" class="button" id="btnShortestPath" data-step="2" data-position="right" data-intro="{{tour_step2}}">'
                   + '    <span class="itinerary"></span><span class="btn-text">{{itinerary}}</span>'
                   + '</a>'
-                  + '<a href="#" class="button" id="btnCircular">'
+                  + '<a href="#" class="button" id="btnCircular" data-step="7" data-position="right" data-intro="{{tour_step7}}">'
                   + '    <span class="loop"></span><span class="btn-text">{{loop}}</span>'
                   + '</a>';                 
                  
@@ -683,7 +684,7 @@ var t_startAddress = '<div id="startAddressBlock" data-step="3" data-position="r
                    + '  <span id="btnStartAddress"></span>'
                    + '</div>';            
                  
-var t_startAddressCircular = '<div id="startCircularAddressBlock" data-step="3" data-position="right" data-intro="{{tour_step3}}">'
+var t_startAddressCircular = '<div id="startCircularAddressBlock" data-step="8" data-position="right" data-intro="{{tour_step8}}">'
                            + '  <input type="text" class="text-field" id="startFieldCircular" placeholder="{{startCircular}}" rel="popover" data-content="{{startCircularContent}}">'
                            + '  <span id="btnStartAddressCircular"></span>'
                            + '</div>';           
@@ -691,9 +692,12 @@ var t_startAddressCircular = '<div id="startCircularAddressBlock" data-step="3" 
 var t_destinationAddress = '<div id="destinationAddressBlock" data-step="4" data-position="right" data-intro="{{tour_step4}}">'
                          + '  <input type="text" class="text-field" id="destinationField" placeholder="{{destination}}" rel="popover" data-content="{{destinationContent}}">'
                          + '  <span id="btnDestinationAddress"></span>'
-                         + '</div>';               
+                         + '</div>';     
 
-var t_costType = '<ul class="iconsCt">'
+var t_routeLengthBlock = '<div id="routeLengthBlock" data-step="6" data-position="right" data-intro="{{tour_step6}}">'
+                       + '</div>';          
+
+var t_costType = '<ul class="iconsCt" id="iconsCTBlock" data-step="5" data-position="right" data-intro="{{tour_step5}}">'
                + '  <li id="btnLength">'
                + '      <a>'
                + '          <i class="icon-shortest"></i>'
@@ -717,7 +721,7 @@ var t_costType = '<ul class="iconsCt">'
                + '</ul>';
                
 
-var t_costTypeCircular = '<ul class="iconsCt">'
+var t_costTypeCircular = '<ul class="iconsCt" id="iconsCTCircularBlock" data-step="9" data-position="right" data-intro="{{tour_step9}}">'
                        + '  <li id="btnLengthC">'
                        + '      <a>'
                        + '          <i class="icon-shortest"></i>'
@@ -759,6 +763,7 @@ var o_routingMode = Mustache.render(t_routingMode, lang);
 var o_startAddress = Mustache.render(t_startAddress, lang);
 var o_startAddressCircular = Mustache.render(t_startAddressCircular, lang);
 var o_destinationAddress = Mustache.render(t_destinationAddress, lang);
+var o_routeLengthBlock = Mustache.render(t_routeLengthBlock, lang);
 var o_costType = Mustache.render(t_costType, lang);
 var o_costTypeCircular = Mustache.render(t_costTypeCircular, lang);
 var o_circularLengthPrompt = Mustache.render(t_circularLengthPrompt, lang);
@@ -768,6 +773,7 @@ $('#routingMode').html( o_routingMode );
 $('#startAddress').html( o_startAddress );
 $('#startAddressCircular').html( o_startAddressCircular );
 $('#destinationAddress').html( o_destinationAddress );
+$('#routeLength').html( o_routeLengthBlock );
 $('#costType').html( o_costType );
 $('#costTypeCircular').html( o_costTypeCircular );
 $('#circularLengthPrompt').html( o_circularLengthPrompt );

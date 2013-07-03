@@ -21,15 +21,15 @@ var i18nTableEn = {
    "time" : "time",
    "tour_step1" : "Welcome !<br />You can follow this introduction to discover MoodWalkr.<br />During this guided tour, you don't have to write in the text fields or click on the map: simply click on Next each time.",
    "tour_step2" : "You can choose whether you want to walk between two locations, or walk a loop around a given place.<br />We will begin with an itinerary.",
-   "tour_step3" : "You can type the address of your starting point, e.g. '8 Grande Rue Nazareth, Toulouse'. Then, click on the search button on the right, or press the 'Enter' key",
+   "tour_step3" : "You can type the address of your starting point, e.g. '8 Grande Rue Nazareth, Toulouse'. Then, click on the search button on the right, or press the 'Enter' key.",
    "tour_step4" : "Type the address of your destination. You will also be able to set the starting and destination points by <b>right-clicking</b> on the map.",
-   "tour_step5" : "The computed walking routes are now displayed on the map for 4 different profiles. We will choose the culture profile by clicking on the yellow button.",
-   "tour_step6" : "Only the chosen route is now displayed. Markers appear along: they indicate interesting places related to the profile you have chosen. You can click on them to get more information.",
+   "tour_step5" : "The computed walking routes are now displayed on the map for 4 different profiles. We will choose the culture profile by clicking on the violet button.",
+   "tour_step6" : "Only the chosen route is now displayed. Markers appear along: they indicate interesting places related to the profile you have chosen. You will be able to click on them to get more information.",
    "tour_step7" : "We will continue with a loop route.",
    "tour_step8" : "As previously, you can type an address or right-click on the map.",
    "tour_step9" : "By default, a 1-hour walking loop will be displayed. You can choose your profile by clicking on the buttons. We will choose the Nature profile in this tour.",
    "tour_step10" : "Select how long you want to walk and click on Compute. We will choose 90 minutes.<br />The loop route is randomly chosen: if the one displayed doesn't suit you, simply click on Compute to get another one.",
-   "tour_step11" : "We are done, let's play with MoodWalkr !"
+   "tour_step11" : "We are done, let's play with MoodWalkr !<br />You will be able to follow the guide again by clicking on the \"?\" icon at the bottom of the screen."
 };
 
 var i18nTableFr = { 
@@ -52,16 +52,16 @@ var i18nTableFr = {
    "min" : "min",
    "distance" : "distance",
    "time" : "temps",
-   "tour_step1" : "Welcome !<br />You can follow this introduction to discover MoodWalkr.<br />During this guided tour, you don't have to write in the text fields or click on the map: simply click on Next each time.",
-   "tour_step2" : "You can choose whether you want to walk between two locations, or walk a loop around a given place.<br />We will begin with an itinerary.",
-   "tour_step3" : "You can type the address of your starting point, e.g. '8 Grande Rue Nazareth, Toulouse'. Then, click on the search button on the right, or press the 'Enter' key",
-   "tour_step4" : "Type the address of your destination. You will also be able to set the starting and destination points by <b>right-clicking</b> on the map.",
-   "tour_step5" : "The computed walking routes are now displayed on the map for 4 different profiles. We will choose the culture profile by clicking on the yellow button.",
-   "tour_step6" : "Only the chosen route is now displayed. Markers appear along: they indicate interesting places related to the profile you have chosen. You can click on them to get more information.",
-   "tour_step7" : "We will continue with a loop route.",
-   "tour_step8" : "As previously, you can type an address or right-click on the map.",
-   "tour_step9" : "By default, a 1-hour walking loop will be displayed. You can choose your profile by clicking on the buttons. We will choose the Nature profile in this tour.",
-   "tour_step10" : "Select how long you want to walk and click on Compute. We will choose 90 minutes.<br />The loop route is randomly chosen: if the one displayed doesn't suit you, simply click on Compute to get another one.",
-   "tour_step11" : "We are done, let's play with MoodWalkr !"
+   "tour_step1" : "Bienvenue !<br />Vous pouvez suivre ce guide pour découvrir MoodWalkR.<br />Pendant cette introduction, vous n'avez pas à écrire de texte ou à cliquer sur la carte : cliquez simplement sur \"Next\" à chaque étape.",
+   "tour_step2" : "Vous pouvez choisir si vous voulez marcher entre deux lieux, ou faire une boucle autour d'un point.<br />Nous allons commencer par un itinéraire.",
+   "tour_step3" : "Vous pouvez entrer l'adresse de votre point de départ, par exemple '8 Grande Rue Nazareth, Toulouse'. Ensuite, cliquez sur le bouton de recherche à droite, ou appuyez sur la touche Entrée de votre clavier.",
+   "tour_step4" : "Entrez l'adresse de votre destination. Vous pourrez également choisir les points de départ et d'arrivée par un <b>clic droit</b> sur la carte.",
+   "tour_step5" : "Les itinéraires calculés sont maintenant affichés sur la carte pour les 4 profils différents. Nous allons choisir le profil Culture en cliquant sur le bouton violet.",
+   "tour_step6" : "Seul l'itinéraire choisi est maintenant affiché. Des marqueurs sont affichés autour : ils indiquent les lieux intéressants pour le profil que vous avez choisi. Vous pourrez cliquer dessus pour obtenir plus d'informations.",
+   "tour_step7" : "Nous allons continuer avec une boucle.",
+   "tour_step8" : "Comme précédemment, vous pouvez entrer une adresse ou faire un clic droit sur la carte.",
+   "tour_step9" : "Par défaut, une boucle d'une heure est affichée. Vous pouvez choisir votre profil en cliquant sur les boutons. Nous allons choisir le profil Nature.",
+   "tour_step10" : "Sélectionnez la durée pendant laquelle vous souhaitez marcher et cliquez sur le bouton Calculer. Nous allons choisir 90 minutes.<br />L'itinéraire circulaire est choisi au hasard : si celui afiché ne vous plaît pas, cliquez simplement sur Calculer pour en générer un autre.",
+   "tour_step11" : "Cette introduction est terminée, amusez-vous avec MoodWalkR !<br />Vous pouvez revoir ce guide en cliquant sur l'icône \"?\" en bas de l'écran."
 };
 
