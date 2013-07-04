@@ -27,6 +27,14 @@ class MyHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(result)
                 self.wfile.close()
+        if self.path == '/info.html':
+            with open('../info.html') as f:
+                result = f.read()
+                self.send_response(200)
+                self.send_header("Content-type", "text/html")
+                self.end_headers()
+                self.wfile.write(result)
+                self.wfile.close()
         if self.path.endswith(".js"):
             f = open('../' + self.path)
             self.send_response(200)

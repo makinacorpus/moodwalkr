@@ -503,6 +503,7 @@ map.on('contextmenu', function(e) {
                         document.getElementById("startFieldCircular").value = address;
                     }); 
 		            chooseRoutingMode('circular');
+                    chooseRouteCircular('length');
                     document.getElementById("costTypeCircular").style.display = "block";
                     document.getElementById("circularLengthPrompt").style.display = "block";
 		            setCircularMarkers(e.latlng);
@@ -836,15 +837,19 @@ $("body").on("click", "#btnCulture", function(){
 });
 $("body").on("click", "#btnLengthC", function(){
     chooseRouteCircular('length');
+    document.getElementById("routeLengthCircular").style.display = "none";
 });
 $("body").on("click", "#btnActivityC", function(){
     chooseRouteCircular('cost_activity');
+    document.getElementById("routeLengthCircular").style.display = "none";
 });
 $("body").on("click", "#btnNatureC", function(){
     chooseRouteCircular('cost_nature');
+    document.getElementById("routeLengthCircular").style.display = "none";
 });
 $("body").on("click", "#btnCultureC", function(){
     chooseRouteCircular('cost_culture');
+    document.getElementById("routeLengthCircular").style.display = "none";
 });
 $("body").on("click", "#btnCircularLengthSet", function(){
     circularLengthSet();
@@ -854,3 +859,9 @@ $("body").on("click", "#help", function(){
     launchScenario();
     console.log("bbb");
 });
+
+$(document).ready(function() {
+
+        $('a.fancybox').fancybox();
+
+    });
