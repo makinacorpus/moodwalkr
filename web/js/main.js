@@ -861,7 +861,5 @@ $("body").on("click", "#help", function(){
 });
 
 $(document).ready(function() {
-
-        $('a.fancybox').fancybox();
-
-    });
+    $('a.fancybox').fancybox();
+});

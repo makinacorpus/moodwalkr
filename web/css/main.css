@@ -242,6 +242,10 @@ html, body {
     float: left;
 }
      
+#circularLengthField {
+    width: 60px;
+}
+     
 #circularLengthPrompt {
     display:none;
     margin-left: 15px;

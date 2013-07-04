@@ -5,7 +5,8 @@
 import psycopg2
 import re
 import flask
-from flask import Flask, request, Response
+import smtplib
+from flask import Flask, request, Response, redirect, url_for
 
 PORT = 8000
 db_name="routing"
@@ -52,7 +53,17 @@ def routecircular():
     conn.close()
     return Response(result, mimetype="application/json")
 
+@app.route('/sendemail', methods=['GET', 'POST'])
+def contact():
+    sender_email = request.form['email']
+    sender_message = request.form['message']
+    server = smtplib.SMTP('smtp.gmail.com:587')  
+    server.starttls()  
+    server.login('moodwalkr','9shh1j9k')  
+    server.sendmail(sender_email, 'moodwalkr@gmail.com', sender_message)  
+    server.quit()
+    return '<script>parent.$.fancybox.close()</script>'
+
+
 if __name__ == '__main__':
     app.run()
-
-
