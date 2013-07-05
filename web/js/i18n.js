@@ -1,6 +1,6 @@
 // i18n tables
 var i18nTableEn = { 
-   "introduction" : "bla bla bla en",
+   "introduction" : "Rediscover your town with the alternative routes of MoodWalkR !",
    "itinerary" : " ITINERARY",
    "loop" : " LOOP ROUTE",
    "length" : "Shortest path",
@@ -33,7 +33,7 @@ var i18nTableEn = {
 };
 
 var i18nTableFr = { 
-   "introduction" : "bla bla bla fr",
+   "introduction" : "Redécouvrez votre ville grâce aux itinéraires alternatifs de MoodWalkR !",
    "itinerary" : " ITINÉRAIRE",
    "loop" : " BOUCLE",
    "length" : "Au plus court",

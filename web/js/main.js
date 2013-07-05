@@ -365,7 +365,7 @@ function setMarker(marker,latlng) {
 // set the markers for circular routing
 function setCircularMarkers(latlng) {
     // Variables and parameters
-    var reduction = 0.75; // Street network is not an open space so the distances need to be reduced
+    var reduction = 0.8; // Street network is not an open space so the distances need to be reduced
     var circularLength = circularTime * walkingSpeed;
     var direction = Math.random() * 2 * Math.PI;
     var distanceOpposite = circularLength/Math.PI*reduction; // geographic distance to the point opposite to the starting point
@@ -474,40 +474,44 @@ map.on('contextmenu', function(e) {
 	$.contextMenu({
         selector: '#map',
         callback: function(key, options) {
+            console.log(key);
             if (key==="start") {
-                    chooseRoutingMode('shortestPath');
-                    setMarker(key,e.latlng);
-                    document.getElementById("startAddress").style.display = "block";
-                    $.getJSON("http://nominatim.openstreetmap.org/reverse?format=json&zoom=18&lat=" + e.latlng.lat + "&lon=" + e.latlng.lng, function(data) {
-                        var address = reverseGeocode(data);
-                        document.getElementById("startField").value = address;
-                    });
-	                computeAllRoutes();
-                    document.getElementById("destinationAddress").style.display = "block";
-                    $.contextMenu('destroy', '#map');
+                chooseRoutingMode('shortestPath');
+                setMarker(key,e.latlng);
+                console.log("cm start");
+                document.getElementById("startAddress").style.display = "block";
+                $.getJSON("http://nominatim.openstreetmap.org/reverse?format=json&zoom=18&lat=" + e.latlng.lat + "&lon=" + e.latlng.lng, function(data) {
+                    var address = reverseGeocode(data);
+                    document.getElementById("startField").value = address;
+                });
+                computeAllRoutes();
+                document.getElementById("destinationAddress").style.display = "block";
+                $.contextMenu('destroy', '#map');
             }                    
             if (key==="stop") {
-                    chooseRoutingMode('shortestPath');
-		            setMarker(key,e.latlng);
-                    document.getElementById("destinationAddress").style.display = "block";
-                    $.getJSON("http://nominatim.openstreetmap.org/reverse?format=json&zoom=18&lat=" + e.latlng.lat + "&lon=" + e.latlng.lng, function(data) {
-                        var address = reverseGeocode(data);
-                        document.getElementById("destinationField").value = address;
-                    }); 
-	                computeAllRoutes();
-                    $.contextMenu('destroy', '#map');
+                chooseRoutingMode('shortestPath');
+	            setMarker(key,e.latlng);
+                console.log("cm stop");
+                document.getElementById("destinationAddress").style.display = "block";
+                $.getJSON("http://nominatim.openstreetmap.org/reverse?format=json&zoom=18&lat=" + e.latlng.lat + "&lon=" + e.latlng.lng, function(data) {
+                    var address = reverseGeocode(data);
+                    document.getElementById("destinationField").value = address;
+                }); 
+                computeAllRoutes();
+                $.contextMenu('destroy', '#map');
             }
             if (key==="c_start") {
-                    $.getJSON("http://nominatim.openstreetmap.org/reverse?format=json&zoom=18&lat=" + e.latlng.lat + "&lon=" + e.latlng.lng, function(data) {
-                        var address = reverseGeocode(data);
-                        document.getElementById("startFieldCircular").value = address;
-                    }); 
-		            chooseRoutingMode('circular');
-                    chooseRouteCircular('length');
-                    document.getElementById("costTypeCircular").style.display = "block";
-                    document.getElementById("circularLengthPrompt").style.display = "block";
-		            setCircularMarkers(e.latlng);
-                    $.contextMenu('destroy', '#map');
+                $.getJSON("http://nominatim.openstreetmap.org/reverse?format=json&zoom=18&lat=" + e.latlng.lat + "&lon=" + e.latlng.lng, function(data) {
+                    var address = reverseGeocode(data);
+                    document.getElementById("startFieldCircular").value = address;
+                }); 
+	            chooseRoutingMode('circular');
+                chooseRouteCircular('length');
+                console.log("cm circ start");
+                document.getElementById("costTypeCircular").style.display = "block";
+                document.getElementById("circularLengthPrompt").style.display = "block";
+	            setCircularMarkers(e.latlng);
+                $.contextMenu('destroy', '#map');
             }
         },
         items: {
@@ -670,7 +674,7 @@ var t_introText = '<div id="logo" data-step="1" data-position="right" data-intro
                 + '    <img id="logo-img" src="/img/logo-moodwalkr.png">'
                 + '</div>'
                 + '<div id="introText" data-step="11" data-position="right" data-intro="{{tour_step11}}">'
-                + '    {{introduction}}'
+                + '    <span style="font-size:16px;vertical-align:middle;">{{introduction}}</font>'
                 + '</div>';
 
 var t_routingMode = '<a href="#" class="button" id="btnShortestPath" data-step="2" data-position="right" data-intro="{{tour_step2}}">'
