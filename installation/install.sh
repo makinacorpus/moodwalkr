@@ -10,7 +10,7 @@ source config.sh
 
 # Add the Ubuntugis unstable PPA in order to install Postgis 2
 sudo apt-get -y install python-software-properties
-sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
+sudo add-apt-repository -y ppa:ubuntugis/ppa
 sudo apt-get update
 
 # Install packages
@@ -18,16 +18,20 @@ sudo apt-get -y install \
     wget \
     postgresql-9.1 \
     git \
+    python-virtualenv \
+    python-dev \
     python-psycopg2 \
     build-essential \
     postgis \
-    libgeos-3.3.3 \
+    libgeos-3.3.8 \
     libprotobuf-c0 \
     postgresql-server-dev-9.1 \
     libcgal-dev \
     libboost-dev \
     python-pip \
-    libexpat1-dev
+    libexpat1-dev \
+    nginx \
+    supervisor
 
 sudo pip install requests
 
@@ -99,4 +103,20 @@ $user_psql -f functions_routing.sql
 
 # Create cost_grid
 $user_psql -f create_costgrid.sql
+
+# Configure nginx
+cp ./nginx/default ./nginx/default_with_config
+sed -i "s|@@@ROOT_PATH@@@|$path|g" ./nginx/default_with_config
+sudo cp ./nginx/default_with_config /etc/nginx/sites-available/default
+rm ./nginx/default_with_config
+
+pushd ../routing
+# Configure gunicorn
+virtualenv ve
+ve/bin/pip install -r requirements.txt
+# Configure supervisor
+sed -i "s|@@@ROOT_PATH@@@|$path|g" ./supervisord.conf
+sudo ln -s ./supervisord.conf /etc/supervisor/conf.d/moodwalkr.conf
+popd
+sudo supervisorctl -c /etc/supervisor/supervisord.conf status
 

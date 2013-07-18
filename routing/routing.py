@@ -7,11 +7,7 @@ import re
 import flask
 import smtplib
 from flask import Flask, request, Response, redirect, url_for
-
-PORT = 8000
-db_name="routing"
-db_user="routing"
-db_pass="KadufZyn8Dr"
+from config import *
 
 app = Flask(__name__)
 app.config['SERVER_NAME'] = '127.0.0.1:8000'
@@ -59,8 +55,8 @@ def contact():
     sender_message = request.form['message']
     server = smtplib.SMTP('smtp.gmail.com:587')  
     server.starttls()  
-    server.login('moodwalkr','9shh1j9k')  
-    server.sendmail(sender_email, 'moodwalkr@gmail.com', sender_message)  
+    server.login(email_login,email_password)  
+    server.sendmail(sender_email, email_adress, sender_message)  
     server.quit()
     return '<script>parent.$.fancybox.close()</script>'
 

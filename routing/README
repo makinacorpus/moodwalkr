@@ -1,4 +1,4 @@
 sudo apt-get install python-virtualenv python-dev
 virtualenv ve
 ve/bin/pip install -r requirements.txt
-./ve/bin/gunicorn routing:app.wsgi_app
+./ve/bin/gunicorn -w 4 routing:app.wsgi_app
