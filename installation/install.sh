@@ -120,3 +120,6 @@ sudo ln -s ./supervisord.conf /etc/supervisor/conf.d/moodwalkr.conf
 popd
 sudo supervisorctl -c /etc/supervisor/supervisord.conf status
 
+sudo service supervisor stop
+sudo service supervisor start
+
