@@ -637,7 +637,7 @@ function chooseRoute(profile) {
 }
 
 function setStart() {
-     $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&viewbox=1.18,43.77,1.64,43.5&bounded=1&q=" + document.getElementById('startField').value, function(data) {
+     $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&viewbox=1.18,43.77,1.64,43.5&bounded=1&viewbox=1.18,43.77,1.64,43.5&bounded=1&q=" + document.getElementById('startField').value, function(data) {
         $.each(data, function(key, val) {
             document.getElementById("destinationAddress").style.display = "block";
             setMarker("start",new L.LatLng(val.lat, val.lon));
@@ -647,7 +647,7 @@ function setStart() {
 }
 
 function setStartCircular() {
-    $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&viewbox=1.18,43.77,1.64,43.5&bounded=1&q=" + document.getElementById('startFieldCircular').value, function(data) {
+    $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&viewbox=1.18,43.77,1.64,43.5&bounded=1&viewbox=1.18,43.77,1.64,43.5&bounded=1&q=" + document.getElementById('startFieldCircular').value, function(data) {
         $.each(data, function(key, val) {
             document.getElementById("circularLengthPrompt").style.display = "block";
             document.getElementById("costTypeCircular").style.display = "block";
@@ -658,7 +658,7 @@ function setStartCircular() {
 }
 
 function setDestination() {
-    $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&viewbox=1.18,43.77,1.64,43.5&bounded=1&q=" + document.getElementById('destinationField').value, function(data) {
+    $.getJSON("http://nominatim.openstreetmap.org/search?format=json&limit=1&viewbox=1.18,43.77,1.64,43.5&bounded=1&viewbox=1.18,43.77,1.64,43.5&bounded=1&q=" + document.getElementById('destinationField').value, function(data) {
         $.each(data, function(key, val) {
             setMarker("stop",new L.LatLng(val.lat, val.lon));
 	        computeAllRoutes();

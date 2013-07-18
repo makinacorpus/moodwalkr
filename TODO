@@ -34,8 +34,6 @@ OK: marqueurs début et arrivée différents
 * reconstruire carte bruit/trafic avec données OSM
 OK: formats : temps en h/min, espace entre les milliers de mètres
 OK: aide (info-bulles) formulaire
-* griser zone non routable (à générer dynamiquement en fonction de la zone choisie ?
-* restreindre zone recherche nominatim
 OK: spin en attendant le chargement
 OK: nom produit
 * fiche produit
@@ -50,5 +48,9 @@ OK: Design du site
 OK: Popin mail
 OK: Popin info
 * Test charge
-* Analytics
+OK: Analytics
 OK: Serveur Python
+* griser zone non routable (à générer dynamiquement en fonction de la zone choisie ?
+* restreindre zone recherche nominatim
+* tooltips
+* zoom sur itineraire
