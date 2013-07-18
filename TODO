@@ -50,7 +50,7 @@ OK: Popin info
 * Test charge
 OK: Analytics
 OK: Serveur Python
-* griser zone non routable (à générer dynamiquement en fonction de la zone choisie ?
-* restreindre zone recherche nominatim
+OK: griser zone non routable (à générer dynamiquement en fonction de la zone choisie ?
+OK: restreindre zone recherche nominatim
 * tooltips
 * zoom sur itineraire

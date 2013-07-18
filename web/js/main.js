@@ -7,7 +7,7 @@ var circularTime=1;
 // Set a default value
 var circularProfile="length";
 
-map = new L.Map('map', {zoomControl:false});
+var map = new L.Map('map', {zoomControl:false});
 // create the tile layer with correct attribution
 var osmUrl='http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png';
 var osmAttrib='Carte <a href="http://www.mapquest.com/" target="_blank">MapQuest</a> <img src="http://developer.mapquest.com/content/osm/mq_logo.png"> Données <a href="http://www.openstreetmap.org/copyright">© Contributeurs OpenStreetMap</a>';
