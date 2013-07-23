@@ -336,6 +336,7 @@ a.button {
     background-image: url("/img/sprite_icons_buttons.png");
     background-repeat: no-repeat;
     background-position: right top;
+    cursor: pointer;
 }
 
 #btnStartAddressCircular{
@@ -348,6 +349,7 @@ a.button {
     background-image: url("/img/sprite_icons_buttons.png");
     background-repeat: no-repeat;
     background-position: right top;
+    cursor: pointer;
 }
 
 #btnDestinationAddress{
@@ -360,6 +362,7 @@ a.button {
     background-image: url("/img/sprite_icons_buttons.png");
     background-repeat: no-repeat;
     background-position: right top;
+    cursor: pointer;
 }
  
 .icon-loop { background-position: 50% top; }
@@ -397,29 +400,37 @@ ul.iconsCt {
  
 #btnLength {
     background-color: #f70952;
+    cursor: pointer;
 }
 #btnActivity {
     background-color: #f3891e;
+    cursor: pointer;
 }
 #btnNature {
     background-color: #0bd05a;
+    cursor: pointer;
 }
 #btnCulture {
     background-color: #7516ea;
+    cursor: pointer;
     margin-right: -10px;
 }
  
 #btnLengthC {
     background-color: #f70952;
+    cursor: pointer;
 }
 #btnActivityC {
     background-color: #f3891e;
+    cursor: pointer;
 }
 #btnNatureC {
     background-color: #0bd05a;
+    cursor: pointer;
 }
 #btnCultureC {
     background-color: #7516ea;
+    cursor: pointer;
     margin-right: -10px;
 }
 
