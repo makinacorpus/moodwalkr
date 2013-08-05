@@ -52,12 +52,12 @@ OK: Analytics
 OK: Serveur Python
 OK: griser zone non routable (à générer dynamiquement en fonction de la zone choisie ?
 OK: restreindre zone recherche nominatim
-* tooltips
+OK: tooltips
 * zoom sur itineraire
-* curseurs main sur search et boutons de choix profil
+OK: curseurs main sur search et boutons de choix profil
 * arreter spinner si pas de resultat (30 secondes ?)
 * fancybox à passer en inline
 * pouvoir passer par certains points
 * geolocalisation depart/arrivee
 * version mobile
-* form contact : pb avec caracteres speciaux
+OK: form contact : pb avec caracteres speciaux

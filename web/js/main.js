@@ -705,22 +705,22 @@ var t_routeLengthBlock = '<div id="routeLengthBlock" data-step="6" data-position
 
 var t_costType = '<ul class="iconsCt" id="iconsCTBlock" data-step="5" data-position="right" data-intro="{{tour_step5}}">'
                + '  <li id="btnLength">'
-               + '      <a>'
+               + '      <a rel="tooltip" data-toggle="tooltip" title="{{length}}">'
                + '          <i class="icon-shortest"></i>'
                + '      </a>'
                + '  </li>'
                + '  <li id="btnActivity">'
-               + '      <a>'
+               + '      <a rel="tooltip" data-toggle="tooltip" title="{{cost_activity}}">'
                + '          <i class="icon-activity"></i>'
                + '      </a>'
                + '  </li>'
                + '  <li id="btnNature">'
-               + '      <a>'
+               + '      <a rel="tooltip" data-toggle="tooltip" title="{{cost_nature}}">'
                + '          <i class="icon-nature"></i>'
                + '      </a>'
                + '  </li>'
                + '  <li id="btnCulture">'
-               + '      <a>'
+               + '      <a rel="tooltip" data-toggle="tooltip" title="{{cost_culture}}">'
                + '          <i class="icon-culture"></i>'
                + '      </a>'
                + '  </li>'
@@ -729,22 +729,22 @@ var t_costType = '<ul class="iconsCt" id="iconsCTBlock" data-step="5" data-posit
 
 var t_costTypeCircular = '<ul class="iconsCt" id="iconsCTCircularBlock" data-step="9" data-position="right" data-intro="{{tour_step9}}">'
                        + '  <li id="btnLengthC">'
-                       + '      <a>'
+                       + '      <a rel="tooltip" data-toggle="tooltip" title="{{length}}">'
                        + '          <i class="icon-shortest"></i>'
                        + '      </a>'
                        + '  </li>'
                        + '  <li id="btnActivityC">'
-                       + '      <a>'
+                       + '      <a rel="tooltip" data-toggle="tooltip" title="{{cost_activity}}">'
                        + '          <i class="icon-activity"></i>'
                        + '      </a>'
                        + '  </li>'
                        + '  <li id="btnNatureC">'
-                       + '      <a>'
+                       + '      <a rel="tooltip" data-toggle="tooltip" title="{{cost_nature}}">'
                        + '          <i class="icon-nature"></i>'
                        + '      </a>'
                        + '  </li>'
                        + '  <li id="btnCultureC">'
-                       + '      <a>'
+                       + '      <a rel="tooltip" data-toggle="tooltip" title="{{cost_culture}}">'
                        + '          <i class="icon-culture"></i>'
                        + '      </a>'
                        + '  </li>'
@@ -786,7 +786,7 @@ $('#circularLengthPrompt').html( o_circularLengthPrompt );
 
 
 // Jquery selectors
-//$("[rel='tooltip']").tooltip();
+$("[rel='tooltip']").tooltip({placement:'bottom'});
 //$("[rel='popover']").popover({placement:'bottom',html:true});
 
 // Call Nominatim to set the start or end points when using the search bar
