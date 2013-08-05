@@ -52,7 +52,7 @@ def routecircular():
 @app.route('/sendemail', methods=['GET', 'POST'])
 def contact():
     sender_email = request.form['email']
-    sender_message = request.form['message']
+    sender_message = request.form['message'].encode("utf-8")
     server = smtplib.SMTP('smtp.gmail.com:587')  
     server.starttls()  
     server.login(email_login,email_password)  

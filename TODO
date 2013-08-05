@@ -60,3 +60,4 @@ OK: restreindre zone recherche nominatim
 * pouvoir passer par certains points
 * geolocalisation depart/arrivee
 * version mobile
+* form contact : pb avec caracteres speciaux
