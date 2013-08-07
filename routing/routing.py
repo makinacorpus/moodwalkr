@@ -56,7 +56,7 @@ def contact():
     server = smtplib.SMTP('smtp.gmail.com:587')  
     server.starttls()  
     server.login(email_login,email_password)  
-    server.sendmail(sender_email, email_adress, sender_message)  
+    server.sendmail(sender_email, email_adress, 'Message from ' + sender_email + ' ' + sender_message)  
     server.quit()
     return '<script>parent.$.fancybox.close()</script>'
 
