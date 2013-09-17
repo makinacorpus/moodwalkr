@@ -122,11 +122,9 @@ html, body {
 }
 
 #logo-img {
-    position: relative;
-    top: 50%;
-    left: 50%;
-    margin-left: -102px;
-    margin-top: -19px;
+    text-align: center;
+    padding-top: 10px;
+    color: white;
 }
 
 #introText {

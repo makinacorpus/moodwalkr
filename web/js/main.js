@@ -672,7 +672,7 @@ var target = document.getElementById('map');
 // Contents
 
 var t_introText = '<div id="logo" data-step="1" data-position="right" data-intro="{{tour_step1}}">'
-                + '    <img id="logo-img" src="/img/logo-moodwalkr.png">'
+                + '    <div id="logo-img"><img src="/img/logo-moodwalkr.png"> Beta</div>'
                 + '</div>'
                 + '<div id="introText" data-step="11" data-position="right" data-intro="{{tour_step11}}">'
                 + '    <span style="font-size:16px;vertical-align:middle;">{{introduction}}</font>'
