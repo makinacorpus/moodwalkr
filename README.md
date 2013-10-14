@@ -35,6 +35,6 @@ chmod +x update.py
 
 Arguments of update.py are:
 ```
--c  			-- Update the cost grid (mandatory the first time)
+-c  	-- Update the cost grid (mandatory the first time)
 -e 		-- use a local OSM extract instead of downloading it (path in preprocessing/routinggraph/config.py)
 ```
