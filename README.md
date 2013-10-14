@@ -1,5 +1,7 @@
-moodwalkr
+Moodwalkr
 =========
+
+A pedestrian routing application using OpenStreetMap data
 
 ## Installation
 
