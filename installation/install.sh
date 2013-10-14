@@ -52,6 +52,12 @@ if test ! -d cmake-2.8.10.2; then
     popd
 fi
 
+# Install libgeos-3.3.3
+if ! (dpkg -l | grep "osm2pgsql *0.80.0+r27899-4"); then
+    wget http://apt.postgresql.org/pub/repos/apt/pool/main/g/geos/libgeos-3.3.3_3.3.3-1.1~pgdg12.4+1_amd64.deb
+    sudo dpkg -i libgeos-3.3.3_3.3.3-1.1~pgdg12.4+1_amd64.deb
+fi
+
 # Get a recent version of osm2pgsql and install it
 if ! (dpkg -l | grep "osm2pgsql *0.80.0+r27899-4"); then
     wget http://archive.ubuntu.com/ubuntu/pool/universe/o/osm2pgsql/osm2pgsql_0.80.0+r27899-4_amd64.deb
