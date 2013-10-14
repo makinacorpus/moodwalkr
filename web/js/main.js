@@ -263,6 +263,7 @@ function computeAllRoutes() {
         computeRoute("cost_nature",markersList.start.marker.getLatLng().lat,markersList.start.marker.getLatLng().lng,markersList.stop.marker.getLatLng().lat,markersList.stop.marker.getLatLng().lng);
         computeRoute("cost_culture",markersList.start.marker.getLatLng().lat,markersList.start.marker.getLatLng().lng,markersList.stop.marker.getLatLng().lat,markersList.stop.marker.getLatLng().lng);
         document.getElementById("costType").style.display = "block";
+        map.fitBounds(routeLayers["length"].getBounds().extend(routeLayers["cost_activity"].getBounds()).extend(routeLayers["cost_nature"].getBounds()).extend(routeLayers["cost_culture"].getBounds()));
         if (! firstRouteInfo) {
             document.getElementById("routeLength").style.display = "none";
             firstRouteInfo = true;
