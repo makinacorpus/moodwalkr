@@ -62,7 +62,11 @@ fi
 if test ! -d osm2pgrouting; then
     git clone git://github.com/pgRouting/osm2pgrouting.git
     pushd osm2pgrouting
+    cmake -H. -Bbuild
+    pushd build
     make
+    sudo make install
+    popd
     popd
 fi
 
