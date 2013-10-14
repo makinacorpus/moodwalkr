@@ -76,9 +76,9 @@ cur.execute("DROP TABLE IF EXISTS ways_openspace")
 
 print "***** osm2pgrouting"
 if use_extract:
-	command = "%s/installation/osm2pgrouting/osm2pgrouting -file %s -conf %s/preprocessing/osm2pgrouting/mapconfig.xml -host localhost -dbname %s -user %s -passwd %s -clean" % (base_path, osm_extract, base_path, db_name, db_user, db_pass)
+	command = "%s/installation/osm2pgrouting/build/osm2pgrouting -file %s -conf %s/preprocessing/osm2pgrouting/mapconfig.xml -host localhost -dbname %s -user %s -passwd %s -clean" % (base_path, osm_extract, base_path, db_name, db_user, db_pass)
 else:
-	command = "%s/installation/osm2pgrouting/osm2pgrouting -file %s -conf %s/preprocessing/osm2pgrouting/mapconfig.xml -host localhost -dbname %s -user %s -passwd %s -clean" % (base_path, f.name, base_path, db_name, db_user, db_pass)
+	command = "%s/installation/osm2pgrouting/build/osm2pgrouting -file %s -conf %s/preprocessing/osm2pgrouting/mapconfig.xml -host localhost -dbname %s -user %s -passwd %s -clean" % (base_path, f.name, base_path, db_name, db_user, db_pass)
 print command
 os.system(command)
 
