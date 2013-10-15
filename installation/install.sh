@@ -30,6 +30,7 @@ sudo apt-get -y install \
     libboost-dev \
     python-pip \
     libexpat1-dev \
+    osmosis \
     nginx \
     supervisor
 
@@ -53,7 +54,7 @@ if test ! -d cmake-2.8.10.2; then
 fi
 
 # Install libgeos-3.3.3
-if ! (dpkg -l | grep "osm2pgsql *0.80.0+r27899-4"); then
+if ! (dpkg -l | grep "libgeos-3.3.3"); then
     wget http://apt.postgresql.org/pub/repos/apt/pool/main/g/geos/libgeos-3.3.3_3.3.3-1.1~pgdg12.4+1_amd64.deb
     sudo dpkg -i libgeos-3.3.3_3.3.3-1.1~pgdg12.4+1_amd64.deb
 fi
