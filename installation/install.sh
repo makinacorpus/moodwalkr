@@ -31,6 +31,13 @@ sudo apt-get -y install \
     python-pip \
     libexpat1-dev \
     osmosis \
+    libxml2-dev \
+    libgeos++-dev \
+    libpq-dev \
+    libbz2-dev \
+    proj \
+    libtool \
+    automake \
     nginx \
     supervisor
 
@@ -60,9 +67,13 @@ if ! (dpkg -l | grep "libgeos-3.3.3"); then
 fi
 
 # Get a recent version of osm2pgsql and install it
-if ! (dpkg -l | grep "osm2pgsql *0.80.0+r27899-4"); then
-    wget http://archive.ubuntu.com/ubuntu/pool/universe/o/osm2pgsql/osm2pgsql_0.80.0+r27899-4_amd64.deb
-    sudo dpkg -i osm2pgsql_0.80.0+r27899-4_amd64.deb
+if test ! -d osm2pgsql; then
+    git clone https://github.com/openstreetmap/osm2pgsql.git
+    pushd osm2pgsql
+    ./autogen.sh
+    ./configure
+    make
+    popd
 fi
 
 # Install osm2pgrouting

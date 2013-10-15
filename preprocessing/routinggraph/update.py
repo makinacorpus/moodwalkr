@@ -23,7 +23,7 @@ cur.execute("DROP TABLE IF EXISTS lines_from_polygon")
 # Download data or use a local file defined in config.py
 print "***** osm2pgsql"
 if use_extract:
-	command = "osm2pgsql -s -W -H localhost -U %s -d %s -S %s/preprocessing/osm2pgsql/default.style %s" % (db_user, db_name, base_path, osm_extract)
+	command = "%s/installation/osm2pgsql/osm2pgsql -s -W -H localhost -U %s -d %s -S %s/preprocessing/osm2pgsql/default.style %s" % (base_path, db_user, db_name, base_path, osm_extract)
 else:
 	print "***** download OSM data"
 	r = requests.get("http://www.overpass-api.de/api/xapi?map?bbox=%s,%s,%s,%s" % (lon_inf, lat_inf,lon_sup, lat_sup), stream=True)
@@ -31,7 +31,7 @@ else:
 	for data in r.iter_content(chunk_size=1024):
 	    f.write(data)
 	f.flush()	
-	command = "osm2pgsql -s -W -H localhost -U %s -d %s -S %s/preprocessing/osm2pgsql/default.style %s" % (db_user, db_name, base_path, f.name)
+	command = "%s/installation/osm2pgsql/osm2pgsql -s -W -H localhost -U %s -d %s -S %s/preprocessing/osm2pgsql/default.style %s" % (base_path, db_user, db_name, base_path, f.name)
 print command
 os.system(command)
 
