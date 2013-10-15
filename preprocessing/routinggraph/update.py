@@ -31,7 +31,7 @@ else:
 	for data in r.iter_content(chunk_size=1024):
 	    f.write(data)
 	f.flush()	
-	command = "osmosis --read-xml %s --write-xml - | osm2pgsql -s -W -H localhost -U %s -d %s -S %s/preprocessing/osm2pgsql/default.style -" % (f.name, db_user, db_name, base_path)
+	command = "osm2pgsql -s -W -H localhost -U %s -d %s -S %s/preprocessing/osm2pgsql/default.style %s" % (db_user, db_name, base_path, f.name)
 print command
 os.system(command)
 
