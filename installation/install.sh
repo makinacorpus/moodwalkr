@@ -138,7 +138,9 @@ virtualenv ve
 ve/bin/pip install -r requirements.txt
 # Configure supervisor
 sed -i "s|@@@ROOT_PATH@@@|$path|g" ./supervisord.conf
-sudo ln -s ./supervisord.conf /etc/supervisor/conf.d/moodwalkr.conf
+pushd /etc/supervisor/conf.d
+sudo ln -s $path/moodwalkr/routing/supervisord.conf ./moodwalkr.conf
+popd
 popd
 sudo supervisorctl -c /etc/supervisor/supervisord.conf status
 
