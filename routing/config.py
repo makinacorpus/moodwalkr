@@ -5,6 +5,6 @@ db_user="routing"
 db_pass="KadufZyn8Dr"
 
 # E-mail
-email_login="moodwalkr"
-email_password="9shh1j9k"
-email_adress="moodwalkr@gmail.com"
+email_login="login"
+email_password="password"
+email_adress="login@email.com"
